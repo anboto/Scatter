@@ -5,11 +5,11 @@
 
 namespace Upp {
 	
-#define  LAYOUTFILE <ScatterCtrl/ScatterCtrl.lay>
+#define  LAYOUTFILE <Scatter/ScatterCtrl/ScatterCtrl.lay>
 #include <CtrlCore/lay.h>
 
 #define IMAGECLASS ScatterImgP
-#define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
+#define IMAGEFILE <Scatter/ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml_header.h>
 
 	

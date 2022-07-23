@@ -6,7 +6,7 @@
 #include <PdfDraw/PdfDraw.h>
 
 #define IMAGECLASS MyImages
-#define IMAGEFILE <examples/ScatterCtrl_demo/ScatterCtrl_Demo.iml>
+#define IMAGEFILE <Scatter/examples/ScatterCtrl_demo/ScatterCtrl_Demo.iml>
 #include <Draw/iml_source.h>
 
 

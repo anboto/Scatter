@@ -2,9 +2,9 @@ description "Scatter series without GUI\377";
 
 uses
 	Core,
-	ScatterDraw,
 	plugin\png,
-	PdfDraw;
+	PdfDraw,
+	Scatter/ScatterDraw;
 
 file
 	ScatterDraw_Demo.cpp;

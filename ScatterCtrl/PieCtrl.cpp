@@ -3,7 +3,7 @@
 #include "PieCtrl.h"
 
 #define IMAGECLASS PieImg
-#define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
+#define IMAGEFILE <Scatter/ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml.h>
 
 namespace Upp {

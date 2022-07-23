@@ -4,7 +4,7 @@
 #define _ScatterDraw_PieCtrl_h
 
 #include <CtrlLib/CtrlLib.h>
-#include <ScatterDraw/PieDraw.h>
+#include <Scatter/ScatterDraw/PieDraw.h>
 #include <plugin/jpg/jpg.h>
 
 namespace Upp {

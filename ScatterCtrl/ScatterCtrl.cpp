@@ -4,10 +4,10 @@
 
 	
 #define IMAGECLASS ScatterImg
-#define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
+#define IMAGEFILE <Scatter/ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml.h>
 
-#define TFILE <ScatterCtrl/ScatterCtrl.t>
+#define TFILE <Scatter/ScatterCtrl/ScatterCtrl.t>
 #include <Core/t.h>
 
 namespace Upp {	

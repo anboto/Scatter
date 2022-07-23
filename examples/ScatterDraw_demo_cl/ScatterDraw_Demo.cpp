@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2021 - 2022, the Anboto author and contributors
-#include <ScatterDraw/ScatterDraw.h>
+#include <Scatter/ScatterDraw/ScatterDraw.h>
 
 using namespace Upp;
 
