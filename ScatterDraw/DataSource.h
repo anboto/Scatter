@@ -3,7 +3,7 @@
 #ifndef _ScatterDraw_DataSource_h_
 #define _ScatterDraw_DataSource_h_
 
-#include <Eigen/Eigen/Eigen.h>
+#include <Eigen/Eigen.h>
 #include <numeric>
 
 namespace Upp {

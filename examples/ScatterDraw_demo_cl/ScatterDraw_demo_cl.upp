@@ -4,7 +4,7 @@ uses
 	Core,
 	plugin\png,
 	PdfDraw,
-	Scatter/ScatterDraw;
+	ScatterDraw;
 
 file
 	ScatterDraw_Demo.cpp;

@@ -5,7 +5,7 @@
 namespace Upp {
 
 #define IMAGECLASS ScatterImgP
-#define IMAGEFILE <Scatter/ScatterCtrl/ScatterCtrl.iml>
+#define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml_source.h>
 
 

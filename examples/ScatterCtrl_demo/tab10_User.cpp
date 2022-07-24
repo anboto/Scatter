@@ -3,7 +3,7 @@
 #include "ScatterCtrl_Demo.h"
 
 #define IMAGECLASS Symbol
-#define IMAGEFILE <Scatter/examples/ScatterCtrl_demo/symbol.iml>
+#define IMAGEFILE <examples/ScatterCtrl_demo/symbol.iml>
 #include <Draw/iml.h>
 
 class MyPlot : public SeriesPlot {

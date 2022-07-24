@@ -5,7 +5,7 @@ uses
 	plugin\jpg,
 	GridCtrl,
 	PdfDraw,
-	Scatter/ScatterDraw;
+	ScatterDraw;
 
 file
 	ScatterCtrl.cpp,

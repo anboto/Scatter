@@ -3,7 +3,7 @@
 #ifndef _ScatterDraw_Equation_h_
 #define _ScatterDraw_Equation_h_
 
-#include <Eigen/Eigen/Eigen.h>
+#include <Eigen/Eigen.h>
 
 namespace Upp {
 

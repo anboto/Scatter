@@ -4,7 +4,7 @@ uses
 	CtrlLib,
 	Report,
 	PdfDraw,
-	Scatter/ScatterCtrl;
+	ScatterCtrl;
 
 file
 	main.cpp,

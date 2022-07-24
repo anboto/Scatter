@@ -3,16 +3,16 @@
 #ifndef _ScatterCtrl_Demo_ScatterCtrl_Demo_h
 #define _ScatterCtrl_Demo_ScatterCtrl_Demo_h
 
-#include <Scatter/ScatterCtrl/ScatterCtrl.h>
-#include <Scatter/ScatterCtrl/PieCtrl.h>
+#include <ScatterCtrl/ScatterCtrl.h>
+#include <ScatterCtrl/PieCtrl.h>
 
 using namespace Upp;
 
-#define LAYOUTFILE <Scatter/examples/ScatterCtrl_demo/ScatterCtrl_Demo.lay>
+#define LAYOUTFILE <examples/ScatterCtrl_demo/ScatterCtrl_Demo.lay>
 #include <CtrlCore/lay.h>
 
 #define IMAGECLASS MyImages
-#define IMAGEFILE <Scatter/examples/ScatterCtrl_demo/ScatterCtrl_Demo.iml>
+#define IMAGEFILE <examples/ScatterCtrl_demo/ScatterCtrl_Demo.iml>
 #include <Draw/iml_header.h>
 
 

@@ -3,12 +3,12 @@
 #ifndef _ScatterCtrl_ScatterCtrl_h
 #define _ScatterCtrl_ScatterCtrl_h
 
-#include <Scatter/ScatterDraw/ScatterDraw.h>
+#include <ScatterDraw/ScatterDraw.h>
 #include <plugin/jpg/jpg.h>
 #include <PdfDraw/PdfDraw.h>
 #include <GridCtrl/GridCtrl.h>
-#include <Eigen/Eigen/Eigen.h>
-#include <Scatter/ScatterDraw/Histogram.h>
+#include <Eigen/Eigen.h>
+#include <ScatterDraw/Histogram.h>
 
 #include "PopUpText.h"
 
