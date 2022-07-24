@@ -10,7 +10,7 @@
 #include "DrawingFunctions.h"
 #include "SeriesPlot.h"
 #include "MarkPlot.h"
-#include <Functions4U/Functions4U.h>
+#include <Functions4U/Functions4U/Functions4U.h>
 
 namespace Upp {
 

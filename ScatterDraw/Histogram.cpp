@@ -2,7 +2,7 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include <Core/Core.h>
 #include <Scatter/ScatterDraw/ScatterDraw.h>
-#include <Eigen/Eigen.h>
+#include <Eigen/Eigen/Eigen.h>
 #include <Scatter/ScatterDraw/Histogram.h>
 
 namespace Upp {
