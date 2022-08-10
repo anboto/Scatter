@@ -1725,7 +1725,177 @@ void Resample(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<
 	rry = pick(ry);
 	rrz = pick(rz);
 }		
-			  
+	
+template <typename T>	
+void GapFillingAxisParams(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, int maxData, 
+	UVector<int> &idsx, UVector<int> &w0x, Eigen::Matrix<T, Eigen::Dynamic, 1> &rrx) {
+		
+	auto MinD = [](const Eigen::Matrix<T, Eigen::Dynamic, 1> &x)->double {
+		double mindx = std::numeric_limits<double>::max();
+		for (int i = 1; i < x.size(); ++i) {
+			if (x[i] - x[i-1] < mindx)
+				mindx = x[i] - x[i-1];
+		}	
+		return mindx;
+	};
+	double mindx = MinD(x);
+
+	auto GetNeww0 = [](UVector<double> &w, UVector<int> &ids, UVector<int> &w0, const Eigen::Matrix<T, Eigen::Dynamic, 1> &qw, double dw) {
+		w.Clear();
+		ids.Clear();
+		w0.Clear();
+		
+		w << qw[0];
+		ids << 0;
+		w0 << 0;
+		for (int i = 1; i < qw.size(); ++i) {
+			if ((qw[i] - qw[i-1])/dw >= 1.5) {
+				int n = int((qw[i] - qw[i-1])/dw) - 1;
+				for (int j = 0; j < n; ++j) {
+					w << qw[i-1] + dw*(j+1);
+					ids << -1;
+					w0 << i-1;
+				}
+			}
+			w << qw[i];
+			ids << i;
+			w0 << i;
+		}
+	};
+	UVector<double> newx;
+	GetNeww0(newx, idsx, w0x, x, mindx);
+	if (newx.size() > maxData) {
+		int extra0 = newx.size() - int(x.size());
+		int extra  = maxData - int(x.size());
+		mindx *= double(extra0)/extra;
+		GetNeww0(newx, idsx, w0x, x, mindx);	
+	}
+	Copy(newx, rrx);
+}
+
+
+template <typename T, typename T2>			  
+void GapFilling(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, 
+			    const Eigen::Matrix<T2, Eigen::Dynamic, 1> &z, 
+	Eigen::Matrix<T, Eigen::Dynamic, 1> &rrx,  
+	Eigen::Matrix<T2, Eigen::Dynamic, 1> &rrz, bool zero, int maxData) {
+	
+	UVector<int> idsx, w0x;	
+	GapFilling(x, z, idsx, w0x, rrx, rrz, zero, maxData);
+}
+		
+template <typename T, typename T2>			  
+void GapFilling(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, 
+			    const Eigen::Matrix<T2, Eigen::Dynamic, 1> &z, 
+			    UVector<int> &idsx, UVector<int> &w0x,
+	Eigen::Matrix<T, Eigen::Dynamic, 1> &rrx,  
+	Eigen::Matrix<T2, Eigen::Dynamic, 1> &rrz, bool zero, int maxData) {
+
+	ASSERT(x.size() == z.size()); 
+
+	if (x.size() == 0 || z.size() == 0)
+		return;
+	if (x.size() == 1 || z.size() == 0) {
+		rrx = clone(x);
+		rrz = clone(z);
+		return;
+	}
+		
+	if (idsx.size() == 0 && w0x.size() == 0)
+		GapFillingAxisParams(x, maxData, idsx, w0x, rrx);
+	
+	int numx = int(rrx.size());
+	
+	if (zero) {
+		rrz = Eigen::Matrix<T2, Eigen::Dynamic, 1>::Zero(numx);
+		for (int c = 0; c < numx; ++c)
+			if (idsx[c] >= 0)
+				rrz(c) = z(idsx[c]);
+	} else {
+		rrz.resize(numx);
+		for (int c = 0; c < numx; ++c) {
+			if (idsx[c] >= 0) 
+				rrz(c) = z(idsx[c]);
+			else {
+				int w0c_1 = min(int(x.size())-1, w0x[c]+1);
+				double x1 = x[w0x[c]];
+				double x2 = x[w0c_1];
+				auto z1 = z(w0x[c]);
+				auto z2 = z(w0c_1);
+				rrz(c) = LinearInterpolate(rrx[c], x1, x2, z1, z2);
+			} 
+		}
+	}	
+}
+
+template <typename T, typename T2>			  
+void GapFilling(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<T, Eigen::Dynamic, 1> &y, 
+			    const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> &z, 
+	Eigen::Matrix<T, Eigen::Dynamic, 1> &rrx, Eigen::Matrix<T, Eigen::Dynamic, 1> &rry, 
+	Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> &rrz, bool zero, int maxData) {
+
+	UVector<int> idsx, idsy, w0x, w0y;
+	GapFilling(x, y, z, idsx, w0x, idsy, w0y, rrx, rry, rrz, zero, maxData);
+}
+	
+template <typename T, typename T2>			  
+void GapFilling(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<T, Eigen::Dynamic, 1> &y, 
+			    const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> &z, 
+			    UVector<int> &idsx, UVector<int> &w0x, 
+			    UVector<int> &idsy, UVector<int> &w0y,
+	Eigen::Matrix<T, Eigen::Dynamic, 1> &rrx, Eigen::Matrix<T, Eigen::Dynamic, 1> &rry, 
+	Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> &rrz, bool zero, int maxData) {
+
+	ASSERT(x.size() == z.cols() && y.size() == z.rows()); 
+
+	if (x.size() == 0 || y.size() == 0 || z.size() == 0)
+		return;
+	if (x.size() == 1 || y.size() == 1 || z.size() == 0) {
+		rrx = clone(x);
+		rry = clone(y);
+		rrz = clone(z);
+		return;
+	}
+		
+	if (idsx.size() == 0 && w0x.size() == 0)
+		GapFillingAxisParams(x, maxData, idsx, w0x, rrx);
+	if (idsy.size() == 0 && w0y.size() == 0)
+		GapFillingAxisParams(y, maxData, idsy, w0y, rry);
+	
+	int numx = int(rrx.size());
+	int numy = int(rry.size());
+	
+	if (zero) {
+		rrz = Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>::Zero(numy, numx);
+		for (int r = 0; r < numy; ++r)		
+			for (int c = 0; c < numx; ++c)
+				if (idsx[c] >= 0 && idsy[r] >= 0)
+					rrz(r, c) = z(idsy[r], idsx[c]);
+	} else {
+		rrz.resize(numy, numx);
+		for (int r = 0; r < numy; ++r) {		
+			for (int c = 0; c < numx; ++c) {
+				if (idsx[c] >= 0 && idsy[r] >= 0) 
+					rrz(r, c) = z(idsy[r], idsx[c]);
+				else {
+					int w0c_1 = min(int(x.size())-1, w0x[c]+1);
+					int w0r_1 = min(int(y.size())-1, w0y[r]+1);
+					double x1 = x[w0x[c]];
+					double x2 = x[w0c_1];
+					double y1 = y[w0y[r]];
+					double y2 = y[w0r_1];
+					auto z11 = z(w0y[r], w0x[c]);
+					auto z12 = z(w0r_1,  w0x[c]);
+					auto z21 = z(w0y[r], w0c_1);
+					auto z22 = z(w0r_1,  w0c_1);
+					rrz(r, c) = BilinearInterpolate(rrx[c], rry[r], x1, x2, y1, y2, z11, z12, z21, z22);
+				} 
+			}
+		}
+	}	
+}
+
+		  
 Vector<Pointf> FFT(const Eigen::VectorXd &data, double tSample, bool frequency, int type = FFT_TYPE::T_FFT, 
 						 int window = FFT_WINDOW::NO_WINDOW, int numOver = 0);
 void FilterFFT(Eigen::VectorXd &data, double T, double fromT, double toT);
