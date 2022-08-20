@@ -18,10 +18,14 @@ struct Equation_functor : NonLinearOptimizationFunctor<double> {
 		for (int i = 0; i < unknowns; ++i)
 			(*fSource).SetCoeffVal(i, b(i));
 		for(int64 i = 0; i < datasetLen; i++) {
-			double residual = (*fSource).f((*series).x(i)) - (*series).y(i);
-			if (weight)
-				residual *= (*weight)[i];
-			fvec(ptrdiff_t(i)) = residual;
+			double x = (*series).x(i),
+				   y = (*series).y(i);
+			if (!IsNull(x) && !IsNull(y)) {
+				double residual = (*fSource).f(x) - y;
+				if (weight)
+					residual *= (*weight)[i];
+				fvec(ptrdiff_t(i)) = residual;
+			}
 		}
 		return 0;
 	}

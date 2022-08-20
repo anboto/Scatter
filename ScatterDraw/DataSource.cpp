@@ -665,10 +665,13 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 	
 	Vector<double> raw, data;
 	
-	Copy(getdata, raw);
-	for (int i = 0; i < raw.size(); ++i)
-		if (Between(raw[i], mn, mx))
-			data << raw[i];
+	if (!IsNull(mn)) {
+		Copy(getdata, raw);
+		for (int i = 0; i < raw.size(); ++i)
+			if (Between(raw[i], mn, mx))
+				data << raw[i];
+	} else
+		Copy(getdata, data);
 	
 	Sort(data);
 	

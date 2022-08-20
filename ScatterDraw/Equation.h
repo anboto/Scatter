@@ -209,13 +209,13 @@ public:
 
 class DampedSinEquation : public ExplicitEquation {
 public:
-	DampedSinEquation() 					{coeff.Clear();	coeff << 0. << 0.1 << 0.1 << 0.1 << 0.; numcoeff = 5;}
+	DampedSinEquation() 					{coeff.Clear();	coeff << 0. << 0.1 << 1 << 0.1 << 0.; numcoeff = 5;}
 	DampedSinEquation(double offset, double A, double lambda, double w, double phi) {Init(offset, A, lambda, w, phi);}
 	void Init(double offset, double A, double lambda, double w, double phi) 	{coeff.Clear();	coeff << offset << A << lambda << w << phi; numcoeff = 5;}
 	double f(double x)				{
 		double ex = -coeff[2]*x;
-		if (ex < 0)
-			return 0;
+		//if (ex < 0)
+		//	return 0;
 		return coeff[0] + coeff[1]*exp(ex)*cos(coeff[3]*x + coeff[4]);
 	}
 	virtual String GetName() 		{return t_("DampedSinusoidal");}
@@ -252,8 +252,8 @@ public:
 								numcoeff = 8;}
 	double f(double x) {
 		double ex = -coeff[5]*x;
-		if (ex < 0)
-			return 0;
+		//if (ex < 0)
+		//	return 0;
 		return coeff[0] + coeff[1]*cos(coeff[2]*x + coeff[3]) + coeff[4]*exp(ex)*cos(coeff[6]*x + coeff[7]);
 	}
 	virtual String GetName() 		{return t_("Sin_DampedSinusoidal");}
@@ -359,6 +359,8 @@ public:
 	double f(double x) 							{
 		if (x < 0)
 			return Null;
+		else if (x == 0)
+			return 0;
 		return coeff[0]*::pow(x, coeff[1]);
 	}
 	virtual String GetName() 					{return t_("RealExponent");}
@@ -575,7 +577,12 @@ class Rational1Equation : public ExplicitEquation {
 public:
 	Rational1Equation() 				{SetCoeff(1, 0, 0);}
 	Rational1Equation(double c0, double c1, double c2)	{SetCoeff(c0, c1, c2);}
-	double f(double x) 					{return coeff[0]/(x + coeff[1]) + coeff[2];}
+	double f(double x) {
+		double den = x + coeff[1];
+		if (den == 0)
+			return Null;
+		return coeff[0]/den + coeff[2];
+	}
 	virtual String GetName() 			{return t_("Rational_1");}
 	virtual String GetEquation(int nDig = 3) {
 		String ret = Format("%s/(x + %s) + %s", FormatCoeff(0, nDig), FormatCoeff(1, nDig), FormatCoeff(2, nDig));
