@@ -214,18 +214,17 @@ public:
 	void Init(double offset, double A, double lambda, double w, double phi) 	{coeff.Clear();	coeff << offset << A << lambda << w << phi; numcoeff = 5;}
 	double f(double x)				{
 		double ex = -coeff[2]*x;
-		//if (ex < 0)
-		//	return 0;
+		if (ex > 705)		// Too close to double limits
+			return 0;
 		return coeff[0] + coeff[1]*exp(ex)*cos(coeff[3]*x + coeff[4]);
 	}
 	virtual String GetName() 		{return t_("DampedSinusoidal");}
 	virtual String GetEquation(int _numDigits = 3) {
-		double zeta  = coeff[2]/coeff[3];
-		String szeta = IsNull(_numDigits) ? String("ζ") : FormatF(zeta, _numDigits);
+		String stheta = IsNull(_numDigits) ? String("ζ") : FormatF(GetDampingRatio(), _numDigits);
 
 		String ret = Format("%s + %s*e^(-%s*t)*cos(%s*t + %s) (ζ: %s)", FormatCoeff(0, _numDigits), 
 			FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), FormatCoeff(3, _numDigits), FormatCoeff(4, _numDigits),
-			szeta);
+			stheta);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}													
@@ -239,6 +238,8 @@ public:
 			coeff[4] = phase;
 		}
 	}
+	double GetPeriod() 			{return 2*M_PI/abs(coeff[3]);}
+	double GetDampingRatio()	{return coeff[3] != 0 ? -coeff[2]/coeff[3] : Null;}
 };
 
 class Sin_DampedSinEquation : public ExplicitEquation {
