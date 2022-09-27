@@ -1653,7 +1653,13 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 	auto ScaleY =
 	[h=plotH, y0=primaryY ? yMin : yMin2, r=primaryY ? yRange : yRange2]
 	(double y) { return h - fround(h*(y - y0)/r); };
-	if (data.IsParam()) {
+	if (data.IsReverse()) {
+		points = DataAddPoints(dynamic_cast<DataWrapper&>(data).Data(), primaryY, sequential);
+		Reverse(points);
+	} else if (data.IsAppend()) {
+		for (int i = 0; i < 2; i++)
+			points.Append(DataAddPoints(dynamic_cast<DataAppend&>(data).DataAt(i), primaryY, sequential));
+	} else if (data.IsParam()) {
 		double xmin = 0;
 		double xmax = double(data.GetCount());
 		for (double x = xmin; x <= xmax; x++) {
