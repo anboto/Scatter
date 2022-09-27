@@ -1646,6 +1646,109 @@ bool ScatterDraw::CheckDash(const char *dash) {
 	return true;
 }
 
+Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool sequential)
+{
+	Vector<Pointf> points;
+	auto ScaleX = [w=plotW, x0=xMin, r=xRange](double x) { return fround(w*(x - x0)/r); };
+	auto ScaleY =
+	[h=plotH, y0=primaryY ? yMin : yMin2, r=primaryY ? yRange : yRange2]
+	(double y) { return h - fround(h*(y - y0)/r); };
+	if (data.IsParam()) {
+		double xmin = 0;
+		double xmax = double(data.GetCount());
+		for (double x = xmin; x <= xmax; x++) {
+			double xx = data.x(x);
+			double yy = data.y(x);
+			if (!IsNum(xx) || !IsNum(yy))
+				points << Null;
+			else
+				points << Point(ScaleX(xx), ScaleY(yy));
+		}
+	} else if (data.IsExplicit()) {
+		double xmin = xMin - 1;
+		double xmax = xMin + xRange + 1;
+		double dx = (xmax - xmin)/plotW;
+		for (double xx = xmin; xx < xmax; xx += dx) {
+			double yy = data.f(xx);
+			if (!IsNum(yy))
+				points << Null;
+			else
+				points << Point(ScaleX(xx), ScaleY(yy));
+		}
+	} else {
+		int64 imin, imax;
+		if (sequential) {
+			imin = imax = Null;
+			for (int64 i = 0; i < data.GetCount(); ++i) {
+				double xx = data.x(i);
+				if (IsNum(xx)) {
+					if (IsNull(imin)) {
+						if (xx >= xMin) 
+							imin = i;
+					}
+					if (IsNull(imax)) {
+						if (xx >= xMin + xRange) 
+							imax = i;
+					}
+				}
+			}
+			if (IsNull(imin))
+			    imin = 0;
+			if (IsNull(imax))
+			    imax = data.GetCount() - 1;
+		} else {
+			imin = 0;
+			imax = data.GetCount() - 1;
+		}
+		if (fastViewX) {
+			double dxpix = (data.x(imax) - data.x(imin))/plotW;
+			int npix = 1;
+			for (int64 i = imin; i <= imax; ) {						
+				double yy = data.y(i);
+				int64 ii;
+				double maxv = data.x(imin) + dxpix*npix; 
+				double maxY = yy, minY = yy;
+				for (ii = 1; i + ii < imax && data.x(i + ii) < maxv; ++ii) {
+					double dd = data.y(i + ii);
+					if (!IsNum(dd))
+						continue;
+					maxY = max(maxY, dd);
+					minY = min(minY, dd);
+				}
+				double xx = data.x(i);
+				if (!IsNum(xx)) {
+					++i;
+					continue;
+				}
+				i += ii;
+				npix++;
+				int ix = ScaleX(xx);
+				int iMax, iMin;
+				if (!IsNum(yy)) 
+					points << Null;							
+				else {
+					iMax = ScaleY(maxY);
+					iMin = ScaleY(minY);
+					points << Point(ix, iMax);
+					if (iMax != iMin)
+						points << Point(ix, iMin);	
+				}
+			} 
+		} else {
+			for (int64 i = imin; i <= imax; ) {	
+				double xx = data.x(i);
+				double yy = data.y(i);
+				++i;
+				if (!IsNum(xx) || !IsNum(yy)) 
+					points << Null;
+				else
+					points << Point(ScaleX(xx), ScaleY(yy));
+			}
+		}
+	}
+	return points;
+}
+
 INITBLOCK {
 	SeriesPlot::Register<LineSeriesPlot>("Line");
 	SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");

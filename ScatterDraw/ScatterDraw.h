@@ -1213,6 +1213,7 @@ protected:
 	static void MonFormat(String& s, int , double d)	{s = Format("%Mon", int(d));}
 	static void DyFormat(String& s, int , double d)		{s = Format("%Dy", int(d));}
 
+	Vector<Pointf> DataAddPoints(DataSource& data, bool primaryY, bool sequential);
 	template<class T>
 	void Plot(T& w);	
 	template<class T>
@@ -1642,132 +1643,8 @@ void ScatterDraw::Plot(T& w) {
 				continue;
 			if (data.IsExplicit() && IsNull(data.GetCount()))
 				continue;
-			Vector<Pointf> points;
-			bool pointsisempty = true;
-			if (data.IsParam()) {
-				double xmin = 0;
-				double xmax = double(data.GetCount());
-				for (double x = xmin; x <= xmax; x++) {
-					double xx = data.x(x);
-					double yy = data.y(x);
-					if (!IsNum(xx) || !IsNum(yy))
-						points << Null;
-					else {
-						int ix = fround(plotW*(xx - xMin)/xRange);
-						int iy;
-						if (serie.primaryY)
-							iy = fround(plotH*(yy - yMin)/yRange);
-						else
-							iy = fround(plotH*(yy - yMin2)/yRange2);
-						points << Point(ix, plotH - iy);
-						pointsisempty = false;
-					}
-				}
-			} else if (data.IsExplicit()) {
-				double xmin = xMin - 1;
-				double xmax = xMin + xRange + 1;
-				double dx = (xmax - xmin)/plotW;
-				for (double xx = xmin; xx < xmax; xx += dx) {
-					double yy = data.f(xx);
-					if (!IsNum(yy))
-						points << Null;
-					else {
-						int ix = fround(plotW*(xx - xMin)/xRange);
-						int iy;
-						if (serie.primaryY)
-							iy = fround(plotH*(yy - yMin)/yRange);
-						else
-							iy = fround(plotH*(yy - yMin2)/yRange2);
-						points << Point(ix, plotH - iy);
-						pointsisempty = false;
-					}
-				}
-			} else {
-				int64 imin, imax;
-				if (serie.sequential) {
-					imin = imax = Null;
-					for (int64 i = 0; i < data.GetCount(); ++i) {
-						double xx = data.x(i);
-						if (IsNum(xx)) {
-							if (IsNull(imin)) {
-								if (xx >= xMin) 
-									imin = i;
-							}
-							if (IsNull(imax)) {
-								if (xx >= xMin + xRange) 
-									imax = i;
-							}
-						}
-					}
-					if (IsNull(imin))
-					    imin = 0;
-					if (IsNull(imax))
-					    imax = data.GetCount() - 1;
-				} else {
-					imin = 0;
-					imax = data.GetCount() - 1;
-				}
-				if (fastViewX) {
-					double dxpix = (data.x(imax) - data.x(imin))/plotW;
-					int npix = 1;
-					for (int64 i = imin; i <= imax; ) {						
-						double yy = data.y(i);
-						int64 ii;
-						double maxv = data.x(imin) + dxpix*npix; 
-						double maxY = yy, minY = yy;
-						for (ii = 1; i + ii < imax && data.x(i + ii) < maxv; ++ii) {
-							double dd = data.y(i + ii);
-							if (!IsNum(dd))
-								continue;
-							maxY = max(maxY, dd);
-							minY = min(minY, dd);
-						}
-						double xx = data.x(i);
-						if (!IsNum(xx)) {
-							++i;
-							continue;
-						}
-						i += ii;
-						npix++;
-						int ix = fround(plotW*(xx - xMin)/xRange);
-						int iMax, iMin;
-						if (!IsNum(yy)) 
-							points << Null;							
-						else {
-							if (serie.primaryY) {
-								iMax = fround(plotH*(maxY - yMin)/yRange);
-								iMin = fround(plotH*(minY - yMin)/yRange);
-							} else {
-								iMax = fround(plotH*(maxY - yMin2)/yRange2);
-								iMin = fround(plotH*(minY - yMin2)/yRange2);
-							}
-							points << Point(ix, plotH - iMax);
-							pointsisempty = false;
-							if (iMax != iMin)
-								points << Point(ix, plotH - iMin);	
-						}
-					} 
-				} else {
-					for (int64 i = imin; i <= imax; ) {	
-						double xx = data.x(i);
-						double yy = data.y(i);
-						++i;
-						if (!IsNum(xx) || !IsNum(yy)) 
-							points << Null;
-						else {
-							int ix = fround(plotW*(xx - xMin)/xRange);
-							int iy;
-							if (serie.primaryY)
-								iy = fround(plotH*(yy - yMin)/yRange);
-							else
-								iy = fround(plotH*(yy - yMin2)/yRange2);
-							points << Point(ix, plotH - iy);
-							pointsisempty = false;
-						}
-					}
-				}
-			}
-			if (!pointsisempty && !points.IsEmpty() && serie.seriesPlot && serie.thickness > 0) 
+			Vector<Pointf> points = DataAddPoints(serie.Data(), serie.primaryY, serie.sequential);
+			if (!points.IsEmpty() && serie.seriesPlot && serie.thickness > 0) 
 				serie.seriesPlot->Paint(w, points, plotScaleAvg, serie.opacity, 
 											serie.thickness, serie.color, 
 											serie.dash, plotAreaColor, serie.fillColor, plotW/xRange, plotH/yRange, 
