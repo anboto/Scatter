@@ -793,9 +793,8 @@ void ScatterCtrl::LeftDown(Point pt, dword keyFlags)
 	MousePointRot(pt);
 	if(!HasFocus()) 
 		SetFocus();
-	mouseAction = LEFT_DOWN;
 	ProcessMouse(true, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, true, false, 0, false);
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = LEFT_DOWN);
 }
 
 void ScatterCtrl::LeftDouble(Point pt, dword keyFlags)
@@ -807,15 +806,14 @@ void ScatterCtrl::LeftDouble(Point pt, dword keyFlags)
 		DoShowEditDlg(3);
 	else if (PointInBorder(pt))
 		DoShowEditDlg(0);
-	WhenMouseClick(pt, keyFlags, LEFT_DOUBLE);
+	WhenMouseClick(pt, keyFlags, mouseAction = LEFT_DOUBLE);
 }
 
 void ScatterCtrl::LeftUp(Point pt, dword keyFlags)
 {
 	MousePointRot(pt);
-	mouseAction = LEFT_UP;
 	ProcessMouse(false, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, true, false, 0, false); 
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = LEFT_UP);
 }
 
 void ScatterCtrl::MiddleDown(Point pt, dword keyFlags)
@@ -823,17 +821,15 @@ void ScatterCtrl::MiddleDown(Point pt, dword keyFlags)
 	MousePointRot(pt);
 	if(!HasFocus()) 
 		SetFocus();
-	mouseAction = MIDDLE_DOWN;
 	ProcessMouse(true, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, false, true, 0, false);
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = MIDDLE_DOWN);
 }
 
 void ScatterCtrl::MiddleUp(Point pt, dword keyFlags)
 {
 	MousePointRot(pt);
-	mouseAction = MIDDLE_UP;
 	ProcessMouse(false, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, false, true, 0, false);
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = MIDDLE_UP);
 }
 
 void ScatterCtrl::RightDown(Point pt, dword keyFlags) 
@@ -841,17 +837,15 @@ void ScatterCtrl::RightDown(Point pt, dword keyFlags)
 	MousePointRot(pt);
 	if(!HasFocus()) 
 		SetFocus();
-	mouseAction = RIGHT_DOWN;
 	ProcessMouse(true, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, false, false, 0, true);
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = RIGHT_DOWN);
 }
 
 void ScatterCtrl::RightUp(Point pt, dword keyFlags)
 {
 	MousePointRot(pt);
-	mouseAction = RIGHT_UP;
 	ProcessMouse(false, pt, keyFlags & K_CTRL, keyFlags & K_ALT, keyFlags & K_SHIFT, false, false, 0, true); 
-	WhenMouseClick(pt, keyFlags, mouseAction);
+	WhenMouseClick(pt, keyFlags, mouseAction = RIGHT_UP);
 }
 
 void ScatterCtrl::MouseWheel(Point pt, int zdelta, dword keyFlags) 

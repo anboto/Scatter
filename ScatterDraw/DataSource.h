@@ -5,23 +5,12 @@
 
 #include <Eigen/Eigen.h>
 #include <numeric>
+#include <complex>
+#include <Functions4U/Functions4U.h>
 
 namespace Upp {
 
 #define Membercall(fun)	(this->*fun)
-
-
-template <typename T>
-inline bool IsNum(const std::complex<T> &n) {return IsFin(n.real()) && IsFin(n.imag());}
-inline bool IsNum(double n) {return IsFin(n) && !IsNull(n);}
-inline bool IsNum(float n) 	{return IsFin(n);}
-inline bool IsNum(int n) 	{return !IsNull(n);}
-
-template <typename T>
-bool IsNull(const std::complex<T> &d)	{return !IsNum(d);};
-
-#define NaNComplex		std::numeric_limits<std::complex<double>>::quiet_NaN()
-#define NaNDouble		std::numeric_limits<double>::quiet_NaN()
 
 
 enum FFT_WINDOW {NO_WINDOW = 0, HAMMING, COS};
@@ -1174,9 +1163,10 @@ public:
 		this->inter = _inter;
 		this->areas = _areas;
 	}
-	virtual inline double x(int id) 	{return (*pxAxis)[id];}
-	virtual inline double y(int id) 	{return (*pyAxis)[id];}
-	virtual inline double data(int id) 	{return (*pdata)[id];}
+	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
+	virtual inline double x(int id) 		{return (*pxAxis)[id];}
+	virtual inline double y(int id) 		{return (*pyAxis)[id];}
+	virtual inline double data(int id) 		{return (*pdata)[id];}
 	
 private:
 	Vector<double> *pdata;
