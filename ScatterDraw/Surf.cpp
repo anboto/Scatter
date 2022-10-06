@@ -62,6 +62,7 @@ Color GetRainbowColor(double frac, const Color &from, const Color &to, int numSc
 }
 
 Color GetRainbowColor(double frac, const Color &col0, const Color &col1, const Color &col2, int numScales) {
+	ASSERT(frac >= 0 && frac <= 1);
 	if (IsNull(col2)) 
 		return GetRainbowColor(frac, col0, col1, numScales);
 	if (numScales > 0)
@@ -107,7 +108,7 @@ double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun ge
 	} else if (inter == BILINEAR) {
 		int ix, iy;
 		for (ix = 0; ix < lenxAxis-1; ++ix) {
-			if (((Membercall(getdataX)(ix)+Membercall(getdataX)(ix+1))/2.) > x) {
+			if (((Membercall(getdataX)(ix) + Membercall(getdataX)(ix+1))/2.) > x) {
 				if (ix == 0) 
 					return Null;
 				else {
@@ -157,7 +158,7 @@ double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun g
 		int ix, iy;
 		if (x < (Membercall(getdataX)(0) + Membercall(getdataX)(1))/2.)
 			ix = 0;
-		else if (x >= (Membercall(getdata)(lenxAxis-1) + Membercall(getdata)(lenxAxis-2))/2.)
+		else if (x >= (Membercall(getdataX)(lenxAxis-1) + Membercall(getdataX)(lenxAxis-2))/2.)
 			ix = lenxAxis-1;
 		else {
 			for (ix = 1; ix < lenxAxis-1; ++ix) {

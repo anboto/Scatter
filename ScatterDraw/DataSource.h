@@ -1152,14 +1152,14 @@ public:
 			Interpolate _inter, bool _areas) {Init(data, xAxis, yAxis, _inter, _areas);}
 	void Init(Vector<double> &data, Vector<double> &xAxis, Vector<double> &yAxis, 
 					Interpolate _inter, bool _areas) {
-		ASSERT(_areas ?  (data.GetCount() == (xAxis.GetCount() - 1)*(yAxis.GetCount() - 1)) : true);
-		ASSERT(!_areas ? (data.GetCount() == xAxis.GetCount()*yAxis.GetCount()) : true);
+		ASSERT(_areas ?  (data.size() == (xAxis.size() - 1)*(yAxis.size() - 1)) : true);
+		ASSERT(!_areas ? (data.size() == xAxis.size()*yAxis.size()) : true);
 		this->pdata = &data;
-		this->lendata = data.GetCount();
+		this->lendata = data.size();
 		this->pxAxis = &xAxis;
-		this->lenxAxis = xAxis.GetCount();
+		this->lenxAxis = xAxis.size();
 		this->pyAxis = &yAxis;
-		this->lenyAxis = yAxis.GetCount();
+		this->lenyAxis = yAxis.size();
 		this->inter = _inter;
 		this->areas = _areas;
 	}

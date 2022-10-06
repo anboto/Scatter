@@ -806,6 +806,9 @@ public:
 	void Unlinked();
 	
 	double GetMinX()			{return xMin;}
+	double GetMaxX()			{return xMin+xRange;}
+	double GetMinY()			{return yMin;}
+	double GetMaxY()			{return yMin+yRange;}
 	int GetPlotWidth()			{return plotW;}
 	int GetPlotHeight()			{return plotH;}
 	double GetPosX(double x)	{return plotW*(x - xMin)/xRange;}
@@ -839,6 +842,10 @@ public:
 	double GetSurfMinZ() const					{return surfMinZ;}
 	ScatterDraw& SetSurfMaxZ(double val)		{surfMaxZ = val;	return *this;}
 	double GetSurfMaxZ() const					{return surfMaxZ;}
+	double GetSurfMinX()						{return surf->MinX();}
+	double GetSurfMinY()						{return surf->MinY();}
+	double GetSurfMaxX()						{return surf->MaxX();}
+	double GetSurfMaxY()						{return surf->MaxY();}
 	ScatterDraw& ZoomToFitZ()					{surfMinZ = surf->MinZ();	surfMaxZ = surf->MaxZ(); return *this;}
 	
 	ScatterDraw& SurfNumColor(int num, bool cont){surfNumColor = num; continuousColor = cont; return *this;}
