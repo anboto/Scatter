@@ -330,6 +330,16 @@ public:
 	ScatterCtrl &Rotate(Angle angle)		{rotate = angle; Refresh(); return *this;}
 	Angle GetRotate()						{return static_cast<Angle>(rotate);}
 
+	ScatterCtrl &ZoomToFit(bool horizontal, bool vertical, double factorH, double factorV) {
+		ScatterDraw::ZoomToFit(horizontal, vertical, factorH, factorV);
+		mouseAction = NONE;	
+		WhenZoomScroll();	
+		return *this;
+	}
+	ScatterCtrl &ZoomToFit(bool horizontal = true, bool vertical = false, double factor = 0) {
+		return ZoomToFit(horizontal, vertical, factor, factor);
+	}
+	
 private:	
 	template <class T>
 	void Ize(T& io) { 
@@ -375,6 +385,8 @@ public:
 	static ScatterCtrl &GetInstance(int i)	{return *(instances[i]);}	
 	
 	void SetPopUp(bool _pop)				{pop = _pop;}
+	
+	MouseAction GetMouseAction()	{return mouseAction;}
 	
 private:
 	bool showInfo = false;

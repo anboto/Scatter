@@ -359,7 +359,7 @@ public:
 	RealExponentEquation(double a, double b)	{SetCoeff(a, b);}
 	double f(double x) 							{
 		if (x < 0)
-			return Null;
+			return 0;
 		else if (x == 0)
 			return 0;
 		return coeff[0]*::pow(x, coeff[1]);
@@ -581,7 +581,7 @@ public:
 	double f(double x) {
 		double den = x + coeff[1];
 		if (den == 0)
-			return Null;
+			return 0;
 		return coeff[0]/den + coeff[2];
 	}
 	virtual String GetName() 			{return t_("Rational_1");}

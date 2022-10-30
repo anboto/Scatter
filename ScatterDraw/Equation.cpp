@@ -20,8 +20,10 @@ struct Equation_functor : NonLinearOptimizationFunctor<double> {
 		for(int64 i = 0; i < datasetLen; i++) {
 			double x = (*series).x(i),
 				   y = (*series).y(i);
-			if (!IsNull(x) && !IsNull(y)) {
-				double residual = (*fSource).f(x) - y;
+			if (IsNum(x) && IsNum(y)) {
+				double residual = (*fSource).f(x);
+				ASSERT(IsNum(residual));
+				residual -= y;
 				if (weight)
 					residual *= (*weight)[i];
 				fvec(ptrdiff_t(i)) = residual;
@@ -37,16 +39,22 @@ void ExplicitEquation::SetNumCoeff(int num) {
 		coeff[i] = 0;
 }
 
-ExplicitEquation::FitError ExplicitEquation::Fit(DataSource &serie, double &r2) {
+ExplicitEquation::FitError ExplicitEquation::Fit(DataSource &serie0, double &r2) {
 	r2 = Null;
 	
-	if (serie.IsExplicit() || serie.IsParam())
+	if (serie0.IsExplicit() || serie0.IsParam())
 		return InadequateDataSource;
 	
-	if (serie.size() < numcoeff)
+	if (serie0.size() < numcoeff)
 		return SmallDataSource;
 	
 	ptrdiff_t numUnknowns = numcoeff;
+	
+	// This is to be sure that no Null data is fed into LevenbergMarquardt
+	VectorXd xx, yy;
+	serie0.CopyXY(xx, yy);
+	
+	EigenVector serie(xx, yy);
 	
 	GuessCoeff(serie);
 	
@@ -65,10 +73,13 @@ ExplicitEquation::FitError ExplicitEquation::Fit(DataSource &serie, double &r2) 
 	
 	NumericalDiff<Equation_functor> numDiff(functor);
 	LevenbergMarquardt<NumericalDiff<Equation_functor> > lm(numDiff);
-// 	ftol is a nonnegative input variable that measures the relative error desired in the sum of squares 
+	
+	// 	ftol is a nonnegative input variable that measures the relative error desired in the sum of squares 
 	lm.parameters.ftol = 1.E4*NumTraits<double>::epsilon();
-//  xtol is a nonnegative input variable that measures the relative error desired in the approximate solution
+	
+	//  xtol is a nonnegative input variable that measures the relative error desired in the approximate solution
 	lm.parameters.xtol = 1.E4*NumTraits<double>::epsilon();
+	
 	lm.parameters.maxfev = maxFitFunctionEvaluations;
 	int ret = lm.minimize(x);
 	if (ret == LevenbergMarquardtSpace::ImproperInputParameters)

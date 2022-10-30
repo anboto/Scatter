@@ -192,6 +192,19 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.numDecimals.WhenAction = [=] {UpdateEquations();};
 	tabFitRight.showEquation.WhenAction = [=] {OnShowEquation();};
 	
+	tabFitRight.array.MultiSelect().SetLineCy(EditField::GetStdHeight());
+	tabFitRight.array.WhenBar = [=](Bar &bar) {OnArrayBar(bar);};
+	
+	tabFitRight.array.AddColumn(t_("Parameter"));
+	tabFitRight.array.AddColumn(t_("Full series"));
+	tabFitRight.array.AddColumn(t_("Visible x"));
+	int row = 0;
+	tabFitRight.array.Set(row++, 0, t_("Max x,y"));
+	tabFitRight.array.Set(row++, 0, t_("Min x,y"));
+	tabFitRight.array.Set(row++, 0, t_("Mean"));
+	tabFitRight.array.Set(row++, 0, t_("RMS"));
+	tabFitRight.array.Set(row++, 0, t_("StdDev"));
+	
 	tabOpRight.xLow.WhenLostFocus = [=] {OnOperation();};
 	tabOpRight.xHigh.WhenLostFocus = [=] {OnOperation();};
 	
@@ -441,6 +454,32 @@ void ProcessingTab::OnOperation()
 	tabOpLeft.scatter.Refresh();
 }
 
+void ProcessingTab::GetVisibleData() {
+	DataSource &data0 = tabFitLeft.scatter.GetDataSource(0);
+
+	if (!data0.IsParam()/* && !data.IsExplicit()*/) {	
+		double xmin = tabFitLeft.scatter.GetXMin();
+		double xmax = tabFitLeft.scatter.GetXMax();
+
+		DataXRange data(data0, xmin, xmax);
+		double avg = data.AvgY();
+		if (!IsNull(avg)) {
+			tabFitRight.array.Set(2, 2, avg);
+			tabFitRight.array.Set(3, 2, data.RMSY());
+			tabFitRight.array.Set(4, 2, data.StdDevY(avg));
+		}
+		int64 idmx;
+		double val;
+		val = data.MaxY(idmx);
+		if (!IsNull(val)) {
+			tabFitRight.array.Set(0, 2, Format("%f,%f", data.x(idmx), val));
+			val = data.MinY(idmx);
+			if (!IsNull(val))
+				tabFitRight.array.Set(1, 2, Format("%f,%f", data.x(idmx), val));
+		}
+	}
+}
+
 void ProcessingTab::UpdateField(const String _name, int _id) 
 {
 	id = _id;
@@ -480,22 +519,25 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		return;
 	DataSource &data = tabFitLeft.scatter.GetDataSource(0);
 	
+	tabFitLeft.scatter.WhenZoomScroll = [&]() {
+		ScatterCtrl::MouseAction action = tabFitLeft.scatter.GetMouseAction();
+		if (action == ScatterCtrl::NONE)
+			GetVisibleData();
+	};
+	
 	if (!data.IsParam()/* && !data.IsExplicit()*/) {	
 		double avg = data.AvgY();
-		tabFitRight.eAverage = avg;
-		tabFitRight.eRMS = data.RMSY();
-		tabFitRight.eStdDev = data.StdDevY(avg);
+		tabFitRight.array.Set(2, 1, avg);
+		tabFitRight.array.Set(3, 1, data.RMSY());
+		tabFitRight.array.Set(4, 1, data.StdDevY(avg));
 		int64 idmx;
 		double val;
 		val = data.MaxY(idmx);
 		if (!IsNull(val)) {
-			tabFitRight.eMax <<= Format("(%f,%f)", data.x(idmx), val);
-			Pointf p = data.MaxSubDataImpY(idmx, 3);
-			if (!IsNull(p))
-				tabFitRight.eMaxImp = Format("(%f,%f)", p.x, p.y);
+			tabFitRight.array.Set(0, 1, Format("%f,%f", data.x(idmx), val));
 			val = data.MinY(idmx);
 			if (!IsNull(val))
-				tabFitRight.eMin = Format("(%f,%f)", data.x(idmx), val);
+				tabFitRight.array.Set(1, 1, Format("%f,%f", data.x(idmx), val));
 		}
 	}
 	if (!data.IsParam() && !data.IsExplicit()) {	
@@ -542,6 +584,8 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		tabFitRight.opSecAvg.Enable(false);
 		tabFitRight.opCumAvg.Enable(false);
 	}
+	
+	GetVisibleData();
 	
 	Show();	
 }
@@ -599,9 +643,10 @@ void ProcessingTab::OnUpdateSensitivity()
 	tabFitRight.labNumMax.Enable(tabFitRight.opMax);
 	tabFitRight.numMax.Enable(tabFitRight.opMax);
 	tabFitRight.numMax <<= (tabFitRight.opMax ? upperEnvelope.GetCount() : Null);
-	tabFitRight.labMPM.Enable(tabFitRight.opMax);
-	tabFitRight.eMPM.Enable(tabFitRight.opMax);
-	tabFitRight.eMPM <<= (tabFitRight.opMax ? mpm : Null);
+	if (tabFitRight.opMax) {
+		tabFitRight.array.Add(5, 0, t_("MPM"));
+		tabFitRight.array.Set(5, 1, mpm);
+	}
 	if (tabFitRight.opMin && newWidthMin != tabFitRight.width) {
 		newWidthMin = tabFitRight.width;
 		

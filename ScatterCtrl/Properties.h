@@ -263,6 +263,8 @@ private:
 	void ArrayCopy();
 	void ArraySelect();
 	void OnArrayBar(Bar &menu);
+	void GetVisibleData();
+	
 	Array<ExplicitEquation> equationTypes;
 	UserEquation *userEquation;
 	//GridCtrlSource ds;

@@ -573,11 +573,11 @@ void ScatterCtrl::DoKeyAction(ScatterAction action)
 	case ZOOM_H_RED:	MouseZoom(120, true, false); 		break;
 	case ZOOM_V_ENL:	MouseZoom(-120, false, true); 		break;
 	case ZOOM_V_RED:	MouseZoom(120, false, true); 		break;
-	case SCROLL_LEFT:	ScatterDraw::Scroll(0.2, 0); 		break;
-	case SCROLL_RIGHT:	ScatterDraw::Scroll(-0.2, 0); 		break;
-	case SCROLL_UP:		ScatterDraw::Scroll(0, -0.2); 		break;
-	case SCROLL_DOWN:	ScatterDraw::Scroll(0, 0.2); 		break;
-	case ZOOM_FIT:		ScatterDraw::ZoomToFit(true, true);	break;
+	case SCROLL_LEFT:	mouseAction = NONE;		ScatterDraw::Scroll(0.2, 0);	break;
+	case SCROLL_RIGHT:	mouseAction = NONE;		ScatterDraw::Scroll(-0.2, 0);	break;
+	case SCROLL_UP:		mouseAction = NONE;		ScatterDraw::Scroll(0, -0.2);	break;
+	case SCROLL_DOWN:	mouseAction = NONE;		ScatterDraw::Scroll(0, 0.2);	break;
+	case ZOOM_FIT:		ZoomToFit(true, true);				break;
 	case NO_ACTION: 
 	case SCROLL:
 	case SHOW_COORDINATES:
@@ -731,6 +731,9 @@ void ScatterCtrl::ZoomWindow(bool down, Point &pt) {
 			popLT = popRB = Null;
 			Refresh();
 			Refresh();
+			
+			mouseAction = NONE;
+			WhenZoomScroll();
 		}		
 	}	
 }
@@ -756,6 +759,8 @@ void ScatterCtrl::Scrolling(bool down, Point &pt, bool isOut)
 			if (!isOut)
 				MouseMove(pt, 0);
 			isScrolling = false;
+			mouseAction = NONE;
+			WhenZoomScroll();
 			Ctrl::OverrideCursor(mouseImg);
 		} 
 	}
@@ -940,6 +945,7 @@ void ScatterCtrl::MouseZoom(int zdelta, bool , bool ) {
 		lastRefresh_ms = Null;					// 1 sec resets lastRefresh check
 	if (!IsNull(lastRefresh_ms) && (lastRefresh_ms > maxRefresh_ms))
 		return;
+	mouseAction = NONE;
 	Zoom(scale, mouseHandlingX, mouseHandlingY);
 }
 
