@@ -618,6 +618,14 @@ public:
 					this->numData = _data[0].GetCount() - _beginData;
 			} else
 				this->numData = _data.GetCount() - _beginData;
+		} else {
+			if (!_useRows) {
+				if (_data.IsEmpty())
+					this->numData = 0;
+				else	
+					this->numData = min(_data[0].GetCount() - _beginData, _numData);
+			} else
+				this->numData = min(_data.GetCount() - _beginData, _numData);
 		}
 	}
 	void Init(const Vector<Vector<T> > &_data, int _idx, int _idy, bool _useRows = true, int _beginData = 0, int _numData = Null) {
