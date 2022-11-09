@@ -122,7 +122,7 @@ Pointf DataSource::MaxSubDataImp(Getdatafun getdataY, Getdatafun getdataX, int64
 double DataSource::Avg(Getdatafun getdata) {
 	double ret = 0;
 	int count = 0;
-	for (int64 i = 0; i < GetCount(); ++i) {
+	for (int64 i = 0; i < size(); ++i) {
 		double d = Membercall(getdata)(i);
 		if (IsNum(d)) {
 			ret += d;
@@ -137,7 +137,7 @@ double DataSource::Avg(Getdatafun getdata) {
 int64 DataSource::Closest(Getdatafun getdata, double dat) {
 	double minD = DBL_MAX;
 	int64 minDat;
-	for (int64 i = 0; i < GetCount(); ++i) {
+	for (int64 i = 0; i < size(); ++i) {
 		double d = Membercall(getdata)(i);
 		if (IsNum(d)) {
 			if (minD > abs(d - dat)) {
@@ -173,7 +173,7 @@ int64 DataSource::Closest(Getdatafun getdataX, Getdatafun getdataY, double x, do
 double DataSource::RMS(Getdatafun getdata) {
 	double ret = 0;
 	int count = 0;
-	for (int64 i = 0; i < GetCount(); ++i) {
+	for (int64 i = 0; i < size(); ++i) {
 		double d = Membercall(getdata)(i);
 		if (IsNum(d)) {
 			ret += d*d;
@@ -186,7 +186,7 @@ double DataSource::RMS(Getdatafun getdata) {
 }
 
 double DataSource::IsSorted(Getdatafun getdata) {
-	int64 num = GetCount();
+	int64 num = size();
 	if (num == 0)
 		return false;
 	if (num == 1)
