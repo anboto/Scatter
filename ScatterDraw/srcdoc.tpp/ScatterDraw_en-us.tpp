@@ -18,8 +18,8 @@ topic "1 Overview";
 speed or printing quality.]&]
 [s0;2 &]
 [s0; [^topic`:`/`/ScatterDraw`/srcdoc`/ScatterDraw`_en`-us^2 ScatterDraw 
-][2 page describes some of the main features, and in ][^topic`:`/`/ScatterDraw`/srcdoc`/Overview`$en`-us^2 S
-catterCtrl`_demo][2  there is an overview of control possibilities.]&]
+][2 page describes some of the main features, and in examples/ScatterDraw`_demo 
+there is an overview of class possibilities.]&]
 [s0;2 &]
 [s0; [2 Here there are some screenshots of its features:]&]
 [s0;2 &]
