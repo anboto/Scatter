@@ -183,7 +183,7 @@ void ScatterDraw::AdjustMinUnitY2() {
 }
 
 void ScatterDraw::AdjustMajorUnitX() {
-	if (xMajorUnit == 0 || IsNull(xMajorUnit))
+	if (xMajorUnit == 0 || !IsNum(xMajorUnit))
 		return;
 	while (xRange/xMajorUnit > 1.2*xMajorUnitNum) 
 		xMajorUnit *= 2;
@@ -192,9 +192,9 @@ void ScatterDraw::AdjustMajorUnitX() {
 }
 
 void ScatterDraw::AdjustMajorUnitY() {
-	if (yMajorUnit == 0 || IsNull(yMajorUnit))
+	if (yMajorUnit == 0 || !IsNum(yMajorUnit))
 		return;
-	if (yMajorUnitNum == 0 || IsNull(yMajorUnitNum))
+	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
 		return;
 	while (yRange/yMajorUnit > 1.2*yMajorUnitNum) 
 		yMajorUnit *= 2;
@@ -203,9 +203,9 @@ void ScatterDraw::AdjustMajorUnitY() {
 }
 
 void ScatterDraw::AdjustMajorUnitY2() {
-	if (yMajorUnit2 == 0 || IsNull(yMajorUnit2))
+	if (yMajorUnit2 == 0 || !IsNum(yMajorUnit2))
 		return;
-	if (yMajorUnitNum == 0 || IsNull(yMajorUnitNum))
+	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
 		return;
 	while (yRange2/yMajorUnit2 > 1.2*yMajorUnitNum) 
 		yMajorUnit2 *= 2;
@@ -214,16 +214,16 @@ void ScatterDraw::AdjustMajorUnitY2() {
 }
 
 ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
-	ASSERT(IsNull(rx) || rx  >= 0);
-	ASSERT(IsNull(ry) || ry  >= 0);
-	ASSERT(IsNull(ry2)|| ry2 >= 0);
+	ASSERT(!IsNum(rx) || rx  >= 0);
+	ASSERT(!IsNum(ry) || ry  >= 0);
+	ASSERT(!IsNum(ry2)|| ry2 >= 0);
 	
-	if (!IsNull(rx)) {
+	if (IsNum(rx)) {
 		xRange = rx;
 		AdjustMajorUnitX();
 		AdjustMinUnitX();
 	}
-	if (!IsNull(ry)) {
+	if (IsNum(ry)) {
 		yRange = ry;
 		AdjustMajorUnitY(); 
 		AdjustMinUnitY();
@@ -238,18 +238,18 @@ ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
 }
 
 ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
-	if (!IsNull(ux)) {
+	if (IsNum(ux)) {
 		xMajorUnit = ux;
 		xMajorUnitNum = max(3, int(xRange/ux));
 		AdjustMinUnitX();
 	}
-	if (!IsNull(uy)) {
+	if (IsNum(uy)) {
 		yMajorUnit = uy;
 		yMajorUnit2 = uy*yRange2/yRange;
 		yMajorUnitNum = max(3, int(yRange/uy));
 		AdjustMinUnitY();
 		AdjustMinUnitY2();
-	} else if (!IsNull(uy2)) {
+	} else if (IsNum(uy2)) {
 		yMajorUnit2 = uy2;
 		yMajorUnit = uy2*yRange/yRange2;
 		yMajorUnitNum = max(3, int(yRange/yMajorUnit));
@@ -260,12 +260,12 @@ ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
 }
 
 ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
-	if (!IsNull(nx)) {
+	if (IsNum(nx)) {
 		xMajorUnitNum = nx;
 		xMajorUnit = xRange/nx;
 		AdjustMinUnitX();
 	}
-	if (!IsNull(ny)) {
+	if (IsNum(ny)) {
 		yMajorUnitNum = ny;
 		yMajorUnit = yRange/ny;
 		yMajorUnit2 = yMajorUnit*yRange2/yRange;
@@ -276,15 +276,15 @@ ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
 }
 
 ScatterDraw &ScatterDraw::SetMinUnits(double ux, double uy) {
-	if (!IsNull(ux))
+	if (IsNum(ux))
 		xMinUnit = xMinUnit0 = ux;
-	if (!IsNull(uy)) {	
+	if (IsNum(uy)) {	
 		yMinUnit = yMinUnit0 = uy;
 		yMinUnit2 = yMinUnit20 = yRange2*yMinUnit/yRange;
 	}
-	if (!IsNull(ux))
+	if (IsNum(ux))
 		AdjustMinUnitX();
-	if (!IsNull(uy)) {
+	if (IsNum(uy)) {
 		AdjustMinUnitY();
 		AdjustMinUnitY2();	
 	}
@@ -292,11 +292,11 @@ ScatterDraw &ScatterDraw::SetMinUnits(double ux, double uy) {
 }
 
 ScatterDraw &ScatterDraw::SetXYMin(double xmin, double ymin, double ymin2) {
-	if (!IsNull(xmin))
+	if (IsNum(xmin))
 		xMin = xmin;
-	if (!IsNull(ymin))
+	if (IsNum(ymin))
 		yMin = ymin;
-	if (!IsNull(ymin2))
+	if (IsNum(ymin2))
 		yMin2 = ymin2;
 	WhenSetXYMin();
 	return *this;
@@ -328,10 +328,10 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				if (serie.IsDeleted() || serie.opacity == 0 || serie.Data().IsExplicit())
 					continue;
 				double mn = serie.Data().MinX();
-				if (!IsNull(mn))
+				if (IsNum(mn))
 					minx = min(minx, mn);
 				double mx = serie.Data().MaxX();
-				if (!IsNull(mx))
+				if (IsNum(mx))
 					maxx = max(maxx, mx);
 			}
 			if (minx != -DOUBLE_NULL && maxx != DOUBLE_NULL) {
@@ -351,7 +351,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 					continue;
 				for (int64 i = 0; i < serie.Data().GetCount(); i++) {
 					double py = serie.Data().y(i);
-					if (IsNull(py))
+					if (!IsNum(py))
 						continue;
 					if (serie.primaryY) {
 						if (py < miny)
@@ -697,7 +697,7 @@ double ScatterDraw::GetValueY(int index, int64 idata) {
 
 Value ScatterDraw::GetStringY(int index, int64 idata) {
 	double ret = GetValueY(index, idata);
-	if (IsNull(ret))
+	if (!IsNum(ret))
 		return Null;
 	if (cbModifFormatY) {
 		String sret;
