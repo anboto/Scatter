@@ -14,8 +14,8 @@ topic "1 Overview";
 [s0; &]
 [s0; [2 Versatile 2D scatter graph control for command line applications.]&]
 [s0;2 &]
-[s0; [2 It uses U`+`+ Draw or Painter on demand to get better refresh 
-speed or printing quality.]&]
+[s0; [2 It uses U`+`+ Draw or Painter on user demand to get better 
+refresh speed or printing quality.]&]
 [s0;2 &]
 [s0; [^topic`:`/`/ScatterDraw`/srcdoc`/ScatterDraw`_en`-us^2 ScatterDraw 
 ][2 page describes some of the main features, and in examples/ScatterDraw`_demo 

@@ -124,8 +124,8 @@ double ExplicitEquation::x_from_y(double y, double x0) {
 }
 
 double PolynomialEquation::f(double x) {
-	if (x < 0)
-		return Null;
+	//if (x < 0)
+	//	return Null;
 	double y = 0;
 	for (int i = 0; i < coeff.GetCount(); ++i) 
 		y += coeff[i]*pow(x, i);
