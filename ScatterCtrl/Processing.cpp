@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterCtrl.h"
+#include <Functions4U/Functions4U_Gui.h>
 
 namespace Upp {
 	
@@ -193,8 +194,7 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.showEquation.WhenAction = [=] {OnShowEquation();};
 	
 	tabFitRight.array.MultiSelect().SetLineCy(EditField::GetStdHeight());
-	tabFitRight.array.WhenBar = [=](Bar &bar) {OnArrayBar(bar);};
-	
+	tabFitRight.array.WhenBar = [&](Bar &menu) {ArrayCtrlWhenBar(menu, tabFitRight.array);};
 	tabFitRight.array.AddColumn(t_("Parameter"));
 	tabFitRight.array.AddColumn(t_("Full series"));
 	tabFitRight.array.AddColumn(t_("Visible x"));
@@ -218,7 +218,7 @@ ProcessingTab::ProcessingTab()
 	tabBestFitRight.gridTrend.AddColumn(t_("Equation"), 30);
 	tabBestFitRight.gridTrend.AddColumn(t_("R2"), 5);
 	tabBestFitRight.gridTrend.SetLineCy(EditField::GetStdHeight()).MultiSelect();
-	tabBestFitRight.gridTrend.WhenBar = [=](Bar &menu) {OnArrayBar(menu);};
+	tabBestFitRight.gridTrend.WhenBar = [&](Bar &menu) {ArrayCtrlWhenBar(menu, tabBestFitRight.gridTrend);};
 	tabBestFitRight.gridTrend.Sort(r2Compare);
 	for (int i = 0; i < ExplicitEquation::GetEquationCount(); ++i) 
 		equationTypes.Add(ExplicitEquation::Create(i));
@@ -261,11 +261,6 @@ void ProcessingTab::ArrayCopy() {
 
 void ProcessingTab::ArraySelect() {
 	tabBestFitRight.gridTrend.Select(0, tabBestFitRight.gridTrend.GetCount(), true);
-}
-
-void ProcessingTab::OnArrayBar(Bar &menu) {
-	menu.Add(t_("Select all"), Null, [=] {ArraySelect();}).Key(K_CTRL_A).Help(t_("Select all rows"));
-	menu.Add(t_("Copy"), ScatterImgP::Copy(), [=] {ArrayCopy();}).Key(K_CTRL_C).Help(t_("Copy selected rows"));
 }
 
 void ProcessingTab::OnFit() {

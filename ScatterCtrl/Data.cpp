@@ -40,11 +40,13 @@ void DataDlg::Init(ScatterCtrl& scatter) {
 			if (serie0.SameX(serie)) {
 				if (!addedAll) {
 					addedAll = true;
-					WithDataSeries <StaticRect> &dataseries = series.Add();
+					WithDataSeries <StaticRect> &dataseries = series.Insert(0);
 					CtrlLayout(dataseries);
 					dataseries.scatterIndex.Hide();
 					dataseries.scatterIndex = -1;
-					tab.Add(dataseries.SizePos(), t_("All"));
+					tab.Insert(0, dataseries.SizePos(), t_("All"));
+					tab.Set(0);
+					OnTab();
 				}
 			}
 		}
