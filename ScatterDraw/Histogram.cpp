@@ -96,6 +96,19 @@ Histogram &Histogram::Create(Array<HistogramDataAxis> &dataAxis, bool isY) {
 Histogram &Histogram::Create(DataSource &data, double min, double max, int numVals, bool isY) {
 	Clear();
 	
+	if (IsNull(min)) {
+		if (isY)
+			min = data.MinY();
+		else
+			min = data.MinX();
+	}
+	if (IsNull(max)) {
+		if (isY)
+			max = data.MaxY();
+		else
+			max = data.MaxX();
+	}
+	
 	values.resize(numVals);
 	values.setZero();
 	ranges.SetCount(1);

@@ -285,7 +285,7 @@ void ProcessingTab::OnFit() {
 	tabBestFitLeft.scatter.RemoveAllSeries();
 	tabBestFitLeft.scatter.AddSeries(ds).Legend("Series").NoMark();
 	for (int i = 0; i < equationTypes.GetCount(); ++i) {
-		if (r2[i] >= tabBestFitRight.minR2)
+		if (!IsNull(r2[i]) && r2[i] >= tabBestFitRight.minR2)
 			tabBestFitLeft.scatter.AddSeries(equationTypes[i]).Legend(equationTypes[i].GetFullName()).NoMark().Stroke(2);
 	}
 	tabBestFitLeft.scatter.ZoomToFit(true, true);
@@ -959,55 +959,7 @@ void ProcessingTab::OnPercentile() {
 	else
 		tabHistRight.resPercentile <<= data.PercentileValX(per, minVal, maxVal);
 
-	// Weibull
-	Histogram hist;
-	hist.Create(data, minVal, maxVal, 2000, isY).Accumulative(true);
-	hist.Normalize(1);
-	
-	Eigen::VectorXd x, y;
-	hist.CopyXY(x, y);
-	
-	const double lam = 1 - exp(-1);
-	double err = lam;
-	int64 ind = -1;
-	for (int64 i = 0; i < y.size(); ++i) {
-		if (abs(y(i) - lam) < err) {
-			err = abs(y(i) - lam);
-			ind = i;
-		}
-	}
-	double lambda = 0;
-	if (ind >= 0)
-		lambda = x(ind)-x(0);
-	double x0 = x(0);
-	double k = 1;
-	
-	Eigen::VectorXd unk(3);
-	unk << lambda, x0, k;
-	if (!NonLinearOptimization(unk, x.size(), [&] (const Eigen::VectorXd &b, Eigen::VectorXd &residual)->int {
-		double lambda =  b[0];
-		double x0 = b[1]; 
-		double k = b[2];
-		for (int i = 0; i < residual.size(); ++i) {
-			if (lambda == 0)
-				residual[i] = 0;
-			else if (x(i) < x0)
-				residual[i] = 0;
-			else if ((x(i)-x0)/lambda < 0)
-				residual[i] = 0;
-			else
-				residual[i] = (1 - ::exp(double(-::pow((x(i)-x0)/lambda, k)))) - y[i];
-		}
-		return 0;	
-	})) {
-		tabHistRight.resPercentileW <<= "";
-		return;
-	} 
-	lambda = unk(0);
-	x0 = unk(1);
-	k = unk(2);
-	
-	tabHistRight.resPercentileW <<= x0 + lambda*pow(-log(1-per), 1/k);	// From percentil (y) returns value (x) (cumulative weibull after clearing x);
+	tabHistRight.resPercentileW <<= data.PercentileWeibullVal(isY, per, minVal, maxVal);	
 }
 
 }

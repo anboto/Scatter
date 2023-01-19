@@ -32,7 +32,7 @@ public:
 	virtual double x(int64 ) 				{NEVER(); return Null;}
 	virtual double y(int64 ) 				{NEVER(); return Null;}	
 	double x_from_y(double y, double x0);
-	virtual String GetName() = 0;
+	virtual String GetName()				{NEVER(); return Null;}	
 	virtual String GetFullName()			{return GetName();}
 	virtual String GetEquation(int numDigits = 3) = 0;
 	virtual inline int64 GetCount() const	{return coeff.GetCount() > 0 ? 0 : int64(Null);}
@@ -253,8 +253,8 @@ public:
 								numcoeff = 8;}
 	double f(double x) {
 		double ex = -coeff[5]*x;
-		//if (ex < 0)
-		//	return 0;
+		if (ex > 705)		// Too close to double limits
+			return 0;
 		return coeff[0] + coeff[1]*cos(coeff[2]*x + coeff[3]) + coeff[4]*exp(ex)*cos(coeff[6]*x + coeff[7]);
 	}
 	virtual String GetName() 		{return t_("Sin_DampedSinusoidal");}
@@ -554,7 +554,10 @@ public:
 		double c    = coeff[0];
 		double mean = coeff[1];
 		double std  = coeff[2];
-		return c*exp(-0.5*sqr((x - mean)/std))/(std*sqrt(2*M_PI));
+		double ex = -0.5*sqr((x - mean)/std);
+		if (ex > 705)		// Too close to double limits
+			return 0;
+		return c*exp(ex)/(std*sqrt(2*M_PI));
 	}
 	virtual String GetName() 					{return t_("Normal");}
 	virtual String GetEquation(int nDig = 3) {
