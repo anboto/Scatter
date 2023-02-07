@@ -878,7 +878,7 @@ void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry
 		rry = clone(y);
 		return;
 	}
-	double range = x(last) - x(0);
+	double range = x(indexing::last) - x(0);
 	if (!IsNum(srate)) 
 		srate = range/(x.size()-1);
 	int num = int(range/srate) + 1;

@@ -1647,7 +1647,7 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 }
 	
 void Resample(const Eigen::VectorXd &sx, const Eigen::VectorXd &sy, 
-			  Eigen::VectorXd &rx, Eigen::VectorXd &ry, double srate = Null);
+			  Eigen::VectorXd &rx, Eigen::VectorXd &ry, double srate);
 void Resample(const Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
 
 template <typename T, typename T2>
@@ -1666,7 +1666,7 @@ void Resample(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<
 		rrz = clone(z);
 		return;
 	}	
-	T range = x(Eigen::last) - x(0);
+	T range = x(Eigen::indexing::last) - x(0);
 	if (!IsNum(srate)) 
 		srate = range/(x.size()-1);
 	int num = int(range/srate) + 1;
@@ -1699,13 +1699,13 @@ void Resample(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<
 		rrz = clone(z);
 		return;
 	}
-	T rangex = x(Eigen::last) - x(0);
+	T rangex = x(Eigen::indexing::last) - x(0);
 	if (!IsNum(sratex)) 
 		sratex = rangex/(x.size()-1);
 	int numx = int(rangex/sratex) + 1;
 	rx.resize(numx);
 	
-	T rangey = y(Eigen::last) - y(0);
+	T rangey = y(Eigen::indexing::last) - y(0);
 	if (!IsNum(sratey)) 
 		sratey = rangey/(y.size()-1);
 	int numy = int(rangey/sratey) + 1;
