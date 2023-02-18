@@ -20,7 +20,7 @@ class DataSource : public Pte<DataSource>  {
 public:
 	typedef double (DataSource::*Getdatafun)(int64 id);
 
-	DataSource() : isParam(false), isExplicit(false) {}
+	DataSource() : isParam(false), isExplicit(false), isAppend(false), isReverse(false) {}
 	virtual ~DataSource() noexcept				{magic = 4321234;}	
 	virtual double y(int64 ) = 0;
 	virtual double x(int64 ) = 0;
@@ -39,6 +39,8 @@ public:
 	virtual int GetznFixedCount() const			{return 0;}
 	bool IsParam() const						{return isParam;}
 	bool IsExplicit() const						{return isExplicit;}
+	bool IsAppend() const                       {return isAppend;}
+	bool IsReverse() const                      {return isReverse;}
 
 	void SetDestructor(Function <void(void)> _OnDestructor) {OnDestructor = _OnDestructor;}
 
@@ -240,7 +242,7 @@ public:
 	bool IsMagic() 				{return magic == 1234321;}		// Temporal use, just for testing
 	
 protected:
-	bool isParam, isExplicit;
+	bool isParam, isExplicit, isAppend, isReverse;
 	
 private:
 	Function <void(void)> OnDestructor;
@@ -261,6 +263,8 @@ public:
 		data = &_data;
 		isExplicit = _data.IsExplicit();
 		isParam = _data.IsParam();
+		isAppend = _data.IsAppend();
+		isReverse = _data.IsReverse();
 		xLow = _xLow;
 		xHigh = _xHigh;
 		count = 1000;
@@ -328,6 +332,8 @@ public:
 		data = &_data;
 		isExplicit = _data.IsExplicit();
 		isParam = _data.IsParam();
+		isAppend = _data.IsAppend();
+		isReverse = _data.IsReverse();
 		shiftX = _shiftX;
 		shiftY = _shiftY;
 		multX = _multX;
@@ -358,33 +364,42 @@ public:
 	}
 };
 
-class DataReverse : public DataSource {
-private:
+class DataWrapper : public DataSource {
+protected:
 	DataSource *data;
 
 public:
-	DataReverse() : data(0) {}
+	DataWrapper() : data(0) {}
+	DataWrapper(DataSource &_data) {Init(_data);}
+	void Init(DataSource *_data)   {Init(*_data);}
+	void Init(DataSource &_data) {
+		data = &_data;
+		isExplicit = data->IsExplicit();
+	}
+	DataSource& Data()             {return *data;}
+};
+
+class DataReverse : public DataWrapper {
+public:
+	DataReverse() {}
 	DataReverse(DataSource &_data) {Init(_data);}
 	void Init(DataSource *_data)   {Init(*_data);}
 	void Init(DataSource &_data) {
-		ASSERT(!_data.IsExplicit() && !_data.IsParam());
-		data = &_data;
+		DataWrapper::Init(_data);
+		isReverse = true;
 	}
 	virtual inline double y(int64 id) {return data->y(GetCount() - id - 1);}
 	virtual inline double x(int64 id) {return data->x(GetCount() - id - 1);}
 	virtual int64 GetCount() const	  {return data->GetCount();}
 };
 
-class DataReverseX : public DataSource {
-private:
-	DataSource *data;
-
+class DataReverseX : public DataWrapper {
 public:
-	DataReverseX() : data(0) {}
+	DataReverseX() {}
 	DataReverseX(DataSource &_data) {Init(_data);}
 	void Init(DataSource &_data) {
 		ASSERT(!_data.IsExplicit() && !_data.IsParam());
-		data = &_data;
+		DataWrapper::Init(_data);
 	}
 	virtual inline double y(int64 id) {return data->y(id);}
 	virtual inline double x(int64 id) {return data->x(GetCount() - id - 1);}
@@ -392,30 +407,32 @@ public:
 };
 
 class DataAppend : public DataSource {
-protected:
-	DataSource *data1, *data2;
+private:
+	DataSource *data[2] = {0, 0};
 
 public:
-	DataAppend() : data1(0), data2(0) {}
+	DataAppend() {}
 	DataAppend(DataSource &_data1, DataSource &_data2) {Init(_data1, _data2);}
 	void Init(DataSource &_data1, DataSource &_data2) {
-		ASSERT(!_data1.IsExplicit() && !_data1.IsParam() && !_data2.IsExplicit() && !_data2.IsParam());
-		data1 = &_data1;
-		data2 = &_data2;
+		data[0] = &_data1;
+		data[1] = &_data2;
+		isExplicit = data[0]->IsExplicit() && data[1]->IsExplicit();
+		isAppend = true;
 	}
 	virtual inline double y(int64 id) {
-		int64 count1 = data1->GetCount();
+		int64 count1 = data[0]->GetCount();
 		if (id < count1)
-			return data1->y(id);	
-		return data2->y(id - count1);
+			return data[0]->y(id);
+		return data[1]->y(id - count1);
 	}
 	virtual inline double x(int64 id) {
-		int64 count1 = data1->GetCount();
+		int64 count1 = data[0]->GetCount();
 		if (id < count1)
-			return data1->x(id);	
-		return data2->x(id - count1);
+			return data[0]->x(id);
+		return data[1]->x(id - count1);
 	}
-	virtual int64 GetCount() const		{return data1->GetCount() + data2->GetCount();}
+	virtual int64 GetCount() const		{return data[0]->GetCount() + data[1]->GetCount();}
+	DataSource& DataAt(int i)           {return *data[i];}
 };
 
 class DataRange : public DataAppend {
@@ -423,10 +440,8 @@ public:
 	DataRange() : DataAppend() {}
 	DataRange(DataSource &_data1, DataSource &_data2) {Init(_data1, _data2);}
 	void Init(DataSource &_data1, DataSource &_data2) {
-		ASSERT(!_data1.IsExplicit() && !_data1.IsParam() && !_data2.IsExplicit() && !_data2.IsParam());
-		data1 = &_data1;
 		rev.Init(_data2);
-		data2 = &rev;
+		DataAppend::Init(_data1, rev);
 	}
 private:
 	DataReverse rev;	
