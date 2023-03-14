@@ -23,10 +23,10 @@ ctrl ScatterCtrl {
 	Text SetTitle;
 	Font SetTitleFont;
 	Color SetTitleColor = :Black;
-	int SetPlotAreaLeftMargin   = 30;
-	int SetPlotAreaRightMargin  = 30;
-	int SetPlotAreaTopMargin    = 30;
-	int SetPlotAreaBottomMargin = 30;
+	int SetLeftMargin   = 30;
+	int SetRightMargin  = 30;
+	int SetTopMargin    = 30;
+	int SetBottomMargin = 30;
 	Color SetPlotAreaColor = :WhiteGray;
 	Text SetLabelX;
 	Text SetLabelY;

@@ -272,16 +272,20 @@ public:
 	ScatterCtrl& SetLabelY(const String& _yLabel)				{ScatterDraw::SetLabelY(_yLabel); 			return *this;};
 	ScatterCtrl& SetLabelY2(const String& _yLabel)				{ScatterDraw::SetLabelY2(_yLabel); 			return *this;};
 	
-	ScatterCtrl& SetPlotAreaMargin(int hLeft, int hRight, int vTop, int vBottom)
-																{ScatterDraw::SetPlotAreaMargin(hLeft, hRight, vTop, vBottom); return *this;};
-	ScatterCtrl& SetPlotAreaLeftMargin(int margin)				{ScatterDraw::SetPlotAreaLeftMargin(margin);return *this;};
-	int GetPlotAreaLeftMargin()									{return ScatterDraw::GetPlotAreaLeftMargin();};
-	ScatterCtrl& SetPlotAreaTopMargin(int margin)				{ScatterDraw::SetPlotAreaTopMargin(margin);	return *this;};
-	int GetPlotAreaTopMargin()									{return ScatterDraw::GetPlotAreaTopMargin();};
-	ScatterCtrl& SetPlotAreaRightMargin(int margin)				{ScatterDraw::SetPlotAreaRightMargin(margin);return *this;};
-	int GetPlotAreaRightMargin()								{return ScatterDraw::GetPlotAreaRightMargin();};
-	ScatterCtrl& SetPlotAreaBottomMargin(int margin)			{ScatterDraw::SetPlotAreaBottomMargin(margin);return *this;};
-	int GetPlotAreaBottomMargin()								{return ScatterDraw::GetPlotAreaBottomMargin();};
+	ScatterCtrl& SetMargin(int left, int right, int top, int bottom)
+																{ScatterDraw::SetMargin(left, right, top, bottom); return *this;};
+	ScatterCtrl& SetLeftMargin(int margin)						{ScatterDraw::SetLeftMargin(margin);return *this;};
+	ScatterCtrl& SetPlotAreaLeftMargin(int margin)				{ScatterDraw::SetLeftMargin(margin);return *this;};
+	int GetLeftMargin()											{return ScatterDraw::GetLeftMargin();};
+	ScatterCtrl& SetTopMargin(int margin)						{ScatterDraw::SetTopMargin(margin);	return *this;};
+	ScatterCtrl& SetPlotAreaTopMargin(int margin)				{ScatterDraw::SetTopMargin(margin);	return *this;};
+	int GetTopMargin()											{return ScatterDraw::GetTopMargin();};
+	ScatterCtrl& SetRightMargin(int margin)						{ScatterDraw::SetRightMargin(margin);return *this;};
+	ScatterCtrl& SetPlotAreaRightMargin(int margin)				{ScatterDraw::SetRightMargin(margin);return *this;};
+	int GetRightMargin()										{return ScatterDraw::GetRightMargin();};
+	ScatterCtrl& SetBottomMargin(int margin)					{ScatterDraw::SetBottomMargin(margin);return *this;};
+	ScatterCtrl& SetPlotAreaBottomMargin(int margin)			{ScatterDraw::SetBottomMargin(margin);return *this;};
+	int GetBottomMargin()										{return ScatterDraw::GetBottomMargin();};
 	
 	ScatterCtrl& ShowLegend(bool show = true) 					{ScatterDraw::ShowLegend(show); 			return *this;}
 	bool GetShowLegend() 										{return ScatterDraw::GetShowLegend();}

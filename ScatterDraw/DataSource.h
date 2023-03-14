@@ -1504,7 +1504,7 @@ bool IsNum(const T* r, int sz) {
 
 template <typename T>
 bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &r) {
-	return IsNum(r.data(), r.size());
+	return IsNum(r.data(), int(r.size()));
 }
 
 template <class Range>

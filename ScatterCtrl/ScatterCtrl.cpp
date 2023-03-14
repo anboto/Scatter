@@ -54,39 +54,29 @@ void ScatterCtrl::SaveToClipboard(bool) {
 #endif
 
 #ifdef PLATFORM_WIN32
-
-String FixPathName(const String &path) {
+static String FixPathNameWindows(const String &path) {
 	const char *forbstr[] = {"CON", "PRN", "AUX", "NUL", "COM", "LPT", ""};
 	for (int i = 0; forbstr[i][0] != '\0'; ++i) {
 		if (path.StartsWith(forbstr[i])) 
 			return String("_") + path;  
 	}
-	
-	String ret;	
-	const char *forbchar = "<>:\"/\\|?*";
-	for (int i = 0; i < path.GetCount(); ++i) {
-		int ch = path[i];
-		if (strchr(forbchar, ch))
-			ret << "_";
-		else
-			ret << String(ch, 1);
-	}
-	ret.Replace("..", ".");
-	
-	return ret;
+	return path;
 }
-
-#else
+#endif
 
 String FixPathName(const String &path) {
+#ifdef PLATFORM_WIN32
+	String ret = FixPathNameWindows(path);
+#else
 	String ret = path;	
-
-	ret.Replace("/", "_");
-	
-	return ret;
-}
-
 #endif
+
+	Vector<Vector<String>> replace = {{":", "_"}, {"..", "_"}, {".", "_"}, {"º", t_("deg")}, {"€", t_("Eur")}};
+	for (const Vector<String> &each : replace) 
+		ret.Replace(each[0], each[1]);
+	
+	return RemoveAccents(RemovePunctuation(ret));
+}
 
 CtrlScroll::CtrlScroll() {
 	AddFrame(scroll);
@@ -224,12 +214,12 @@ void ScatterCtrl::SaveControl() {
 	fs.Type(Format(t_("%s data file"), "xml"), "*.xml");
 	fs.Type(Format(t_("%s data file"), "bin"), "*.bin");
 	fs.AllFilesType();
-	if (!defaultDataFile.IsEmpty())
-		fs = defaultDataFile;
-	else if (!GetTitle().IsEmpty())
+	if (!GetTitle().IsEmpty())
 		fs = FixPathName(GetTitle()) + ".json";
+	else if (!defaultDataFile.IsEmpty())
+		fs = defaultDataFile;
 	else
-		fs = String(t_("Scatter plot data")) + ".json";
+		fs = S(t_("Scatter plot data")) + ".json";
 	
 	String ext = GetFileExt(~fs);
 	fs.DefaultExt(ext);
@@ -1048,7 +1038,7 @@ bool ScatterCtrl::SaveToFile(String fileName) {
 		else if (!defaultFileNamePlot.IsEmpty())
 			fs = defaultFileNamePlot;
 		else
-			fs = String(t_("Scatter plot")) + ".jpg";
+			fs = S(t_("Scatter plot")) + ".jpg";
 		
 		String ext = GetFileExt(~fs);
 		fs.DefaultExt(ext);
