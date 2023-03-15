@@ -1659,6 +1659,12 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 	} else if (data.IsAppend()) {
 		for (int i = 0; i < 2; i++)
 			points.Append(DataAddPoints(dynamic_cast<DataAppend&>(data).DataAt(i), primaryY, sequential));
+		if (data.IsRange())
+		{
+			Vector<Pointf> filtered_points;
+			filtered_points.AppendRange(FilterRange(points, [](Pointf p) { return !IsNull(p); }));
+			points = pick(filtered_points);
+		}
 	} else if (data.IsParam()) {
 		double xmin = 0;
 		double xmax = double(data.GetCount());
