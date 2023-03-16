@@ -136,8 +136,10 @@ void ScatterDraw::DrawLegend(Draw& w) const {
 				Color textColor;
 				if (serie.opacity > 0 && serie.thickness > 0 && (serie.seriesPlot || serie.legendLine))
 					textColor = serie.color;
+				else if(!IsNull(serie.markColor))
+					textColor = serie.markColor;
 				else
-					textColor = serie.markColor;					
+					textColor = serie.markBorderColor;					
 				DrawText(w, lx + lineLen + xWidth, ly - int((2*rowAscent)/3), 0, legends[ireal], font, textColor);                   
 				ireal++;
 			} 
