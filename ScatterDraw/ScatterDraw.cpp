@@ -1659,13 +1659,21 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 	} else if (data.IsAppend()) {
 		for (int i = 0; i < 2; i++)
 			points.Append(DataAddPoints(dynamic_cast<DataAppend&>(data).DataAt(i), primaryY, sequential));
+		if (data.IsRange())
+		{
+			Vector<Pointf> filtered_points;
+			filtered_points.AppendRange(FilterRange(points, [](Pointf p) { return !IsNull(p); }));
+			points = pick(filtered_points);
+		}
 	} else if (data.IsParam()) {
 		double xmin = 0;
 		double xmax = double(data.GetCount());
 		for (double x = xmin; x <= xmax; x++) {
 			double xx = data.x(x);
 			double yy = data.y(x);
-			if (IsNum(xx) && IsNum(yy))
+			if (!IsNum(xx) || !IsNum(yy))
+				points << Null;
+			else
 				points << Point(ScaleX(xx), ScaleY(yy));
 		}
 	} else if (data.IsExplicit()) {
@@ -1674,7 +1682,9 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 		double dx = (xmax - xmin)/plotW;
 		for (double xx = xmin; xx < xmax; xx += dx) {
 			double yy = data.f(xx);
-			if (IsNum(yy))
+			if (!IsNum(yy))
+				points << Null;
+			else
 				points << Point(ScaleX(xx), ScaleY(yy));
 		}
 	} else {
@@ -1726,7 +1736,9 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				npix++;
 				int ix = ScaleX(xx);
 				int iMax, iMin;
-				if (IsNum(yy)) {
+				if (!IsNum(yy)) 
+					points << Null;							
+				else {
 					iMax = ScaleY(maxY);
 					iMin = ScaleY(minY);
 					points << Point(ix, iMax);
@@ -1739,7 +1751,9 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				double xx = data.x(i);
 				double yy = data.y(i);
 				++i;
-				if (IsNum(xx) && IsNum(yy)) 
+				if (!IsNum(xx) || !IsNum(yy)) 
+					points << Null;
+				else
 					points << Point(ScaleX(xx), ScaleY(yy));
 			}
 		}

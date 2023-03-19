@@ -20,7 +20,7 @@ class DataSource : public Pte<DataSource>  {
 public:
 	typedef double (DataSource::*Getdatafun)(int64 id);
 
-	DataSource() : isParam(false), isExplicit(false), isAppend(false), isReverse(false) {}
+	DataSource() : isParam(false), isExplicit(false), isAppend(false), isReverse(false), isRange(false) {}
 	virtual ~DataSource() noexcept				{magic = 4321234;}	
 	virtual double y(int64 ) = 0;
 	virtual double x(int64 ) = 0;
@@ -41,6 +41,7 @@ public:
 	bool IsExplicit() const						{return isExplicit;}
 	bool IsAppend() const                       {return isAppend;}
 	bool IsReverse() const                      {return isReverse;}
+	bool IsRange() const						{return isRange;}
 
 	void SetDestructor(Function <void(void)> _OnDestructor) {OnDestructor = _OnDestructor;}
 
@@ -242,7 +243,7 @@ public:
 	bool IsMagic() 				{return magic == 1234321;}		// Temporal use, just for testing
 	
 protected:
-	bool isParam, isExplicit, isAppend, isReverse;
+	bool isParam, isExplicit, isAppend, isReverse, isRange;
 	
 private:
 	Function <void(void)> OnDestructor;
@@ -265,6 +266,7 @@ public:
 		isParam = _data.IsParam();
 		isAppend = _data.IsAppend();
 		isReverse = _data.IsReverse();
+		isRange = _data.IsRange();
 		xLow = _xLow;
 		xHigh = _xHigh;
 		count = 1000;
@@ -334,6 +336,7 @@ public:
 		isParam = _data.IsParam();
 		isAppend = _data.IsAppend();
 		isReverse = _data.IsReverse();
+		isRange = _data.IsRange();
 		shiftX = _shiftX;
 		shiftY = _shiftY;
 		multX = _multX;
@@ -442,6 +445,7 @@ public:
 	void Init(DataSource &_data1, DataSource &_data2) {
 		rev.Init(_data2);
 		DataAppend::Init(_data1, rev);
+		isRange = true;
 	}
 private:
 	DataReverse rev;	
