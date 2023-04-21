@@ -1534,6 +1534,13 @@ void CleanNAN(const Range1 &x, Range2 &retx) {
 	ResizeConservative(retx, n);
 }
 
+template <class Range>	// Safely can rewrite the results
+void CleanNAN_safe(Range &x) {
+	Range retx;
+	CleanNAN(x, retx);
+	x = pick(retx);
+}
+
 template <class Range1, class Range2>
 void CleanNAN(const Range1 &x, const Range1 &y, Range2 &retx, Range2 &rety) {
 	int num = int(x.size());
@@ -1550,6 +1557,14 @@ void CleanNAN(const Range1 &x, const Range1 &y, Range2 &retx, Range2 &rety) {
 	}
 	ResizeConservative(retx, n);
 	ResizeConservative(rety, n);
+}
+
+template <class Range>
+void CleanNAN_safe(Range &x, Range &y) {
+	Range retx, rety;
+	CleanNAN(x, y, retx, rety);
+	x = pick(retx);
+	y = pick(rety);
 }
 
 template <class Range1, class Range2>
@@ -1571,6 +1586,15 @@ void CleanNAN(const Range1 &x, const Range1 &y, const Range1 &z, Range2 &retx, R
 	ResizeConservative(retx, n);
 	ResizeConservative(rety, n);
 	ResizeConservative(retz, n);
+}
+
+template <class Range>
+void CleanNAN_safe(Range &x, Range &y, Range &z) {
+	Range retx, rety, retz;
+	CleanNAN(x, y, z, retx, rety, retz);
+	x = pick(retx);
+	y = pick(rety);
+	z = pick(retz);	
 }
 
 template <class Range1, class Range2>

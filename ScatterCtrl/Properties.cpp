@@ -34,8 +34,8 @@ void MeasuresTab::Init(ScatterCtrl& scatter) {
 	yMax <<= scatter.GetYRange() + scatter.GetYMin();
 	yMin2 <<= scatter.GetYMin2();
 	yMax2 <<= scatter.GetY2Range() + scatter.GetYMin2();
-	xMinUnit	<<= scatter.GetXMinUnit();
-	yMinUnit	<<= scatter.GetYMinUnit();
+	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
+	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
 	xMajorUnit	<<= scatter.GetMajorUnitsX();
 	yMajorUnit	<<= scatter.GetMajorUnitsY();
 	
@@ -119,8 +119,15 @@ void MeasuresTab::Change() {
     scatter.SetXYMinLinked(xMin, yMin, yMin2);
 	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
 
-	scatter.SetMinUnits(xMinUnit, yMinUnit);
+	scatter.SetMinUnits(xMinUnit-xMin, yMinUnit-yMin);
 	scatter.SetMajorUnits(xMajorUnit, yMajorUnit);
+
+	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
+	
+	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
+	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
+	xMajorUnit	<<= scatter.GetMajorUnitsX();
+	yMajorUnit	<<= scatter.GetMajorUnitsY();
 
 	scatter.SetGridDash(DashStyle::Style(DashStyle::TypeIndex(~dashStyle)));
 	scatter.SetGridColor(~linecolor);

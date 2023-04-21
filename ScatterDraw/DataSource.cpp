@@ -496,7 +496,7 @@ Vector<Pointf> DataSource::FFT(Getdatafun getdata, double tSample, bool frequenc
 			Vector<Pointf> fftPart;
 			fftPart = Upp::FFT(dataPart, tSample, frequency, type, window, int(numOver));
 			if (iPart == 0)
-				fft = clone(fftPart);		// pick()
+				fft = pick(fftPart);		// pick()
 			else {
 				for (int i = 0; i < fftPart.GetCount(); ++i) {
 					fft[i].y += fftPart[i].y;
@@ -869,6 +869,7 @@ double LinearInterpolate(double x, const VectorXd &vecx, const VectorXd &vecy) {
 }
 
 void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry, double srate) {
+	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
 	if (x.size() == 0 || y.size() == 0)
@@ -893,6 +894,7 @@ void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry
 }
 
 void Resample(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
+	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
 	if (x.size() == 0 || y.size() == 0)

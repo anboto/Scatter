@@ -183,7 +183,7 @@ void ScatterDraw::AdjustMinUnitY2() {
 }
 
 void ScatterDraw::AdjustMajorUnitX() {
-	if (xMajorUnit == 0 || !IsNum(xMajorUnit))
+	if (xRange <= 0 || xMajorUnit == 0 || !IsNum(xMajorUnit))
 		return;
 	while (xRange/xMajorUnit > 1.2*xMajorUnitNum) 
 		xMajorUnit *= 2;
@@ -192,7 +192,7 @@ void ScatterDraw::AdjustMajorUnitX() {
 }
 
 void ScatterDraw::AdjustMajorUnitY() {
-	if (yMajorUnit == 0 || !IsNum(yMajorUnit))
+	if (yRange <= 0 || yMajorUnit == 0 || !IsNum(yMajorUnit))
 		return;
 	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
 		return;
@@ -203,7 +203,7 @@ void ScatterDraw::AdjustMajorUnitY() {
 }
 
 void ScatterDraw::AdjustMajorUnitY2() {
-	if (yMajorUnit2 == 0 || !IsNum(yMajorUnit2))
+	if (yRange2 <= 0 || yMajorUnit2 == 0 || !IsNum(yMajorUnit2))
 		return;
 	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
 		return;
@@ -276,15 +276,13 @@ ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
 }
 
 ScatterDraw &ScatterDraw::SetMinUnits(double ux, double uy) {
-	if (IsNum(ux))
+	if (IsNum(ux)) {
 		xMinUnit = xMinUnit0 = ux;
+		AdjustMinUnitX();
+	}
 	if (IsNum(uy)) {	
 		yMinUnit = yMinUnit0 = uy;
 		yMinUnit2 = yMinUnit20 = yRange2*yMinUnit/yRange;
-	}
-	if (IsNum(ux))
-		AdjustMinUnitX();
-	if (IsNum(uy)) {
 		AdjustMinUnitY();
 		AdjustMinUnitY2();	
 	}

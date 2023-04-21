@@ -75,7 +75,7 @@ String FixPathName(const String &path) {
 	for (const Vector<String> &each : replace) 
 		ret.Replace(each[0], each[1]);
 	
-	return RemoveAccents(RemovePunctuation(ret));
+	return RemoveAccents(RemovePunctuation(RemoveGreek(ret)));
 }
 
 CtrlScroll::CtrlScroll() {
