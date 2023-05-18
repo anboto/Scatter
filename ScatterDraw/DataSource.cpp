@@ -121,18 +121,13 @@ Pointf DataSource::MaxSubDataImp(Getdatafun getdataY, Getdatafun getdataX, int64
 }
 
 double DataSource::Avg(Getdatafun getdata) {
-	double ret = 0;
-	int count = 0;
-	for (int64 i = 0; i < size(); ++i) {
-		double d = Membercall(getdata)(i);
-		if (IsNum(d)) {
-			ret += d;
-			count++;
-		}
-	}
-	if (count == 0) 
-		return Null;
-	return ret/count;
+	VectorXd d = Copy<VectorXd>(getdata);
+	return d.mean();
+}
+
+double DataSource::AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w) {
+	VectorXd d = Copy<VectorXd>(getdata);
+	return (w.array()*d.array()).sum()/w.sum();		// Weighted average
 }
 
 int64 DataSource::Closest(Getdatafun getdata, double dat) {

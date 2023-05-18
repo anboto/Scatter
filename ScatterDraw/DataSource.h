@@ -155,7 +155,9 @@ public:
 	int64 ClosestX(double d)  		{return Closest(&DataSource::x, d);}
 	double AvgY()  					{return Avg(&DataSource::y);}		
 	double AvgX()  					{return Avg(&DataSource::x);}	
-	double RMSY()  					{return RMS(&DataSource::y);}			
+	double AvgYWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::y, w);}		
+	double AvgXWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::x, w);}	
+	double RMSY()  									{return RMS(&DataSource::y);}			
 	double StdDevY(double avg = Null)  				{return StdDev(&DataSource::y, avg);}
 	double StdDevX(double avg = Null)  				{return StdDev(&DataSource::x, avg);}
 	double VarianceY(double avg = Null)  			{return Variance(&DataSource::y, avg);}	
@@ -203,6 +205,7 @@ public:
 	double Min(Getdatafun getdata, int64& id);
 	double Max(Getdatafun getdata, int64& id);
 	double Avg(Getdatafun getdata);
+	double AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w);
 	int64 Closest(Getdatafun getdata, double d);
 	int64 Closest(Getdatafun getdataX, Getdatafun getdataY, double x, double y);
 	double IsSorted(Getdatafun getdata);
@@ -1045,7 +1048,7 @@ void GetInterpolatePos(const typename Range::value_type x, const Range &vecx, in
 }
 
 template <class T>
-T LinearInterpolate(const T x, const T *vecx, const T *vecy, size_t len) {
+T LinearInterpolateDir(const T x, const T *vecx, const T *vecy, int len) {
 	ASSERT(len > 1);
 	if (x < vecx[0])
 		return vecy[0];
@@ -1054,6 +1057,27 @@ T LinearInterpolate(const T x, const T *vecx, const T *vecy, size_t len) {
 			return LinearInterpolate(x, vecx[i], vecx[i+1], vecy[i], vecy[i+1]);
 	
 	return vecy[len-1];
+}
+
+template <class T>
+T LinearInterpolateRev(const T x, const T *vecx, const T *vecy, int len) {
+	ASSERT(len > 1);
+	if (x < vecx[len-1])
+		return vecy[len-1];
+	for (int i = len-1; i > 0; --i) 
+		if (vecx[i-1] >= x && vecx[i] <= x) 
+			return LinearInterpolate(x, vecx[i], vecx[i-1], vecy[i], vecy[i-1]);
+	
+	return vecy[0];
+}
+
+template <class T>
+T LinearInterpolate(const T x, const T *vecx, const T *vecy, size_t len) {
+	ASSERT(len > 1);
+	if (vecx[1] > vecx[0])
+		return LinearInterpolateDir(x, vecx, vecy, int(len));
+	else
+		return LinearInterpolateRev(x, vecx, vecy, int(len));		
 }
 
 template <typename T>

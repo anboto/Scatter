@@ -24,7 +24,7 @@ public:
 	virtual FitError Fit(DataSource &series, double &r2);
 	FitError Fit(DataSource &series)		{double dummy; return Fit(series, dummy);}
 	virtual void GuessCoeff(DataSource &series)	= 0;
-	void SetWeight(const Eigen::VectorXd &w){weight = clone(w);}
+	void SetWeight(const Eigen::VectorXd &w);
 	
 	virtual double f(double ) 				= 0;
 	virtual double f(double , double ) 		{NEVER(); return Null;}
@@ -68,6 +68,7 @@ public:
 		return *this;
 	}
 	double R2Y(DataSource &series, double mean = Null);
+	double R2YWeighted(DataSource &series, double mean = Null);
 	
 protected:
 	Vector<double> coeff;
