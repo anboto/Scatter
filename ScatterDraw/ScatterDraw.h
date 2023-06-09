@@ -618,6 +618,8 @@ public:
 	template <class X, class Y>
 	ScatterDraw &InsertSeries(int index, ArrayMap<X, Y> &data)	{return _InsertSeries(index, new ArrayMapXY<X, Y>(data));}
 	
+	const ScatterSeries &GetSeries(int i)	{return series[i];}
+	
 	int64 GetCount(int index);
 	void GetValues(int index, int64 idata, double &x, double &y);
 	double GetValueX(int index, int64 idata);

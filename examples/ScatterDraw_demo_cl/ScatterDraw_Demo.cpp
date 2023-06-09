@@ -76,11 +76,17 @@ void NullDataDemo(String fileName) {
 	scatter.AddSeries(s1).Legend("Series null").Units("kW", "seg");
 	
 	scatter.SetTitle("ScatterDraw Null data demo").SetTitleFont(SansSerif(14).Bold());
-	scatter.SetFastViewX(true).SetSequentialXAll(true);
 	scatter.SetLabelY("Power").SetLabelX("Time").SetLabelsFont(SansSerif(12));
-	scatter.SetPlotAreaLeftMargin(70).SetPlotAreaRightMargin(30).SetPlotAreaTopMargin(40).SetPlotAreaBottomMargin(50);
+	scatter.SetLeftMargin(70).SetRightMargin(30).SetTopMargin(40).SetBottomMargin(50);
 	scatter.SetMode(ScatterDraw::MD_ANTIALIASED).SetLegendAnchor(ScatterDraw::RIGHT_TOP);
 	scatter.SetSize(Size(1000, 500)).ZoomToFit(true, true);
+	scatter.SetSequentialXAll().SetFastViewX();
+	scatter.WhenPainter = [&](Painter &p) {
+		double sizex = scatter.GetSizeX(0.5);
+		DrawText(p, scatter.GetPosX(4) - sizex, scatter.GetPosY(35), 0, "This is a Null", Arial(14), Black());
+		DrawText(p, scatter.GetPosX(7) - sizex, scatter.GetPosY(40), 0, "This is another Null", Arial(14), Black());
+		
+	};
 	
 	fileName = fileName + " null data.png";
 	PNGEncoder().SaveFile(fileName, scatter.GetImage());	

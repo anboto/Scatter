@@ -1548,7 +1548,7 @@ bool IsNum(const Range& r) {
 
 template <class Range1, class Range2>
 void CleanNAN(const Range1 &x, Range2 &retx) {
-	int num = x.size();
+	int num = int(x.size());
 	Resize(retx, num);
 	int n = 0;
 	for (int i = 0; i < num; ++i) {		

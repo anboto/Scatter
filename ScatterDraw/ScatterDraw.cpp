@@ -1718,30 +1718,29 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				int64 ii;
 				double maxv = data.x(imin) + dxpix*npix; 
 				double maxY = yy, minY = yy;
-				for (ii = 1; i + ii < imax && data.x(i + ii) < maxv; ++ii) {
+				for (ii = 1; (i + ii < imax) && IsNum(data.x(i + ii)) && data.x(i + ii) < maxv; ++ii) {
 					double dd = data.y(i + ii);
-					if (!IsNum(dd))
-						continue;
 					maxY = max(maxY, dd);
 					minY = min(minY, dd);
 				}
 				double xx = data.x(i);
 				if (!IsNum(xx)) {
 					++i;
-					continue;
-				}
-				i += ii;
-				npix++;
-				int ix = ScaleX(xx);
-				int iMax, iMin;
-				if (!IsNum(yy)) 
-					points << Null;							
-				else {
-					iMax = ScaleY(maxY);
-					iMin = ScaleY(minY);
-					points << Point(ix, iMax);
-					if (iMax != iMin)
-						points << Point(ix, iMin);	
+					points << Null;
+				} else {
+					i += ii;
+					npix++;
+					int ix = ScaleX(xx);
+					int iMax, iMin;
+					if (!IsNum(yy)) 
+						points << Null;							
+					else {
+						iMax = ScaleY(maxY);
+						iMin = ScaleY(minY);
+						points << Point(ix, iMax);
+						if (iMax != iMin)
+							points << Point(ix, iMin);	
+					}
 				}
 			} 
 		} else {
