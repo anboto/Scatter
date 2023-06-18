@@ -122,6 +122,8 @@ protected:
 		bool showLegend;
 		bool legendLine; // show line in legend even if series is NoPlot
 		
+		int angle;
+		
 		int id;
 	
 	private:
@@ -885,13 +887,13 @@ public:
 	Color& GetRainbowPaletteTextColor() 					{return rainbowPaletteTextColor;}
 	
 	ScatterDraw &AddLabelSeries(Vector<String> &labels, int dx = 0, int dy = 0, Font font = StdFont(), 
-					Alignment align = ALIGN_CENTER, Color color = SColorText()) {
+					Alignment align = ALIGN_CENTER, Color color = SColorText(), int angle = 0) {
 		int index = series.GetCount() - 1;
 		
-		return AddLabelSeries(index, labels, dx, dy, font, align, color);
+		return AddLabelSeries(index, labels, dx, dy, font, align, color, angle);
 	}
 	ScatterDraw& AddLabelSeries(int index, Vector<String> &labels, int dx = 0, int dy = 0, Font font = StdFont(), 
-					Alignment align = ALIGN_CENTER, Color color = SColorText()) {	
+					Alignment align = ALIGN_CENTER, Color color = SColorText(), int angle = 0) {	
 		ASSERT(IsValid(index));
 		ASSERT(!series[index].IsDeleted());
 		
@@ -901,6 +903,7 @@ public:
 		series[index].labelsFont = font;
 		series[index].labelsAlign = align;
 		series[index].labelsColor = color;
+		series[index].angle = angle;
 		return *this;
 	}
 	
@@ -1698,17 +1701,24 @@ void ScatterDraw::Plot(T& w) {
 					if (!IsNull(points[i])) {
 						String txt = (*(serie.labels))[i];
 						Size sz = GetTextSizeSpace(txt, fnt);
-						int ddy = static_cast<int>(-sz.cy/2.);
-						int ddx = 0;
+						double ddy = static_cast<int>(-sz.cy/2.);
+						double ddx;
 						switch (serie.labelsAlign) {
 						case ALIGN_LEFT:	ddx = 0;		break;
-						case ALIGN_CENTER:	ddx = -sz.cx/2;	break;
+						case ALIGN_CENTER:	ddx = -sz.cx/2.;break;
 						case ALIGN_RIGHT:	ddx = -sz.cx;	break;
 						default: 			NEVER();
 						}
+						if (serie.angle != 0) {
+							double l = sqrt(ddx*ddx + ddy*ddy);
+							double ang = serie.angle + atan2(ddy, ddx)*180/M_PI; 
+							ang *= M_PI/180;
+							ddx = l*cos(ang);
+							ddy = l*sin(ang);
+						}
 						double x = points[i].x + dx + ddx;
 						double y = points[i].y + dy + ddy;
-						DrawText(w, x, y, 0, txt, fnt, serie.labelsColor);
+						DrawText(w, x, y, serie.angle*10, txt, fnt, serie.labelsColor);
 					}
 				}
 			}

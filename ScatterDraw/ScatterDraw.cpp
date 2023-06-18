@@ -557,6 +557,7 @@ ScatterDraw::ScatterBasicSeries::ScatterBasicSeries() {
 	labelsAlign = ALIGN_CENTER;
 	showLegend = true;
 	legendLine = false;
+	angle = 0;
 }
 		
 void ScatterDraw::ScatterBasicSeries::Init(int index) {
