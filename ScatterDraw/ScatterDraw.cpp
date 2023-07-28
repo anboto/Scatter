@@ -228,7 +228,7 @@ ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
 		AdjustMajorUnitY(); 
 		AdjustMinUnitY();
 	}
-	if (!IsNull(ry2)) {
+	if (IsNum(ry2)) {
 		yRange2 = ry2;
 		AdjustMajorUnitY2();
 		AdjustMinUnitY2();
@@ -767,9 +767,12 @@ ScatterDraw &ScatterDraw::SetMarkStyleType(int index, int type) {
 	ASSERT(IsValid(index));
 	ASSERT(!series[index].IsDeleted());
 	
-	if (series[index].markPlot)
-		series[index].markPlot->SetTypeType(type);
-	
+	if (IsNull(type)) 
+		series[index].markPlot = GetNewMarkPlot(index);
+	else {
+		if (series[index].markPlot)
+			series[index].markPlot->SetTypeType(type);
+	}
 	return *this;	
 }
 
@@ -781,7 +784,8 @@ ScatterDraw &ScatterDraw::Stroke(int index, double thickness, Color color) {
 		color = GetNewColor(index);
 	series[index].color = color;
 	series[index].thickness = thickness;
-	//series[index].dash = GetNewDash(index);
+	//if (visibleBN)
+	//	series[index].dash = GetNewDash(index);
 	
 	Refresh();
 	return *this;	
@@ -1780,7 +1784,8 @@ INITBLOCK {
 	DashStyle::Register("LINE_DOTTED_SEP", LINE_DOTTED_SEP);
 	DashStyle::Register("LINE_DASHED", LINE_DASHED);
 	DashStyle::Register("LINE_DASH_DOT", LINE_DASH_DOT);
-	DashStyle::Register("-    -", LINE_BEGIN_END);
+	DashStyle::Register("LINE_BEGIN_END", LINE_BEGIN_END);
+	DashStyle::Register("LINE_NONE", LINE_NONE);
 }
 
 }

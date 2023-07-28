@@ -48,7 +48,7 @@ Vector <double> &GetDashedArray(String dash) {
 	int pos = pats.Find(dash);
 	if (pos < 0) {
 		pats.Add(dash, GetLineDash(dash));
-		pos = pats.GetCount()-1;
+		pos = pats.size()-1;
 	} 
 	return pats.GetValues()[pos];
 }
@@ -193,7 +193,7 @@ void DrawCircleOpa(Draw& w, double x, double y, double r, double scale, double o
 }
 
 void DashScaled(Painter& w, const String dash, double scale) {
-	if (!dash.IsEmpty()) {		
+	if (!dash.IsEmpty() && dash != LINE_NONE) {		
 		Vector<double> d;
 		double start = 0;
 		CParser p(dash);
@@ -306,7 +306,9 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 			if (!(IsNull(p[i-1]) || IsNull(p[i])))
 				w.DrawLine(p[i-1], p[i], int(thick*scale), color);
 		}
-	} else {
+	} else if (dash == LINE_NONE) 
+		;
+	else {
 		Vector <double> &pat = GetDashedArray(dash);
 		if (pat.IsEmpty())
 			return;
@@ -344,6 +346,10 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double opacity, 
 				double thick, const Color &color, String dash, const Color &) {	
 	ASSERT(!p.IsEmpty());
+	
+	if (dash == LINE_NONE)
+		return;
+	
 	bool broken = true;
 	for (int i = 0; i < p.size(); ++i) {
 		if (IsNull(p[i]))

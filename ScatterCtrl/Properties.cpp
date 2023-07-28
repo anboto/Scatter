@@ -238,6 +238,9 @@ void LegendTab::Init(ScatterCtrl& scatter) {
 	showLegend <<= scatter.GetShowLegend();
 	showLegend.WhenAction = [=] {Change();};
 	
+	legend_w_units <<= scatter.GetLegendWithUnits();
+	legend_w_units.WhenAction = [=] {Change();};
+	
 	legendPosition <<= (scatter.GetLegendAnchor() == ScatterDraw::TOP ? 0 : 1);
 	legendPosition.WhenAction = [=] {Change();};
 	switch(scatter.GetLegendAnchor()) {
@@ -286,6 +289,7 @@ void LegendTab::Change() {
 	ScatterCtrl &scatter = *pscatter;
 	
     scatter.ShowLegend(showLegend);
+    scatter.SetLegendWithUnits(legend_w_units);
     scatter.SetLegendRowSpacing(rowSpacing);
     ScatterDraw::LEGEND_POS legendTableAnchor;
     if (legendPosition == 0)
@@ -506,9 +510,15 @@ void SeriesTab::Change() {
 	scatter.SetFillColor(index, ~right.fillcolor);
 	scatter.ScatterDraw::Show(index, ~right.visible);
 	scatter.Dash(index, DashStyle::Style(DashStyle::TypeIndex(~right.dashStyle)));
-	scatter.Stroke(index, ~right.linethickness, Upp::Color(~right.linecolor));
-//	if (IsNull(Upp::Color(~right.linecolor)))
-//		scatter.SetLineColor(index, Upp::Color(~right.linecolor));
+	if (!IsNull(Upp::Color(~right.linecolor)))
+		scatter.Stroke(index, ~right.linethickness, Upp::Color(~right.linecolor));
+	else {
+		double thickness;										// Null is not allowed
+		Color color;
+		scatter.GetStroke(index, thickness, color);
+		right.linecolor <<= color;
+		scatter.Stroke(index, ~right.linethickness, color);		// Maintain the same colour
+	}
 	
 	scatter.MarkStyle(index, String(~right.markstyle));
 	scatter.SetMarkColor(index, Upp::Color(~right.markcolor));

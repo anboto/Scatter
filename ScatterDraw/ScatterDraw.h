@@ -75,13 +75,14 @@ public:
 	};
 	
 	#define LINE_SOLID 		  ""
+	#define LINE_NONE 		  "0"
 	#define LINE_DOTTED_FINER "2 10"
 	#define LINE_DOTTED_FINE  "2 6"
 	#define LINE_DOTTED 	  "4 10"
 	#define LINE_DOTTED_SEP	  "4 20"
 	#define LINE_DASHED 	  "12 12"
 	#define LINE_DASH_DOT 	  "12 8 3 8"	// Reduced. Previous was too long
-	#define LINE_BEGIN_END	  "-"
+	#define LINE_BEGIN_END	  "2"
 	
 protected:
 	class ScatterBasicSeries {
@@ -447,6 +448,9 @@ public:
 	Color& GetLegendFillColor() 							{return legendFillColor;}
 	Color& GetLegendBorderColor() 							{return legendBorderColor;}
 	
+	ScatterDraw& SetLegendWithUnits(bool show = true) 		{legend_w_units = show;		return *this;}
+	bool GetLegendWithUnits()								{return legend_w_units;}
+	
 	ScatterDraw& SetMode(int _mode = MD_ANTIALIASED)		{mode = _mode; Refresh(); return *this;};
 	int GetMode()											{return mode;};
 	
@@ -668,15 +672,15 @@ public:
 	ScatterDraw &MarkStyle(int index, int typeidx);
 	ScatterDraw &MarkStyle(const String name)				{return MarkStyle(series.GetCount() - 1, name);}
 	const String GetMarkStyleName(int index);
-	ScatterDraw &SetMarkStyleType(int index, int type);
-	ScatterDraw &SetMarkStyleType(int type)					{return SetMarkStyleType(series.GetCount() - 1, type);}
+	ScatterDraw &SetMarkStyleType(int index, int type = Null);
+	ScatterDraw &SetMarkStyleType(int type = Null)			{return SetMarkStyleType(series.GetCount() - 1, type);}
 	int GetMarkStyleType(int index);
 	
 	ScatterDraw &NoMark()	{return MarkStyle();};
 		
 	ScatterDraw &Stroke(int index, double thickness, Color color);
 	ScatterDraw &Stroke(double thickness, Color color = Null)   {return Stroke(series.GetCount() - 1, thickness, color);}
-	ScatterDraw &SetLineColor(int index, Color color);
+	//ScatterDraw &SetLineColor(int index, Color color);
 	void GetStroke(int index, double &thickness, Color &color);
 	ScatterDraw &Closed(int index, bool closed);
 	ScatterDraw &Closed(bool closed)							{return Closed(series.GetCount() - 1, closed);}
@@ -1026,6 +1030,8 @@ public:
 				("surfUnits", surfUnits)
 				("surfUnitsPos", intsurfUnitsPos)
 				("surfLegendPos", intsurfLegendPos)
+				("showLegend", showLegend)
+				("legend_w_units", legend_w_units)
 			;
 			if (io.IsLoading()) {
 				labelsChanged = true;
@@ -1120,6 +1126,8 @@ public:
 				% drawYReticleNumbers
 				% drawY2ReticleNumbers
 				% axisWidth
+				% showLegend
+				% legend_w_units
 			;
 			if (s.IsLoading()) {
 				labelsChanged = true;
@@ -1197,6 +1205,7 @@ protected:
 	Array<ScatterSeries> series;
 	
 	bool showLegend = true;
+	bool legend_w_units = true;
 	
 	bool isPolar = false;
 	
