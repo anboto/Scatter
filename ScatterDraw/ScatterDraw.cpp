@@ -307,7 +307,7 @@ ScatterDraw &ScatterDraw::ZoomToFit(bool horizontal, bool vertical, double facto
 	}
 	ZoomToFitNonLinked(horizontal, vertical, factorH, factorV);
 	if (!linkedCtrls.IsEmpty()) {
-		for (int i = 0; i < linkedCtrls.GetCount(); ++i)
+		for (int i = 0; i < linkedCtrls.size(); ++i)
 	    	linkedCtrls[i]->ZoomToFitNonLinked(horizontal, vertical, factorH, factorV);
 	}
 	WhenZoomToFit();
@@ -321,7 +321,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 	
 	try {
 		if (horizontal) {
-			for (int j = 0; j < series.GetCount(); j++) {
+			for (int j = 0; j < series.size(); j++) {
 				ScatterSeries &serie = series[j]; 
 				if (serie.IsDeleted() || serie.opacity == 0 || serie.Data().IsExplicit())
 					continue;
@@ -343,11 +343,11 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 			}
 		}
 		if (vertical) {
-			for (int j = 0; j < series.GetCount(); j++) {
+			for (int j = 0; j < series.size(); j++) {
 				ScatterSeries &serie = series[j]; 
 				if (serie.IsDeleted() || serie.opacity == 0 || serie.Data().IsExplicit())
 					continue;
-				for (int64 i = 0; i < serie.Data().GetCount(); i++) {
+				for (int64 i = 0; i < serie.Data().size(); i++) {
 					double py = serie.Data().y(i);
 					if (!IsNum(py))
 						continue;
@@ -1649,8 +1649,7 @@ bool ScatterDraw::CheckDash(const char *dash) {
 	return true;
 }
 
-Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool sequential)
-{
+Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool sequential) {
 	Vector<Pointf> points;
 	auto ScaleX = [w=plotW, x0=xMin, r=xRange](double x) { return fround(w*(x - x0)/r); };
 	auto ScaleY =
@@ -1763,6 +1762,55 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 	return points;
 }
 
+double ScatterDraw::GetSeriesMaxX() {
+	if (series.IsEmpty())
+		return Null;
+	double mx = series[0].Data().MaxX();
+	for (int i = 1; i < series.size(); ++i) {
+		double d = series[i].Data().MaxX();
+		if (d > mx)
+			mx = d;
+	}
+	return mx;
+}
+
+double ScatterDraw::GetSeriesMinX() {
+	if (series.IsEmpty())
+		return Null;
+	double mn = series[0].Data().MinX();
+	for (int i = 1; i < series.size(); ++i) {
+		double d = series[i].Data().MinX();
+		if (d < mn)
+			mn = d;
+	}
+	return mn;
+}
+
+double ScatterDraw::GetSeriesMaxY() {
+	if (series.IsEmpty())
+		return Null;
+	double mx = series[0].Data().MaxY();
+	for (int i = 1; i < series.size(); ++i) {
+		double d = series[i].Data().MaxY();
+		if (d > mx)
+			mx = d;
+	}
+	return mx;
+}
+
+double ScatterDraw::GetSeriesMinY() {
+	if (series.IsEmpty())
+		return Null;
+	double mn = series[0].Data().MinY();
+	for (int i = 1; i < series.size(); ++i) {
+		double d = series[i].Data().MinY();
+		if (d < mn)
+			mn = d;
+	}
+	return mn;
+}
+	
+	
 INITBLOCK {
 	SeriesPlot::Register<LineSeriesPlot>("Line");
 	SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");

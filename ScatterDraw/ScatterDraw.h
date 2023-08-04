@@ -807,6 +807,11 @@ public:
 	double GetXPointByValue(double x);
 	double GetYPointByValue(double y);
 
+	double GetSeriesMaxX();
+	double GetSeriesMinX();
+	double GetSeriesMaxY();
+	double GetSeriesMinY();
+
 	int GetCount() 	{return series.GetCount();}
 	bool IsEmpty()	{return series.IsEmpty();}
 	

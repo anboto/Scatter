@@ -240,7 +240,17 @@ public:
 		}
 	}
 	double GetPeriod() 			{return 2*M_PI/abs(coeff[3]);}
-	double GetDampingRatio()	{return coeff[3] != 0 ? -coeff[2]/coeff[3] : Null;}
+	double GetDampingRatio()	{return coeff[2]/sqrt(sqr(coeff[2]) + sqr(coeff[3]));}
+	FitError Fit(DataSource &data, double &r2) {	
+		FitError ret = ExplicitEquation::Fit(data, r2);		
+		if (ret == NoError) {
+			if (coeff[3] < 0) {		// cos(a) = cos(-a)
+				coeff[3] = -coeff[3];
+				coeff[4] = -coeff[4];
+			}
+		}
+		return ret;
+	}
 };
 
 class Sin_DampedSinEquation : public ExplicitEquation {
@@ -276,6 +286,20 @@ public:
 			coeff[2] = frequency;
 			coeff[3] = phase;
 		}
+	}
+	FitError Fit(DataSource &data, double &r2) {	
+		FitError ret = ExplicitEquation::Fit(data, r2);		
+		if (ret == NoError) {
+			if (coeff[2] < 0) {		// cos(a) = cos(-a)
+				coeff[2] = -coeff[3];
+				coeff[3] = -coeff[4];
+			}
+			if (coeff[6] < 0) {		// cos(a) = cos(-a)
+				coeff[6] = -coeff[3];
+				coeff[7] = -coeff[4];
+			}
+		}
+		return ret;
 	}
 };
 	
