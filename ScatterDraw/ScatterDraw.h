@@ -1184,7 +1184,7 @@ protected:
 	double xRange = 100., yRange = 100., yRange2 = 100.;
 	double xMin = 0, yMin = 0, yMin2 = 0;
 	double xMajorUnit = 10, yMajorUnit = 10, yMajorUnit2 = 10;
-	double xMajorUnitNum = 5, yMajorUnitNum = 5;
+	//double xMajorUnitNum = 5, yMajorUnitNum = 5;
 	double xMinUnit = 0, yMinUnit = 0, yMinUnit2 = 0;
 	double xMinUnit0 = 0, yMinUnit0 = 0, yMinUnit20 = 0;
 	double minXRange = -1, maxXRange = -1, minYRange = -1, maxYRange = -1;
@@ -1746,6 +1746,8 @@ void ScatterDraw::Plot(T& w) {
 	w.End();
 }
 		
+double GetMajorUnits(double minV, double maxV);
+			
 }
 		
 #endif

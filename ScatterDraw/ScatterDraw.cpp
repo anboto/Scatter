@@ -149,74 +149,55 @@ bool ScatterDraw::PointInLegend(Point &)  {
 void ScatterDraw::AdjustMinUnitX() {
 	if (SetGridLinesX)
 		return;
-	xMinUnit = xMinUnit0;
-	if (xMajorUnit > 0) {
-		if (xMinUnit < 0)
-			xMinUnit += (fabs(floor(xMinUnit/xMajorUnit)))*xMajorUnit;
-		else if (xMinUnit >= xMajorUnit) 
-			xMinUnit -= (fabs(floor(xMinUnit/xMajorUnit)))*xMajorUnit;
-	}
+	xMinUnit = NumberWithLeastSignificantDigits(xMin, xMin + xRange) - xMin;
+	while (xMinUnit < 0)
+		xMinUnit += xMajorUnit;
+	while (xMinUnit - xMajorUnit > 0)
+		xMinUnit -= xMajorUnit;
 }
 
 void ScatterDraw::AdjustMinUnitY() {
 	if (SetGridLinesY)
 		return;
-	yMinUnit = yMinUnit0;
-	if (yMajorUnit > 0) {
-		if (yMinUnit < 0)
-			yMinUnit += (fabs(ceil(yMinUnit/yMajorUnit)) + 1)*yMajorUnit;
-		else if (yMinUnit >= yMajorUnit)
-			yMinUnit -= (fabs(floor(yMinUnit/yMajorUnit)))*yMajorUnit;
-	}
+	yMinUnit = NumberWithLeastSignificantDigits(yMin, yMin + yRange) - yMin;
+	while (yMinUnit < 0)
+		yMinUnit += yMajorUnit;
+	while (yMinUnit - yMajorUnit > 0)
+		yMinUnit -= yMajorUnit;
 }
 
 void ScatterDraw::AdjustMinUnitY2() {
 	if (SetGridLinesY)
 		return;
-	yMinUnit2 = yMinUnit20;
-	if (yMajorUnit2 > 0) {
-		if (yMinUnit2 < 0)
-			yMinUnit2 += (fabs(ceil(yMinUnit2/yMajorUnit2)) + 1)*yMajorUnit2;
-		else if (yMinUnit2 >= yMajorUnit2)
-			yMinUnit2 -= (fabs(floor(yMinUnit2/yMajorUnit2)))*yMajorUnit2;
-	}
+	yMinUnit2 = NumberWithLeastSignificantDigits(yMin2, yMin2 + yRange2) - yMin2;
+	while (yMinUnit2 < 0)
+		yMinUnit2 += yMajorUnit2;
+	while (yMinUnit2 - yMajorUnit2 > 0)
+		yMinUnit2 -= yMajorUnit2;
 }
 
 void ScatterDraw::AdjustMajorUnitX() {
 	if (xRange <= 0 || xMajorUnit == 0 || !IsNum(xMajorUnit))
 		return;
-	while (xRange/xMajorUnit > 1.2*xMajorUnitNum) 
-		xMajorUnit *= 2;
-	while (xRange/xMajorUnit < xMajorUnitNum/1.5 && xMajorUnit > 0) 
-		xMajorUnit /= 2;
+	xMajorUnit = GetMajorUnits(xMin, xMin + xRange);
 }
 
 void ScatterDraw::AdjustMajorUnitY() {
 	if (yRange <= 0 || yMajorUnit == 0 || !IsNum(yMajorUnit))
 		return;
-	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
-		return;
-	while (yRange/yMajorUnit > 1.2*yMajorUnitNum) 
-		yMajorUnit *= 2;
-	while (yRange/yMajorUnit < yMajorUnitNum/1.5) 
-		yMajorUnit /= 2;
+	yMajorUnit = GetMajorUnits(yMin, yMin + yRange);
 }
 
 void ScatterDraw::AdjustMajorUnitY2() {
 	if (yRange2 <= 0 || yMajorUnit2 == 0 || !IsNum(yMajorUnit2))
 		return;
-	if (yMajorUnitNum == 0 || !IsNum(yMajorUnitNum))
-		return;
-	while (yRange2/yMajorUnit2 > 1.2*yMajorUnitNum) 
-		yMajorUnit2 *= 2;
-	while (yRange2/yMajorUnit2 < yMajorUnitNum/1.5) 
-		yMajorUnit2 /= 2;
+	yMajorUnit2 = GetMajorUnits(yMin2, yMin2 + yRange2);
 }
 
 ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
-	ASSERT(!IsNum(rx) || rx  >= 0);
-	ASSERT(!IsNum(ry) || ry  >= 0);
-	ASSERT(!IsNum(ry2)|| ry2 >= 0);
+	ASSERT(!IsNum(rx)  || rx  >= 0);
+	ASSERT(!IsNum(ry)  || ry  >= 0);
+	ASSERT(!IsNum(ry2) || ry2 >= 0);
 	
 	if (IsNum(rx)) {
 		xRange = rx;
@@ -238,37 +219,22 @@ ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
 }
 
 ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
+	ASSERT(!IsNum(ux)  || ux   >= 0);
+	ASSERT(!IsNum(uy)  || uy   >= 0);
+	ASSERT(!IsNum(uy2) || uy2  >= 0);
+	
 	if (IsNum(ux)) {
 		xMajorUnit = ux;
-		xMajorUnitNum = max(3, int(xRange/ux));
 		AdjustMinUnitX();
 	}
 	if (IsNum(uy)) {
 		yMajorUnit = uy;
 		yMajorUnit2 = uy*yRange2/yRange;
-		yMajorUnitNum = max(3, int(yRange/uy));
 		AdjustMinUnitY();
 		AdjustMinUnitY2();
 	} else if (IsNum(uy2)) {
 		yMajorUnit2 = uy2;
 		yMajorUnit = uy2*yRange/yRange2;
-		yMajorUnitNum = max(3, int(yRange/yMajorUnit));
-		AdjustMinUnitY();
-		AdjustMinUnitY2();
-	}
-	return *this;
-}
-
-ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
-	if (IsNum(nx)) {
-		xMajorUnitNum = nx;
-		xMajorUnit = xRange/nx;
-		AdjustMinUnitX();
-	}
-	if (IsNum(ny)) {
-		yMajorUnitNum = ny;
-		yMajorUnit = yRange/ny;
-		yMajorUnit2 = yMajorUnit*yRange2/yRange;
 		AdjustMinUnitY();
 		AdjustMinUnitY2();
 	}
@@ -392,8 +358,8 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				double deltaX = xMin - minx;
 				xMin -= deltaX;
 				
-				AdjustMinUnitX();
 				AdjustMajorUnitX();
+				AdjustMinUnitX();
 			}
 		}
 		if (vertical) {
@@ -1809,8 +1775,30 @@ double ScatterDraw::GetSeriesMinY() {
 	}
 	return mn;
 }
-	
-	
+
+double GetMajorUnits(double minV, double maxV) {
+	ASSERT(minV < maxV);
+	double rgy = maxV - minV;
+	double dy = rgy/6;
+	dy = pow(10, GetExponent10(rgy));
+	if (int(rgy/dy) > 6) {
+		if (int(rgy/(2*dy)) < 6) 
+			dy *= 2;
+		else
+			dy *= 5;
+	} else if (int(rgy/dy) < 3) {
+		dy /= 10;
+		
+		if (int(rgy/dy) > 6) {
+			if (int(rgy/(2*dy)) < 6) 
+				dy *= 2;
+			else
+				dy *= 5;
+		} 
+	}
+	return dy;
+}
+
 INITBLOCK {
 	SeriesPlot::Register<LineSeriesPlot>("Line");
 	SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");
