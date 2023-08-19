@@ -1745,8 +1745,6 @@ void ScatterDraw::Plot(T& w) {
 	ClipEnd(w);
 	w.End();
 }
-		
-double GetMajorUnits(double minV, double maxV);
 			
 }
 		

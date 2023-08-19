@@ -179,19 +179,19 @@ void ScatterDraw::AdjustMinUnitY2() {
 void ScatterDraw::AdjustMajorUnitX() {
 	if (xRange <= 0 || xMajorUnit == 0 || !IsNum(xMajorUnit))
 		return;
-	xMajorUnit = GetMajorUnits(xMin, xMin + xRange);
+	xMajorUnit = GetRangeMajorUnits(xMin, xMin + xRange);
 }
 
 void ScatterDraw::AdjustMajorUnitY() {
 	if (yRange <= 0 || yMajorUnit == 0 || !IsNum(yMajorUnit))
 		return;
-	yMajorUnit = GetMajorUnits(yMin, yMin + yRange);
+	yMajorUnit = GetRangeMajorUnits(yMin, yMin + yRange);
 }
 
 void ScatterDraw::AdjustMajorUnitY2() {
 	if (yRange2 <= 0 || yMajorUnit2 == 0 || !IsNum(yMajorUnit2))
 		return;
-	yMajorUnit2 = GetMajorUnits(yMin2, yMin2 + yRange2);
+	yMajorUnit2 = GetRangeMajorUnits(yMin2, yMin2 + yRange2);
 }
 
 ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
@@ -1374,10 +1374,12 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 			double oldYMin = yMin;
 			yMin += yRange*(1 - scale)/2.;
 			yMinUnit = oldYMin + yMinUnit - yMin;
+			AdjustMajorUnitY();
 			AdjustMinUnitY();
 			double oldYMin2 = yMin2;
 			yMin2 += yRange2*(1-scale)/2.;
 			yMinUnit2 = oldYMin2 + yMinUnit2 - yMin2;
+			AdjustMajorUnitY2();
 			AdjustMinUnitY2();
 		}
 		yRange *= scale;
@@ -1774,29 +1776,6 @@ double ScatterDraw::GetSeriesMinY() {
 			mn = d;
 	}
 	return mn;
-}
-
-double GetMajorUnits(double minV, double maxV) {
-	ASSERT(minV < maxV);
-	double rgy = maxV - minV;
-	double dy = rgy/6;
-	dy = pow(10, GetExponent10(rgy));
-	if (int(rgy/dy) > 6) {
-		if (int(rgy/(2*dy)) < 6) 
-			dy *= 2;
-		else
-			dy *= 5;
-	} else if (int(rgy/dy) < 3) {
-		dy /= 10;
-		
-		if (int(rgy/dy) > 6) {
-			if (int(rgy/(2*dy)) < 6) 
-				dy *= 2;
-			else
-				dy *= 5;
-		} 
-	}
-	return dy;
 }
 
 INITBLOCK {
