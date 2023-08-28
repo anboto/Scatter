@@ -451,6 +451,9 @@ public:
 	ScatterDraw& SetLegendWithUnits(bool show = true) 		{legend_w_units = show;		return *this;}
 	bool GetLegendWithUnits()								{return legend_w_units;}
 	
+	ScatterDraw& SetSciExpTop(bool top = true) 				{sciExpTop = top;		return *this;}
+	bool GetSciExpTop()										{return sciExpTop;}
+	
 	ScatterDraw& SetMode(int _mode = MD_ANTIALIASED)		{mode = _mode; Refresh(); return *this;};
 	int GetMode()											{return mode;};
 	
@@ -1037,6 +1040,7 @@ public:
 				("surfLegendPos", intsurfLegendPos)
 				("showLegend", showLegend)
 				("legend_w_units", legend_w_units)
+				("sciExpTop", sciExpTop)
 			;
 			if (io.IsLoading()) {
 				labelsChanged = true;
@@ -1133,6 +1137,7 @@ public:
 				% axisWidth
 				% showLegend
 				% legend_w_units
+				% sciExpTop
 			;
 			if (s.IsLoading()) {
 				labelsChanged = true;
@@ -1211,6 +1216,7 @@ protected:
 	
 	bool showLegend = true;
 	bool legend_w_units = true;
+	bool sciExpTop = false;
 	
 	bool isPolar = false;
 	
@@ -1460,7 +1466,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 				else if (cbModifFormatX)
 					cbModifFormatX(gridLabelX, i, gridX);
 				else
-					gridLabelX = FDS(gridX, min(numNumX, NumAdvicedDigits(gridX, xRange)), false);
+					gridLabelX = FDS(gridX, min(numNumX, NumAdvicedDigits(xRange)), false);
 				
 				if (!gridLabelX.IsEmpty()) {
 					if (drawXReticleNumbers) {
@@ -1488,35 +1494,78 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 				unitsY << yMinUnit + i*yMajorUnit;
 		}
 		double factorY = plotH/yRange;
+		Vector<double> gridY, gridY2;
+		if (drawYReticleNumbers) {
+			gridY.SetCount(unitsY.size());
+			for(int i = 0; i < unitsY.size(); ++i) 
+				gridY[i] = yMin + unitsY[i];
+		}
+		if (drawY2ReticleNumbers) {
+			gridY2.SetCount(unitsY.size());
+			for(int i = 0; i < unitsY.size(); ++i) 
+				gridY2[i] = (gridY[i] - yMin)/yRange*yRange2 + yMin2;
+		}
+		int minExp = std::numeric_limits<int>::max(), minExp2 = std::numeric_limits<int>::max();
+		if (sciExpTop) {
+			if (drawYReticleNumbers) {
+				for(int i = 0; i < gridY.size(); ++i) {
+					if (gridY[i] != 0) {
+						int exp = GetExponent10(gridY[i]);
+						minExp = min(minExp, exp);
+					}
+				}
+				double div = pow(10, minExp);
+				for(int i = 0; i < gridY.size(); ++i) 
+					gridY[i] /= div;
+			}
+			if (drawY2ReticleNumbers) {
+				for(int i = 0; i < gridY2.size(); ++i) {
+					if (gridY2[i] != 0) {
+						int exp = GetExponent10(gridY2[i]);
+						minExp2 = min(minExp2, exp);
+					}
+				}	
+				double div2 = pow(10, minExp2);
+				for(int i = 0; i < gridY2.size(); ++i) 
+					gridY2[i] /= div2;
+			}
+		}
 		for(int i = 0; i < unitsY.GetCount(); ++i) {
 			double reticleY = plotH - factorY*unitsY[i];
 			if (drawYReticle)
 				DrawLineOpa(w, -plotScaleX*4, reticleY, 0, reticleY, plotScaleAvg, 1, axisWidth, axisColor, LINE_SOLID);
 			if (drawY2Reticle)
 				DrawLineOpa(w, plotW+plotScaleX*4, reticleY, plotW, reticleY, plotScaleAvg, 1, axisWidth, axisColor, LINE_SOLID);
-			double gridY = yMin + unitsY[i];
 			if (drawYReticleNumbers) {
 				String gridLabelY;
 				if (cbModifFormatYGridUnits)
-					cbModifFormatYGridUnits(gridLabelY, i, gridY);
+					cbModifFormatYGridUnits(gridLabelY, i, gridY[i]);
 				else if (cbModifFormatY)
-					cbModifFormatY(gridLabelY, i, gridY);
+					cbModifFormatY(gridLabelY, i, gridY[i]);
 				else
-					gridLabelY = FDS(gridY, min(numNumY, NumAdvicedDigits(gridY, yRange)), false);
+					gridLabelY = FDS(gridY[i], min(numNumY, NumAdvicedDigits(yRange)), false);
 				Size sz = GetTextSizeSpace(gridLabelY, fontYNum);
 				DrawText(w, -sz.cx - plotScaleX*6, reticleY - sz.cy/2, 0, gridLabelY, fontYNum, axisColor);
 			}
 			if (drawY2ReticleNumbers) {
-				double gridY2 = (gridY - yMin)/yRange*yRange2 + yMin2;
 				String gridLabelY2;
 				if (cbModifFormatY2GridUnits)
-					cbModifFormatY2GridUnits(gridLabelY2, i, gridY2);
+					cbModifFormatY2GridUnits(gridLabelY2, i, gridY2[i]);
 				else if (cbModifFormatY2)
-					cbModifFormatY2(gridLabelY2, i, gridY2);
+					cbModifFormatY2(gridLabelY2, i, gridY2[i]);
 				else
-					gridLabelY2 = FDS(gridY2, min(numNumY2, NumAdvicedDigits(gridY2, yRange2)), false);
+					gridLabelY2 = FDS(gridY2[i], min(numNumY2, NumAdvicedDigits(yRange2)), false);
 				Size sz = GetTextSizeSpace(gridLabelY2, fontY2Num);
 				DrawText(w, plotW + plotScaleX*10, reticleY - sz.cy/2, 0, gridLabelY2, fontY2Num, axisColor);
+			}
+		}
+		if (sciExpTop) {
+			if (drawYReticle && minExp != 0)
+				DrawText(w, 0, -1.5*fontYNum.GetHeight(), 0, "x10" + NumToSubSupScript(minExp, false), fontYNum, axisColor);
+			if (drawY2Reticle && minExp != 0) {
+				String str = "x10" + NumToSubSupScript(minExp2, false);
+				Size sz = GetTextSizeSpace(str, fontY2Num);
+				DrawText(w, plotW - sz.cx, -1.5*fontY2Num.GetHeight(), 0, str, fontY2Num, axisColor);
 			}
 		}
 	}

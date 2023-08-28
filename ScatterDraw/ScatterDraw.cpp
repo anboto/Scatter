@@ -12,7 +12,7 @@ ScatterDraw::ScatterDraw() {
 }
 
 void debug_h() {
-	;		// It does nothing. It just serves as a place to set a breakpoint for templated functions
+	int dummy = 0;		// It does nothing. It just serves as a place to set a breakpoint for templated functions
 }
 
 ScatterDraw& ScatterDraw::SetColor(const Color& _color) {

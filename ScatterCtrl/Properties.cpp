@@ -173,6 +173,8 @@ void TextsTab::Init(ScatterCtrl& scatter) {
 	colorLabel.WhenAction = [=]{Change();};
 	butFontGrid.SetImage(ScatterImgP::ColorA);
 	butFontGrid.WhenAction = [=]{OnFontGrid();};
+	sciExpTop <<= scatter.GetSciExpTop();
+	sciExpTop.WhenAction = [=]{Change();};
 	
 	Change();
 }
@@ -224,6 +226,7 @@ void TextsTab::Change() {
 	scatter.SetPlotAreaMargin(~leftMargin, ~rightMargin, ~topMargin, ~bottomMargin);
 	scatter.SetPlotAreaColor(~backcolor);
 	scatter.SetTitleColor(~colorTitle);
+	scatter.SetSciExpTop(~sciExpTop);
 	
 	scatter.SetModify();
 	scatter.Refresh();
