@@ -35,7 +35,7 @@ public:
 	virtual String GetName()				{NEVER(); return Null;}	
 	virtual String GetFullName()			{return GetName();}
 	virtual String GetEquation(int numDigits = 3) = 0;
-	virtual inline int64 GetCount() const	{return coeff.GetCount() > 0 ? 0 : int64(Null);}
+	virtual inline int64 GetCount() const	{return coeff.size() > 0 ? 0 : int64(Null);}
 	
 	void SetMaxFitFunctionEvaluations(int n){maxFitFunctionEvaluations = n;}
 	int GetMaxFitFunctionEvaluations()		{return maxFitFunctionEvaluations;}
@@ -55,10 +55,10 @@ public:
 		classMap().Remove(i);
 	}
 	static int            	 NameIndex(const String& name) {return classMap().Find(name);}
-	static int            	 GetEquationCount()            {return classMap().GetCount();}
+	static int            	 GetEquationCount()            {return classMap().size();}
 	static ExplicitEquation* Create(int i)                 {return classMap()[i]();}
 	
-	int GetNumCoeff(int ) 	{return coeff.GetCount();}
+	int GetNumCoeff(int ) 	{return coeff.size();}
 	
 	ExplicitEquation &operator=(ExplicitEquation &other) {
 		if (this != &other) {
