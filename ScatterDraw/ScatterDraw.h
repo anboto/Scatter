@@ -75,13 +75,14 @@ public:
 	};
 	
 	#define LINE_SOLID 		  ""
+	#define LINE_NONE 		  "0"
 	#define LINE_DOTTED_FINER "2 10"
 	#define LINE_DOTTED_FINE  "2 6"
 	#define LINE_DOTTED 	  "4 10"
 	#define LINE_DOTTED_SEP	  "4 20"
 	#define LINE_DASHED 	  "12 12"
 	#define LINE_DASH_DOT 	  "12 8 3 8"	// Reduced. Previous was too long
-	#define LINE_BEGIN_END	  "-"
+	#define LINE_BEGIN_END	  "2"
 	
 protected:
 	class ScatterBasicSeries {
@@ -121,6 +122,8 @@ protected:
 		
 		bool showLegend;
 		bool legendLine; // show line in legend even if series is NoPlot
+		
+		int angle;
 		
 		int id;
 	
@@ -445,6 +448,12 @@ public:
 	Color& GetLegendFillColor() 							{return legendFillColor;}
 	Color& GetLegendBorderColor() 							{return legendBorderColor;}
 	
+	ScatterDraw& SetLegendWithUnits(bool show = true) 		{legend_w_units = show;		return *this;}
+	bool GetLegendWithUnits()								{return legend_w_units;}
+	
+	ScatterDraw& SetSciExpTop(bool top = true) 				{sciExpTop = top;		return *this;}
+	bool GetSciExpTop()										{return sciExpTop;}
+	
 	ScatterDraw& SetMode(int _mode = MD_ANTIALIASED)		{mode = _mode; Refresh(); return *this;};
 	int GetMode()											{return mode;};
 	
@@ -618,6 +627,8 @@ public:
 	template <class X, class Y>
 	ScatterDraw &InsertSeries(int index, ArrayMap<X, Y> &data)	{return _InsertSeries(index, new ArrayMapXY<X, Y>(data));}
 	
+	const ScatterSeries &GetSeries(int i)	{return series[i];}
+	
 	int64 GetCount(int index);
 	void GetValues(int index, int64 idata, double &x, double &y);
 	double GetValueX(int index, int64 idata);
@@ -664,15 +675,15 @@ public:
 	ScatterDraw &MarkStyle(int index, int typeidx);
 	ScatterDraw &MarkStyle(const String name)				{return MarkStyle(series.GetCount() - 1, name);}
 	const String GetMarkStyleName(int index);
-	ScatterDraw &SetMarkStyleType(int index, int type);
-	ScatterDraw &SetMarkStyleType(int type)					{return SetMarkStyleType(series.GetCount() - 1, type);}
+	ScatterDraw &SetMarkStyleType(int index, int type = Null);
+	ScatterDraw &SetMarkStyleType(int type = Null)			{return SetMarkStyleType(series.GetCount() - 1, type);}
 	int GetMarkStyleType(int index);
 	
 	ScatterDraw &NoMark()	{return MarkStyle();};
 		
 	ScatterDraw &Stroke(int index, double thickness, Color color);
 	ScatterDraw &Stroke(double thickness, Color color = Null)   {return Stroke(series.GetCount() - 1, thickness, color);}
-	ScatterDraw &SetLineColor(int index, Color color);
+	//ScatterDraw &SetLineColor(int index, Color color);
 	void GetStroke(int index, double &thickness, Color &color);
 	ScatterDraw &Closed(int index, bool closed);
 	ScatterDraw &Closed(bool closed)							{return Closed(series.GetCount() - 1, closed);}
@@ -799,6 +810,11 @@ public:
 	double GetXPointByValue(double x);
 	double GetYPointByValue(double y);
 
+	double GetSeriesMaxX();
+	double GetSeriesMinX();
+	double GetSeriesMaxY();
+	double GetSeriesMinY();
+
 	int GetCount() 	{return series.GetCount();}
 	bool IsEmpty()	{return series.IsEmpty();}
 	
@@ -837,6 +853,7 @@ public:
 	bool GetMouseHandlingY()	{return mouseHandlingY;}
 	
 	ScatterDraw& AddSurf(DataSourceSurf &surf);
+	bool IsSurf()								{return surf;}
 	ScatterDraw& RemoveSurf()					{surf = nullptr;	return *this;}
 	ScatterDraw& SetSurfMinZ(double val)		{surfMinZ = val;	return *this;}
 	double GetSurfMinZ() const					{return surfMinZ;}
@@ -882,13 +899,13 @@ public:
 	Color& GetRainbowPaletteTextColor() 					{return rainbowPaletteTextColor;}
 	
 	ScatterDraw &AddLabelSeries(Vector<String> &labels, int dx = 0, int dy = 0, Font font = StdFont(), 
-					Alignment align = ALIGN_CENTER, Color color = SColorText()) {
+					Alignment align = ALIGN_CENTER, Color color = SColorText(), int angle = 0) {
 		int index = series.GetCount() - 1;
 		
-		return AddLabelSeries(index, labels, dx, dy, font, align, color);
+		return AddLabelSeries(index, labels, dx, dy, font, align, color, angle);
 	}
 	ScatterDraw& AddLabelSeries(int index, Vector<String> &labels, int dx = 0, int dy = 0, Font font = StdFont(), 
-					Alignment align = ALIGN_CENTER, Color color = SColorText()) {	
+					Alignment align = ALIGN_CENTER, Color color = SColorText(), int angle = 0) {	
 		ASSERT(IsValid(index));
 		ASSERT(!series[index].IsDeleted());
 		
@@ -898,6 +915,7 @@ public:
 		series[index].labelsFont = font;
 		series[index].labelsAlign = align;
 		series[index].labelsColor = color;
+		series[index].angle = angle;
 		return *this;
 	}
 	
@@ -1020,6 +1038,9 @@ public:
 				("surfUnits", surfUnits)
 				("surfUnitsPos", intsurfUnitsPos)
 				("surfLegendPos", intsurfLegendPos)
+				("showLegend", showLegend)
+				("legend_w_units", legend_w_units)
+				("sciExpTop", sciExpTop)
 			;
 			if (io.IsLoading()) {
 				labelsChanged = true;
@@ -1114,6 +1135,9 @@ public:
 				% drawYReticleNumbers
 				% drawY2ReticleNumbers
 				% axisWidth
+				% showLegend
+				% legend_w_units
+				% sciExpTop
 			;
 			if (s.IsLoading()) {
 				labelsChanged = true;
@@ -1165,7 +1189,7 @@ protected:
 	double xRange = 100., yRange = 100., yRange2 = 100.;
 	double xMin = 0, yMin = 0, yMin2 = 0;
 	double xMajorUnit = 10, yMajorUnit = 10, yMajorUnit2 = 10;
-	double xMajorUnitNum = 5, yMajorUnitNum = 5;
+	//double xMajorUnitNum = 5, yMajorUnitNum = 5;
 	double xMinUnit = 0, yMinUnit = 0, yMinUnit2 = 0;
 	double xMinUnit0 = 0, yMinUnit0 = 0, yMinUnit20 = 0;
 	double minXRange = -1, maxXRange = -1, minYRange = -1, maxYRange = -1;
@@ -1191,6 +1215,8 @@ protected:
 	Array<ScatterSeries> series;
 	
 	bool showLegend = true;
+	bool legend_w_units = true;
+	bool sciExpTop = false;
 	
 	bool isPolar = false;
 	
@@ -1440,7 +1466,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 				else if (cbModifFormatX)
 					cbModifFormatX(gridLabelX, i, gridX);
 				else
-					gridLabelX = FDS(gridX, min(numNumX, NumAdvicedDigits(gridX, xRange)), false);
+					gridLabelX = FDS(gridX, min(numNumX, NumAdvicedDigits(xRange)), false);
 				
 				if (!gridLabelX.IsEmpty()) {
 					if (drawXReticleNumbers) {
@@ -1468,35 +1494,78 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 				unitsY << yMinUnit + i*yMajorUnit;
 		}
 		double factorY = plotH/yRange;
+		Vector<double> gridY, gridY2;
+		if (drawYReticleNumbers) {
+			gridY.SetCount(unitsY.size());
+			for(int i = 0; i < unitsY.size(); ++i) 
+				gridY[i] = yMin + unitsY[i];
+		}
+		if (drawY2ReticleNumbers) {
+			gridY2.SetCount(unitsY.size());
+			for(int i = 0; i < unitsY.size(); ++i) 
+				gridY2[i] = (gridY[i] - yMin)/yRange*yRange2 + yMin2;
+		}
+		int minExp = std::numeric_limits<int>::max(), minExp2 = std::numeric_limits<int>::max();
+		if (sciExpTop) {
+			if (drawYReticleNumbers) {
+				for(int i = 0; i < gridY.size(); ++i) {
+					if (gridY[i] != 0) {
+						int exp = GetExponent10(gridY[i]);
+						minExp = min(minExp, exp);
+					}
+				}
+				double div = pow(10, minExp);
+				for(int i = 0; i < gridY.size(); ++i) 
+					gridY[i] /= div;
+			}
+			if (drawY2ReticleNumbers) {
+				for(int i = 0; i < gridY2.size(); ++i) {
+					if (gridY2[i] != 0) {
+						int exp = GetExponent10(gridY2[i]);
+						minExp2 = min(minExp2, exp);
+					}
+				}	
+				double div2 = pow(10, minExp2);
+				for(int i = 0; i < gridY2.size(); ++i) 
+					gridY2[i] /= div2;
+			}
+		}
 		for(int i = 0; i < unitsY.GetCount(); ++i) {
 			double reticleY = plotH - factorY*unitsY[i];
 			if (drawYReticle)
 				DrawLineOpa(w, -plotScaleX*4, reticleY, 0, reticleY, plotScaleAvg, 1, axisWidth, axisColor, LINE_SOLID);
 			if (drawY2Reticle)
 				DrawLineOpa(w, plotW+plotScaleX*4, reticleY, plotW, reticleY, plotScaleAvg, 1, axisWidth, axisColor, LINE_SOLID);
-			double gridY = yMin + unitsY[i];
 			if (drawYReticleNumbers) {
 				String gridLabelY;
 				if (cbModifFormatYGridUnits)
-					cbModifFormatYGridUnits(gridLabelY, i, gridY);
+					cbModifFormatYGridUnits(gridLabelY, i, gridY[i]);
 				else if (cbModifFormatY)
-					cbModifFormatY(gridLabelY, i, gridY);
+					cbModifFormatY(gridLabelY, i, gridY[i]);
 				else
-					gridLabelY = FDS(gridY, min(numNumY, NumAdvicedDigits(gridY, yRange)), false);
+					gridLabelY = FDS(gridY[i], min(numNumY, NumAdvicedDigits(yRange)), false);
 				Size sz = GetTextSizeSpace(gridLabelY, fontYNum);
 				DrawText(w, -sz.cx - plotScaleX*6, reticleY - sz.cy/2, 0, gridLabelY, fontYNum, axisColor);
 			}
 			if (drawY2ReticleNumbers) {
-				double gridY2 = (gridY - yMin)/yRange*yRange2 + yMin2;
 				String gridLabelY2;
 				if (cbModifFormatY2GridUnits)
-					cbModifFormatY2GridUnits(gridLabelY2, i, gridY2);
+					cbModifFormatY2GridUnits(gridLabelY2, i, gridY2[i]);
 				else if (cbModifFormatY2)
-					cbModifFormatY2(gridLabelY2, i, gridY2);
+					cbModifFormatY2(gridLabelY2, i, gridY2[i]);
 				else
-					gridLabelY2 = FDS(gridY2, min(numNumY2, NumAdvicedDigits(gridY2, yRange2)), false);
+					gridLabelY2 = FDS(gridY2[i], min(numNumY2, NumAdvicedDigits(yRange2)), false);
 				Size sz = GetTextSizeSpace(gridLabelY2, fontY2Num);
 				DrawText(w, plotW + plotScaleX*10, reticleY - sz.cy/2, 0, gridLabelY2, fontY2Num, axisColor);
+			}
+		}
+		if (sciExpTop) {
+			if (drawYReticle && minExp != 0)
+				DrawText(w, 0, -1.5*fontYNum.GetHeight(), 0, "x10" + NumToSubSupScript(minExp, false), fontYNum, axisColor);
+			if (drawY2Reticle && minExp != 0) {
+				String str = "x10" + NumToSubSupScript(minExp2, false);
+				Size sz = GetTextSizeSpace(str, fontY2Num);
+				DrawText(w, plotW - sz.cx, -1.5*fontY2Num.GetHeight(), 0, str, fontY2Num, axisColor);
 			}
 		}
 	}
@@ -1695,17 +1764,24 @@ void ScatterDraw::Plot(T& w) {
 					if (!IsNull(points[i])) {
 						String txt = (*(serie.labels))[i];
 						Size sz = GetTextSizeSpace(txt, fnt);
-						int ddy = static_cast<int>(-sz.cy/2.);
-						int ddx = 0;
+						double ddy = static_cast<int>(-sz.cy/2.);
+						double ddx;
 						switch (serie.labelsAlign) {
 						case ALIGN_LEFT:	ddx = 0;		break;
-						case ALIGN_CENTER:	ddx = -sz.cx/2;	break;
+						case ALIGN_CENTER:	ddx = -sz.cx/2.;break;
 						case ALIGN_RIGHT:	ddx = -sz.cx;	break;
 						default: 			NEVER();
 						}
+						if (serie.angle != 0) {
+							double l = sqrt(ddx*ddx + ddy*ddy);
+							double ang = serie.angle + atan2(ddy, ddx)*180/M_PI; 
+							ang *= M_PI/180;
+							ddx = l*cos(ang);
+							ddy = l*sin(ang);
+						}
 						double x = points[i].x + dx + ddx;
 						double y = points[i].y + dy + ddy;
-						DrawText(w, x, y, 0, txt, fnt, serie.labelsColor);
+						DrawText(w, x, y, serie.angle*10, txt, fnt, serie.labelsColor);
 					}
 				}
 			}
@@ -1718,7 +1794,7 @@ void ScatterDraw::Plot(T& w) {
 	ClipEnd(w);
 	w.End();
 }
-		
+			
 }
 		
 #endif

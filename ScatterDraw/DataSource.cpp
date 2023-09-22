@@ -121,18 +121,13 @@ Pointf DataSource::MaxSubDataImp(Getdatafun getdataY, Getdatafun getdataX, int64
 }
 
 double DataSource::Avg(Getdatafun getdata) {
-	double ret = 0;
-	int count = 0;
-	for (int64 i = 0; i < size(); ++i) {
-		double d = Membercall(getdata)(i);
-		if (IsNum(d)) {
-			ret += d;
-			count++;
-		}
-	}
-	if (count == 0) 
-		return Null;
-	return ret/count;
+	VectorXd d = Copy<VectorXd>(getdata);
+	return d.mean();
+}
+
+double DataSource::AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w) {
+	VectorXd d = Copy<VectorXd>(getdata);
+	return (w.array()*d.array()).sum()/w.sum();		// Weighted average
 }
 
 int64 DataSource::Closest(Getdatafun getdata, double dat) {
@@ -496,7 +491,7 @@ Vector<Pointf> DataSource::FFT(Getdatafun getdata, double tSample, bool frequenc
 			Vector<Pointf> fftPart;
 			fftPart = Upp::FFT(dataPart, tSample, frequency, type, window, int(numOver));
 			if (iPart == 0)
-				fft = clone(fftPart);		// pick()
+				fft = pick(fftPart);		// pick()
 			else {
 				for (int i = 0; i < fftPart.GetCount(); ++i) {
 					fft[i].y += fftPart[i].y;
@@ -869,6 +864,7 @@ double LinearInterpolate(double x, const VectorXd &vecx, const VectorXd &vecy) {
 }
 
 void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry, double srate) {
+	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
 	if (x.size() == 0 || y.size() == 0)
@@ -893,6 +889,7 @@ void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry
 }
 
 void Resample(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
+	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
 	if (x.size() == 0 || y.size() == 0)

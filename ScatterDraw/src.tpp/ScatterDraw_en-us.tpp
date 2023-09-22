@@ -800,12 +800,6 @@ catterDraw]_`&[* SetMajorUnits]([@(0.0.255) double]_[*@3 ux], [@(0.0.255) double
 [s3; Sets the horizontal ([%-*@3 ux]), vertical ([%-*@3 uy]) or secondary 
 vertical ([%-*@3 uy2]) distance between grid lines.&]
 [s1; &]
-[s6; &]
-[s5;:ScatterDraw`:`:SetMajorUnitsNum`(int`,int`):%- [_^ScatterDraw^ ScatterDraw]_`&[* Set
-MajorUnitsNum]([@(0.0.255) int]_[*@3 nx], [@(0.0.255) int]_[*@3 ny])&]
-[s3; Sets the horizontal ([%-*@3 nx]) and vertical ([%-*@3 ny]) number 
-of grid lines.&]
-[s1; &]
 [s6;%- &]
 [s5;:ScatterDraw`:`:GetMajorUnitsX`(`):%- [@(0.0.255) double]_[* GetMajorUnitsX]()&]
 [s3; Returns the distance between grid lines in X axis.&]

@@ -33,6 +33,10 @@ struct Equation_functor : NonLinearOptimizationFunctor<double> {
 	}
 };
 
+void ExplicitEquation::SetWeight(const Eigen::VectorXd &w) {
+	weight = w.cwiseSqrt();
+}
+
 void ExplicitEquation::SetNumCoeff(int num) {
 	coeff.SetCount(num); 
 	for (int i = 0; i < num; ++i)
@@ -69,7 +73,10 @@ ExplicitEquation::FitError ExplicitEquation::Fit(DataSource &serie0, double &r2)
 	functor.datasetLen = Eigen::Index(serie.size());
 	
 	ASSERT(weight.size() == 0 || serie.size() == weight.size());
-	functor.weight = weight.size() > 0 ? &weight : nullptr ;	
+	if(weight.size() == 0 || serie.size() != weight.size())		// Nulls in serie
+		functor.weight = nullptr;
+	else
+		functor.weight = &weight;	
 	
 	NumericalDiff<Equation_functor> numDiff(functor);
 	LevenbergMarquardt<NumericalDiff<Equation_functor> > lm(numDiff);
@@ -87,7 +94,10 @@ ExplicitEquation::FitError ExplicitEquation::Fit(DataSource &serie0, double &r2)
 	else if (ret == LevenbergMarquardtSpace::TooManyFunctionEvaluation)
 		return TooManyFunctionEvaluation;
 
-	r2 = R2Y(serie);
+	if (!functor.weight)
+		r2 = R2Y(serie);
+	else 
+		r2 = R2YWeighted(serie);
 
 	return NoError;
 }
@@ -96,20 +106,35 @@ double ExplicitEquation::R2Y(DataSource &serie, double mean) {
 	if (!IsNum(mean))
 		mean = serie.AvgY();
 	double sse = 0, sst = 0;
-	for (int64 i = 0; i < serie.GetCount(); ++i) {
+	for (int64 i = 0; i < serie.size(); ++i) {
 		double y = serie.y(i);
-		if (!!IsNum(y)) {
-			double err = y - f(serie.x(i));
-			sse += err*err;
-			double d = y - mean;
-			sst += d*d;
-		}
+		double err = y - f(serie.x(i));
+		sse += err*err;
+		double d = y - mean;
+		sst += d*d;
 	}
 	if (sst < 1E-50 || sse > sst)
 		return 0;
 	return 1 - sse/sst;
 }
 
+double ExplicitEquation::R2YWeighted(DataSource &serie, double mean) {
+	if (!IsNum(mean))
+		mean = serie.AvgYWeighted(weight);
+	double sse = 0, sst = 0;
+	for (int64 i = 0; i < serie.size(); ++i) {
+		double y = serie.y(i);
+		double err = y - f(serie.x(i));
+		sse += err*err*weight[i];
+		double d = y - mean;
+		sst += d*d*weight[i];
+	}
+	if (sst < 1E-50 || sse > sst)
+		return 0;
+	else
+		return 1 - sse/sst;
+}
+	
 int ExplicitEquation::maxFitFunctionEvaluations = 2000;
 
 double ExplicitEquation::x_from_y(double y, double x0) {
@@ -126,8 +151,8 @@ double ExplicitEquation::x_from_y(double y, double x0) {
 double PolynomialEquation::f(double x) {
 	//if (x < 0)
 	//	return Null;
-	double y = 0;
-	for (int i = 0; i < coeff.GetCount(); ++i) 
+	double y = coeff[0];
+	for (int i = 1; i < coeff.GetCount(); ++i) 
 		y += coeff[i]*pow(x, i);
 	return y;
 }

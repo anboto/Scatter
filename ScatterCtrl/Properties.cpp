@@ -34,8 +34,8 @@ void MeasuresTab::Init(ScatterCtrl& scatter) {
 	yMax <<= scatter.GetYRange() + scatter.GetYMin();
 	yMin2 <<= scatter.GetYMin2();
 	yMax2 <<= scatter.GetY2Range() + scatter.GetYMin2();
-	xMinUnit	<<= scatter.GetXMinUnit();
-	yMinUnit	<<= scatter.GetYMinUnit();
+	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
+	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
 	xMajorUnit	<<= scatter.GetMajorUnitsX();
 	yMajorUnit	<<= scatter.GetMajorUnitsY();
 	
@@ -119,8 +119,15 @@ void MeasuresTab::Change() {
     scatter.SetXYMinLinked(xMin, yMin, yMin2);
 	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
 
-	scatter.SetMinUnits(xMinUnit, yMinUnit);
+	scatter.SetMinUnits(xMinUnit-xMin, yMinUnit-yMin);
 	scatter.SetMajorUnits(xMajorUnit, yMajorUnit);
+
+	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
+	
+	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
+	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
+	xMajorUnit	<<= scatter.GetMajorUnitsX();
+	yMajorUnit	<<= scatter.GetMajorUnitsY();
 
 	scatter.SetGridDash(DashStyle::Style(DashStyle::TypeIndex(~dashStyle)));
 	scatter.SetGridColor(~linecolor);
@@ -166,6 +173,8 @@ void TextsTab::Init(ScatterCtrl& scatter) {
 	colorLabel.WhenAction = [=]{Change();};
 	butFontGrid.SetImage(ScatterImgP::ColorA);
 	butFontGrid.WhenAction = [=]{OnFontGrid();};
+	sciExpTop <<= scatter.GetSciExpTop();
+	sciExpTop.WhenAction = [=]{Change();};
 	
 	Change();
 }
@@ -217,6 +226,7 @@ void TextsTab::Change() {
 	scatter.SetPlotAreaMargin(~leftMargin, ~rightMargin, ~topMargin, ~bottomMargin);
 	scatter.SetPlotAreaColor(~backcolor);
 	scatter.SetTitleColor(~colorTitle);
+	scatter.SetSciExpTop(~sciExpTop);
 	
 	scatter.SetModify();
 	scatter.Refresh();
@@ -230,6 +240,9 @@ void LegendTab::Init(ScatterCtrl& scatter) {
 	
 	showLegend <<= scatter.GetShowLegend();
 	showLegend.WhenAction = [=] {Change();};
+	
+	legend_w_units <<= scatter.GetLegendWithUnits();
+	legend_w_units.WhenAction = [=] {Change();};
 	
 	legendPosition <<= (scatter.GetLegendAnchor() == ScatterDraw::TOP ? 0 : 1);
 	legendPosition.WhenAction = [=] {Change();};
@@ -279,6 +292,7 @@ void LegendTab::Change() {
 	ScatterCtrl &scatter = *pscatter;
 	
     scatter.ShowLegend(showLegend);
+    scatter.SetLegendWithUnits(legend_w_units);
     scatter.SetLegendRowSpacing(rowSpacing);
     ScatterDraw::LEGEND_POS legendTableAnchor;
     if (legendPosition == 0)
@@ -499,9 +513,15 @@ void SeriesTab::Change() {
 	scatter.SetFillColor(index, ~right.fillcolor);
 	scatter.ScatterDraw::Show(index, ~right.visible);
 	scatter.Dash(index, DashStyle::Style(DashStyle::TypeIndex(~right.dashStyle)));
-	scatter.Stroke(index, ~right.linethickness, Upp::Color(~right.linecolor));
-//	if (IsNull(Upp::Color(~right.linecolor)))
-//		scatter.SetLineColor(index, Upp::Color(~right.linecolor));
+	if (!IsNull(Upp::Color(~right.linecolor)))
+		scatter.Stroke(index, ~right.linethickness, Upp::Color(~right.linecolor));
+	else {
+		double thickness;										// Null is not allowed
+		Color color;
+		scatter.GetStroke(index, thickness, color);
+		right.linecolor <<= color;
+		scatter.Stroke(index, ~right.linethickness, color);		// Maintain the same colour
+	}
 	
 	scatter.MarkStyle(index, String(~right.markstyle));
 	scatter.SetMarkColor(index, Upp::Color(~right.markcolor));

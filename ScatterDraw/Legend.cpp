@@ -40,11 +40,9 @@ void ScatterDraw::DrawLegend(Draw& w) const {
 	int legendWidth = 0;
 	for (int i = 0; i < series.GetCount(); ++i) {
 		const ScatterSeries &serie = series[i]; 
-		if (serie.IsDeleted() || serie.opacity == 0)
-			continue;
-		if (serie.showLegend) {
+		if (!serie.IsDeleted() && serie.opacity != 0 && serie.showLegend) {
 			String legend = serie.legend;
-			if (legend.Find('[') < 0 && !serie.unitsY.IsEmpty())
+			if (legend_w_units && legend.Find('[') < 0 && !serie.unitsY.IsEmpty())
 				legend += " [" + serie.unitsY + "]";
 			legends.Add(legend);
 			legendWidth = max<int>(legendWidth, GetTextSizeSpace(legend, boldFont).cx);

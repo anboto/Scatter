@@ -24,7 +24,7 @@ public:
 	virtual FitError Fit(DataSource &series, double &r2);
 	FitError Fit(DataSource &series)		{double dummy; return Fit(series, dummy);}
 	virtual void GuessCoeff(DataSource &series)	= 0;
-	void SetWeight(Eigen::VectorXd &w)		{weight = clone(w);}
+	void SetWeight(const Eigen::VectorXd &w);
 	
 	virtual double f(double ) 				= 0;
 	virtual double f(double , double ) 		{NEVER(); return Null;}
@@ -35,7 +35,7 @@ public:
 	virtual String GetName()				{NEVER(); return Null;}	
 	virtual String GetFullName()			{return GetName();}
 	virtual String GetEquation(int numDigits = 3) = 0;
-	virtual inline int64 GetCount() const	{return coeff.GetCount() > 0 ? 0 : int64(Null);}
+	virtual inline int64 GetCount() const	{return coeff.size() > 0 ? 0 : int64(Null);}
 	
 	void SetMaxFitFunctionEvaluations(int n){maxFitFunctionEvaluations = n;}
 	int GetMaxFitFunctionEvaluations()		{return maxFitFunctionEvaluations;}
@@ -55,10 +55,10 @@ public:
 		classMap().Remove(i);
 	}
 	static int            	 NameIndex(const String& name) {return classMap().Find(name);}
-	static int            	 GetEquationCount()            {return classMap().GetCount();}
+	static int            	 GetEquationCount()            {return classMap().size();}
 	static ExplicitEquation* Create(int i)                 {return classMap()[i]();}
 	
-	int GetNumCoeff(int ) 	{return coeff.GetCount();}
+	int GetNumCoeff(int ) 	{return coeff.size();}
 	
 	ExplicitEquation &operator=(ExplicitEquation &other) {
 		if (this != &other) {
@@ -68,6 +68,7 @@ public:
 		return *this;
 	}
 	double R2Y(DataSource &series, double mean = Null);
+	double R2YWeighted(DataSource &series, double mean = Null);
 	
 protected:
 	Vector<double> coeff;
@@ -239,7 +240,17 @@ public:
 		}
 	}
 	double GetPeriod() 			{return 2*M_PI/abs(coeff[3]);}
-	double GetDampingRatio()	{return coeff[3] != 0 ? -coeff[2]/coeff[3] : Null;}
+	double GetDampingRatio()	{return coeff[2]/sqrt(sqr(coeff[2]) + sqr(coeff[3]));}
+	FitError Fit(DataSource &data, double &r2) {	
+		FitError ret = ExplicitEquation::Fit(data, r2);		
+		if (ret == NoError) {
+			if (coeff[3] < 0) {		// cos(a) = cos(-a)
+				coeff[3] = -coeff[3];
+				coeff[4] = -coeff[4];
+			}
+		}
+		return ret;
+	}
 };
 
 class Sin_DampedSinEquation : public ExplicitEquation {
@@ -275,6 +286,20 @@ public:
 			coeff[2] = frequency;
 			coeff[3] = phase;
 		}
+	}
+	FitError Fit(DataSource &data, double &r2) {	
+		FitError ret = ExplicitEquation::Fit(data, r2);		
+		if (ret == NoError) {
+			if (coeff[2] < 0) {		// cos(a) = cos(-a)
+				coeff[2] = -coeff[3];
+				coeff[3] = -coeff[4];
+			}
+			if (coeff[6] < 0) {		// cos(a) = cos(-a)
+				coeff[6] = -coeff[3];
+				coeff[7] = -coeff[4];
+			}
+		}
+		return ret;
 	}
 };
 	
