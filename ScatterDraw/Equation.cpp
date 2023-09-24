@@ -135,7 +135,7 @@ double ExplicitEquation::R2YWeighted(DataSource &serie, double mean) {
 		return 1 - sse/sst;
 }
 	
-int ExplicitEquation::maxFitFunctionEvaluations = 2000;
+int ExplicitEquation::maxFitFunctionEvaluations = 4000;
 
 double ExplicitEquation::x_from_y(double y, double x0) {
 	Eigen::VectorXd x(1);

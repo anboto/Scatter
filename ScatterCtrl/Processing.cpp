@@ -278,7 +278,7 @@ void ProcessingTab::OnFit() {
 	Progress progress(t_("Fitting..."), equationTypes.GetCount());
 	progress.Title(t_("Searching for the function that best fits")); 	
 	for (int i = 0; i < equationTypes.GetCount(); ++i) {
-		equationTypes[i].GuessCoeff(ds);
+		//equationTypes[i].GuessCoeff(ds);
 		equationTypes[i].Fit(ds, r2[i]);
 		progress.SetPos(i+1);
 	}

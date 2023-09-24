@@ -11,7 +11,7 @@ namespace Upp {
 
 class ExplicitEquation : public DataSource {
 public:
-	ExplicitEquation() {isExplicit = true;}
+	ExplicitEquation() : count(1000) {isExplicit = true;}
 
 	virtual void SetDegree(int num) = 0;
 	enum FitError {
@@ -35,7 +35,9 @@ public:
 	virtual String GetName()				{NEVER(); return Null;}	
 	virtual String GetFullName()			{return GetName();}
 	virtual String GetEquation(int numDigits = 3) = 0;
-	virtual inline int64 GetCount() const	{return coeff.size() > 0 ? 0 : int64(Null);}
+	virtual inline int64 GetCount() const	{return coeff.size() > 0 ? 0 : count;}
+	
+	void SetCount(int64 _count)	{count = _count;}
 	
 	void SetMaxFitFunctionEvaluations(int n){maxFitFunctionEvaluations = n;}
 	int GetMaxFitFunctionEvaluations()		{return maxFitFunctionEvaluations;}
@@ -74,6 +76,7 @@ protected:
 	Vector<double> coeff;
 	int numcoeff = -1;
 	Eigen::VectorXd weight;
+	int64 count;
 	
 	static int maxFitFunctionEvaluations;
 	
@@ -158,30 +161,6 @@ class PolynomialEquation5 : public PolynomialEquation {
 public:
 	PolynomialEquation5() {SetDegree(5);}
 };
-/*
-class PolynomialQuotient : public ExplicitEquation {
-public:
-	PolynomialQuotient() 				  	{}
-	double f(double x);
-	virtual String GetName() 			    {return t_("Polynomial Quotient");}
-	virtual String GetFullName() 		    {return t_("Polynomial Quotient") + Format(" n/d = %d/%d", nnum, nden);}
-	virtual String GetEquation(int numDigits = 3);
-	void SetDegree(int num)					{NEVER();}
-	void SetDegreeNumDen(int num, int den)	{
-		nnum = num + 1;
-		nden = den;
-		numcoeff = num;	
-		SetNumCoeff(nnum + nden + 1);
-	}
-	virtual void GuessCoeff(DataSource &) {}
-private:
-	int nnum, nden;
-};
-
-class PolynomialQuotient2_2 : public PolynomialQuotient {
-public:
-	PolynomialQuotient2_2() {SetDegreeNumDen(2, 2);}
-};*/
 
 class SinEquation : public ExplicitEquation {
 public:
@@ -244,9 +223,12 @@ public:
 	FitError Fit(DataSource &data, double &r2) {	
 		FitError ret = ExplicitEquation::Fit(data, r2);		
 		if (ret == NoError) {
-			if (coeff[3] < 0) {		// cos(a) = cos(-a)
-				coeff[3] = -coeff[3];
-				coeff[4] = -coeff[4];
+			FitError ret = ExplicitEquation::Fit(data, r2);	// Two tries to get coeff[3]	
+			if (ret == NoError) {
+				if (coeff[3] < 0) {		// cos(a) = cos(-a)
+					coeff[3] = -coeff[3];
+					coeff[4] = -coeff[4];
+				}
 			}
 		}
 		return ret;
@@ -619,6 +601,39 @@ public:
 		return ret;
 	}			
 	virtual void GuessCoeff(DataSource &) {}
+	void SetDegree(int )				{NEVER();}
+};
+
+class AsymptoticPower : public ExplicitEquation {
+public:
+	AsymptoticPower() 			{SetCoeff(1, 1, 1);}
+	double f(double x) {
+		double exp = coeff[2];
+		if (exp < 1)
+			exp = Mirror(exp, 1.);
+		return coeff[0] + coeff[1]*::pow(x, exp);
+	}
+	virtual String GetName() 	{return t_("Asymptotic Power");}
+	virtual String GetEquation(int numDigits = 3) {
+		return Format("%s + %s*^x^%s", FormatCoeff(0, numDigits), FormatCoeff(1, numDigits), FormatCoeff(2, numDigits));
+	}
+	virtual void GuessCoeff(DataSource &series) {
+		LinearEquation lin;
+		if (lin.Fit(series) != ExplicitEquation::NoError) 
+			throw Exc("Problem fitting linear");
+		
+		coeff[0] = lin.GetCoeff(0);
+		coeff[1] = lin.GetCoeff(1);
+		coeff[2] = 2;
+	}
+	FitError Fit(DataSource &series) {
+		FitError error = ExplicitEquation::Fit(series);
+		if (error == ExplicitEquation::NoError) {
+			if (coeff[2] < 1)
+				coeff[2] = Mirror(coeff[2], 1.);
+		}
+		return error;
+	}
 	void SetDegree(int )				{NEVER();}
 };
 
