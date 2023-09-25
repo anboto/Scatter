@@ -47,7 +47,7 @@ public:
 
 	template <class Range>
 	void Copy(Getdatafun getdata, Range &out) {
-		ASSERT(!isExplicit);
+		//ASSERT(!isExplicit);
 		Resize(out, GetCount());
 		int n = 0;		
 		for (int64 i = 0; i < GetCount(); ++i) { 
@@ -74,7 +74,7 @@ public:
 	}
 	template <class Range>
 	void Copy(Getdatafun getdata0, Getdatafun getdata1, Range &out0, Range &out1) {
-		ASSERT(!isExplicit);
+		//ASSERT(!isExplicit);
 		Resize(out0, GetCount());
 		Resize(out1, GetCount());
 		int n = 0;		
@@ -1341,10 +1341,10 @@ void MovingAverage(const Range1 &x, const Range1 &y, typename Range1::value_type
 	using Scalar = typename Range1::value_type;
 	ASSERT(x.size() == y.size());
 	
-	Range2 resy(x.size());
-	
 	if (x.size() == 0)
 		return;
+		
+	Range2 resy(x.size());
 	
 	Scalar width_2 = width/2.;
 	
@@ -1359,7 +1359,53 @@ void MovingAverage(const Range1 &x, const Range1 &y, typename Range1::value_type
 			if ((x[ito] - xi) > width_2) 
 				break;
 		ito--;
-		resy[i] = std::accumulate(&y[ifrom], &y[ito], 0.)/(ito - ifrom + 1);
+		
+		Scalar sum = 0;
+		for (int j = ifrom; j <= ito; ++j)
+			sum += y[j]; 
+		resy[i] = sum/(ito - ifrom + 1);
+	}
+	rresy = pick(resy);
+}
+
+template <class Range1, class Range2>
+void MovingAverage(const Range1 &x, const Range1 &y, typename Range1::value_type width, const Range2 &rresx, Range2 &rresy, bool triangular = false) {
+	using Scalar = typename Range1::value_type;
+	ASSERT(x.size() == y.size());
+	
+	if (rresx.size() == 0)
+		return;
+		
+	Range2 resy(rresx.size());
+	
+	Scalar width_2 = width/2.;
+	
+	for (int i = 0; i < rresx.size(); ++i) {
+		int ifrom, ito;
+		Scalar xi = rresx[i];
+		for (ifrom = x.size()-1; ifrom >= 0; --ifrom) 
+			if ((xi - x[ifrom]) > width_2)
+				break;
+		ifrom++;
+		for (ito = 0; ito < x.size(); ++ito) 
+			if ((x[ito] - xi) > width_2) 
+				break;
+		ito--;
+		
+		Scalar num = 0, den;
+		if (triangular) {
+			den = 0;
+			for (int j = ifrom; j <= ito; ++j) {
+				double w = width_2 - abs(xi - x[j]);
+				num += y[j]*w;
+				den += w;
+			}
+		} else {
+			for (int j = ifrom; j <= ito; ++j) 
+				num += y[j];
+			den = ito-ifrom+1;
+		}
+		resy[i] = num/den;
 	}
 	rresy = pick(resy);
 }
