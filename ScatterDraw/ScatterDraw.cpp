@@ -152,7 +152,7 @@ void ScatterDraw::AdjustMinUnitX() {
 	xMinUnit = NumberWithLeastSignificantDigits(xMin, xMin + xRange) - xMin;
 	while (xMinUnit < 0)
 		xMinUnit += xMajorUnit;
-	while (xMinUnit - xMajorUnit > 0)
+	while (xMinUnit - xMajorUnit >= 0)
 		xMinUnit -= xMajorUnit;
 }
 
@@ -162,7 +162,7 @@ void ScatterDraw::AdjustMinUnitY() {
 	yMinUnit = NumberWithLeastSignificantDigits(yMin, yMin + yRange) - yMin;
 	while (yMinUnit < 0)
 		yMinUnit += yMajorUnit;
-	while (yMinUnit - yMajorUnit > 0)
+	while (yMinUnit - yMajorUnit >= 0)
 		yMinUnit -= yMajorUnit;
 }
 
@@ -172,7 +172,7 @@ void ScatterDraw::AdjustMinUnitY2() {
 	yMinUnit2 = NumberWithLeastSignificantDigits(yMin2, yMin2 + yRange2) - yMin2;
 	while (yMinUnit2 < 0)
 		yMinUnit2 += yMajorUnit2;
-	while (yMinUnit2 - yMajorUnit2 > 0)
+	while (yMinUnit2 - yMajorUnit2 >= 0)
 		yMinUnit2 -= yMajorUnit2;
 }
 
@@ -260,13 +260,22 @@ ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
 ScatterDraw &ScatterDraw::SetMinUnits(double ux, double uy) {
 	if (IsNum(ux)) {
 		xMinUnit = xMinUnit0 = ux;
-		AdjustMinUnitX();
+		while (xMinUnit < 0)
+			xMinUnit += xMajorUnit;
+		while (xMinUnit - xMajorUnit >= 0)
+			xMinUnit -= xMajorUnit;
 	}
 	if (IsNum(uy)) {	
 		yMinUnit = yMinUnit0 = uy;
 		yMinUnit2 = yMinUnit20 = yRange2*yMinUnit/yRange;
-		AdjustMinUnitY();
-		AdjustMinUnitY2();	
+		while (yMinUnit < 0)
+			yMinUnit += yMajorUnit;
+		while (yMinUnit - yMajorUnit >= 0)
+			yMinUnit -= yMajorUnit;
+		while (yMinUnit2 < 0)
+			yMinUnit2 += yMajorUnit2;
+		while (yMinUnit2 - yMajorUnit2 >= 0)
+			yMinUnit2 -= yMajorUnit2;	
 	}
 	return *this;
 }

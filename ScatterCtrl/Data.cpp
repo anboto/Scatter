@@ -100,7 +100,7 @@ void DataDlg::OnTab() {
 		}
 		data.AddRowNumColumn(textX).SetConvert(dataSourceX);
 		
-		String textY = pscatter->GetLabelY();
+		String textY = pscatter->GetLegend(scatterIndex);
 		if (!pscatter->GetUnitsY(scatterIndex).IsEmpty()) {
 			String unitsY = "[" + pscatter->GetUnitsY(scatterIndex) + "]";
 			if (textY.Find(unitsY) < 0)
@@ -126,7 +126,7 @@ void DataDlg::OnTab() {
 				dataY.pscatter = pscatter;
 				dataY.index = c;
 				
-				String textY = pscatter->GetLabelY();
+				String textY = pscatter->GetLegend(c);
 				if (!pscatter->GetUnitsY(c).IsEmpty()) {
 					String unitsY = "[" + pscatter->GetUnitsY(c) + "]";
 					if (textY.Find(unitsY) < 0)
