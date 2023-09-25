@@ -218,6 +218,22 @@ ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
 	return *this;
 }
 
+ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
+	if (IsNum(nx)) {
+		//xMajorUnitNum = nx;
+		xMajorUnit = xRange/nx;
+		//AdjustMinUnitX();
+	}
+	if (IsNum(ny)) {
+		//yMajorUnitNum = ny;
+		yMajorUnit = yRange/ny;
+		yMajorUnit2 = yMajorUnit*yRange2/yRange;
+		//AdjustMinUnitY();
+		//AdjustMinUnitY2();
+	}
+	return *this;
+}
+
 ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
 	ASSERT(!IsNum(ux)  || ux   >= 0);
 	ASSERT(!IsNum(uy)  || uy   >= 0);
