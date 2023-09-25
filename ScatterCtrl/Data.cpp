@@ -62,12 +62,7 @@ Value DataDlg::DataSourceX::Format(const Value& q) const {
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
 		return Null;
-	Value ret = pscatter->GetStringX(index, q);
-	if (ret.Is<String>()) {
-		String sret = ret;
-		sret.Replace("\n", " ");
-		return sret;
-	}
+	Value ret = pscatter->GetStringX(index, q, true);
 	return ret;
 }
 
@@ -76,12 +71,7 @@ Value DataDlg::DataSourceY::Format(const Value& q) const {
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
 		return Null;
-	Value ret = pscatter->GetStringY(index, q);
-	if (ret.Is<String>()) {
-		String sret = ret;
-		sret.Replace("\n", " ");
-		return sret;
-	}
+	Value ret = pscatter->GetStringY(index, q, true);
 	return ret;
 }
 
@@ -101,26 +91,47 @@ void DataDlg::OnTab() {
 		DataSourceY &dataSourceY = dataSourceYArr.Add();
 		dataSourceX.pscatter = dataSourceY.pscatter = pscatter;
 		dataSourceX.index = dataSourceY.index = scatterIndex;
-		String textX = pscatter->GetLabelX() + 
-					   (pscatter->GetUnitsX(scatterIndex).IsEmpty() ? "" : " [" + pscatter->GetUnitsX(scatterIndex) + "]"); 
-		String textY = pscatter->GetLegend(scatterIndex) + 
-					   (pscatter->GetUnitsY(scatterIndex).IsEmpty() ? "" : " [" + pscatter->GetUnitsY(scatterIndex) + "]"); 
+		
+		String textX = pscatter->GetLabelX();
+		if (!pscatter->GetUnitsX(scatterIndex).IsEmpty()) {
+			String unitsX = "[" + pscatter->GetUnitsX(scatterIndex) + "]";
+			if (textX.Find(unitsX) < 0)
+				textX << " " << unitsX;
+		}
 		data.AddRowNumColumn(textX).SetConvert(dataSourceX);
+		
+		String textY = pscatter->GetLabelY();
+		if (!pscatter->GetUnitsY(scatterIndex).IsEmpty()) {
+			String unitsY = "[" + pscatter->GetUnitsY(scatterIndex) + "]";
+			if (textY.Find(unitsY) < 0)
+				textY << " " << unitsY;
+		}
 		data.AddRowNumColumn(textY).SetConvert(dataSourceY);
 	} else {
 		data.SetVirtualCount(int(scatter.GetCount(0)));
 		dataSourceX.pscatter = pscatter;
 		dataSourceX.index = 0;
-		String textX = pscatter->GetLabelX() + 
-					   (pscatter->GetUnitsX(0).IsEmpty() ? "" : " [" + pscatter->GetUnitsX(0) + "]"); 
+		
+		String textX = pscatter->GetLabelX();
+		if (!pscatter->GetUnitsX(0).IsEmpty()) {
+			String unitsX = "[" + pscatter->GetUnitsX(0) + "]";
+			if (textX.Find(unitsX) < 0)
+				textX << " " << unitsX;
+		}
 		data.AddRowNumColumn(textX).SetConvert(dataSourceX);
+		
 		for (int c = 0; c < scatter.GetCount(); ++c) {
 			if (!IsNull(scatter.GetCount(c))) {
 				DataSourceY &dataY = dataSourceYArr.Add();
 				dataY.pscatter = pscatter;
 				dataY.index = c;
-				String textY = pscatter->GetLegend(c) + 
-					   (pscatter->GetUnitsY(c).IsEmpty() ? "" : " [" + pscatter->GetUnitsY(c) + "]"); 		
+				
+				String textY = pscatter->GetLabelY();
+				if (!pscatter->GetUnitsY(c).IsEmpty()) {
+					String unitsY = "[" + pscatter->GetUnitsY(c) + "]";
+					if (textY.Find(unitsY) < 0)
+						textY << " " << unitsY;
+				}
 				data.AddRowNumColumn(textY).SetConvert(dataY);	
 			}
 		}
