@@ -650,13 +650,18 @@ double ScatterDraw::GetValueX(int index, int64 idata) {
 	}
 }
 
-Value ScatterDraw::GetStringX(int index, int64 idata) {
+Value ScatterDraw::GetStringX(int index, int64 idata, bool removeEnter) {
 	double ret = GetValueX(index, idata);
 	if (IsNull(ret))
 		return Null;
 	if (cbModifFormatX) {
 		String sret;
 		cbModifFormatX(sret, int(idata), ret);
+		if (removeEnter) {
+			sret.Replace(" \n", " ");
+			sret.Replace("\n ", " ");
+			sret.Replace("\n", " ");
+		}
 		return sret;
 	} else
 		return ret;
@@ -676,13 +681,18 @@ double ScatterDraw::GetValueY(int index, int64 idata) {
 	}
 }
 
-Value ScatterDraw::GetStringY(int index, int64 idata) {
+Value ScatterDraw::GetStringY(int index, int64 idata, bool removeEnter) {
 	double ret = GetValueY(index, idata);
 	if (!IsNum(ret))
 		return Null;
 	if (cbModifFormatY) {
 		String sret;
 		cbModifFormatY(sret, int(idata), ret);
+		if (removeEnter) {
+			sret.Replace(" \n", " ");
+			sret.Replace("\n ", " ");
+			sret.Replace("\n", " ");
+		}
 		return sret;
 	} else
 		return ret;
@@ -1608,15 +1618,15 @@ String ScatterDraw::GetCSV() {
 			if (i > 0)
 				line << sep;
 			for (int ii = 0; ii < idGroups[i].size(); ii++) {
-				ScatterSeries &serie = series[idGroups[i][ii]];
-				DataSource &data = serie.Data();
+				//ScatterSeries &serie = series[idGroups[i][ii]];
+				//DataSource &data = serie.Data();
 				if (ii == 0) {
 					if (plot) 
-						line << data.x(row);
+						line << GetStringX(idGroups[i][ii], row, true); //data.x(row);
 				}
 				line << sep;
 				if (plot)
-					line << data.y(row);
+					line << GetStringY(idGroups[i][ii], row, true); //data.y(row);
 			}
 		}
 		if (thereIsData)

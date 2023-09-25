@@ -632,9 +632,9 @@ public:
 	int64 GetCount(int index);
 	void GetValues(int index, int64 idata, double &x, double &y);
 	double GetValueX(int index, int64 idata);
-	Value GetStringX(int index, int64 idata);
+	Value GetStringX(int index, int64 idata, bool removeEnter = false);
 	double GetValueY(int index, int64 idata);
-	Value GetStringY(int index, int64 idata);
+	Value GetStringY(int index, int64 idata, bool removeEnter = false);
 	
 	ScatterDraw &SetNoPlot(int index);
 	
