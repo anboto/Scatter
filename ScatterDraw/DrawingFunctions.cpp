@@ -303,7 +303,7 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 	if (dash == LINE_SOLID) {
 		//w.DrawPolyline(p, int(thick*scale), color);
 		for (int i = 1; i < p.GetCount(); ++i) {
-			if (!(IsNull(p[i-1]) || IsNull(p[i])))
+			if (!(!IsNum(p[i-1]) || !IsNum(p[i])))
 				w.DrawLine(p[i-1], p[i], int(thick*scale), color);
 		}
 	} else if (dash == LINE_NONE) 
@@ -318,7 +318,7 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 		Pointf begin, end;
 		begin = p[0];
 		for (int i = 1; i < p.GetCount();) {
-			if (IsNull(begin) || IsNull(p[i])) 
+			if (!IsNum(begin) || !IsNum(p[i])) 
 				i++;
 			else {
 				double d = Distance(begin, p[i]);
@@ -352,7 +352,7 @@ void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double o
 	
 	bool broken = true;
 	for (int i = 0; i < p.size(); ++i) {
-		if (IsNull(p[i]))
+		if (!IsNum(p[i]))
 			broken = true;		
 		else {
 			if (broken) {

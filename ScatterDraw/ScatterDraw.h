@@ -1723,7 +1723,7 @@ void ScatterDraw::Plot(T& w) {
 			if (serie.markWidth >= 1 && serie.markPlot) {
 				if (!serie.markPlot->IsMultiPlot()) {
 					for (int i = 0; i < points.GetCount(); i++) { 
-						if (!IsNull(points[i])) 
+						if (IsNum(points[i])) 
 							serie.markPlot->Paint(w, plotScaleAvg, points[i], 
 								serie.markWidth, serie.markColor, 
 								serie.markBorderWidth, serie.markBorderColor);              
@@ -1761,7 +1761,7 @@ void ScatterDraw::Plot(T& w) {
 				Font fnt = serie.labelsFont;
 				fnt.Height(int((fnt.GetHeight() + fnt.GetDescent())*min(plotScaleX, plotScaleY)));
 				for (int i = 0; i < points.GetCount() && i < serie.labels->GetCount(); i++) {
-					if (!IsNull(points[i])) {
+					if (IsNum(points[i])) {
 						String txt = (*(serie.labels))[i];
 						Size sz = GetTextSizeSpace(txt, fnt);
 						double ddy = static_cast<int>(-sz.cy/2.);
