@@ -665,7 +665,7 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 	
 	Vector<double> raw, data;
 	
-	if (!IsNull(mn)) {
+	if (IsNum(mn)) {
 		Copy(getdata, raw);
 		for (int i = 0; i < raw.size(); ++i)
 			if (Between(raw[i], mn, mx))
@@ -1099,7 +1099,7 @@ Pointf Intersection(Pointf &a, Pointf &b, Pointf &c, Pointf &d) {
  
 Pointf SegIntersection(Pointf &a, Pointf &b, Pointf &c, Pointf &d) {
 	Pointf inter = Intersection(a, b, c, d); 	
-	if (IsNull(inter))
+	if (!IsNum(inter))
 		return Null;
     if (((a.x <= inter.x && b.x >= inter.x) || (b.x <= inter.x && a.x >= inter.x)) &&
     	((a.y <= inter.y && b.y >= inter.y) || (b.y <= inter.y && a.y >= inter.y)) &&
@@ -1115,7 +1115,7 @@ Vector<Pointf> Intersection(Vector<Pointf> &poly1, Vector<Pointf> &poly2) {
 	for (int i1 = 0; i1 < poly1.GetCount() - 1; ++i1) {
 		for (int i2 = 0; i2 < poly2.GetCount() - 1; ++i2) {
 			Pointf inter = SegIntersection(poly1[i1], poly1[i1+1], poly2[i2], poly2[i2+1]);
-			if (!IsNull(inter)) {
+			if (IsNum(inter)) {
 				bool found = false;
 				for (int i = 0; i < listInter.GetCount(); ++i) {
 					if (abs((inter.x - listInter[i].x)/inter.x) < 0.000001 && 

@@ -69,7 +69,7 @@ void NullDataDemo(String fileName) {
 
 	UppLog() << "\nPreparing Null data scatter";
 
-	Vector<Pointf> s1 = {{1,14}, {2,65}, {3,29}, {Null,Null}, {5,40}, {6,50}, {7,Null}, {8,25}, {9,10}, {10, Null}, {Null, Null}};
+	Vector<Pointf> s1 = {{1,14}, {2,65}, {3,29}, {Null,Null}, {5,40}, {6,50}, {7,Null}, {8,25}, {9,10}, {10,Null}, {Null,Null}};
 	
 	UppLog() << "\nScatter with Null data";
 	

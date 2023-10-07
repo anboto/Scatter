@@ -1373,12 +1373,12 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	
 	if (mouseX) {
 		if (zoomStyleX == TO_CENTER) {
-			if (!IsNull(minXmin) && xMin + xRange*(1-scale)/2. <= minXmin) {
+			if (IsNum(minXmin) && xMin + xRange*(1-scale)/2. <= minXmin) {
 				highlight_0 = GetTickCount();
 				Refresh();
 				return;
 			}
-			if (!IsNull(maxXmax) && xMin + xRange*scale + xRange*(1-scale)/2. >= maxXmax) {
+			if (IsNum(maxXmax) && xMin + xRange*scale + xRange*(1-scale)/2. >= maxXmax) {
 				highlight_0 = GetTickCount();
 				Refresh();
 				return;
@@ -1396,12 +1396,12 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	}
 	if (mouseY) {
 		if (zoomStyleY == TO_CENTER) {
-			if (!IsNull(minYmin) && yMin + yRange*(1-scale)/2. <= minYmin) {
+			if (IsNum(minYmin) && yMin + yRange*(1-scale)/2. <= minYmin) {
 				highlight_0 = GetTickCount();
 				Refresh();
 				return;
 			}
-			if (!IsNull(maxYmax) && yMin + yRange*scale + yRange*(1-scale)/2. >= maxYmax) {
+			if (IsNum(maxYmax) && yMin + yRange*scale + yRange*(1-scale)/2. >= maxYmax) {
 				highlight_0 = GetTickCount();
 				Refresh();
 				return;
@@ -1448,7 +1448,7 @@ void ScatterDraw::Scroll(double factorX, double factorY) {
 void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 	if (factorX != 0) {
 		double deltaX = factorX*xRange;
-		if (!IsNull(minXmin) && factorX > 0) {
+		if (IsNum(minXmin) && factorX > 0) {
 			if (xMin > minXmin) {
 				if (xMin - deltaX < minXmin) {
 					highlight_0 = GetTickCount();
@@ -1459,7 +1459,7 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 				highlight_0 = GetTickCount();
 			}
 		}
-		if (!IsNull(maxXmax) && factorX < 0) {
+		if (IsNum(maxXmax) && factorX < 0) {
 			if (xMin + xRange < maxXmax) {
 				if (xMin + xRange - deltaX > maxXmax) {
 					highlight_0 = GetTickCount();
@@ -1478,7 +1478,7 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 	}
 	if (factorY != 0) {
 		double deltaY = factorY*yRange;
-		if (!IsNull(minYmin) && factorY > 0) {
+		if (IsNum(minYmin) && factorY > 0) {
 			if (yMin > minYmin) {
 				if (yMin - deltaY < minYmin) {
 					highlight_0 = GetTickCount();
@@ -1489,7 +1489,7 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 				highlight_0 = GetTickCount();
 			}
 		}
-		if (!IsNull(maxYmax) && factorY < 0) {
+		if (IsNum(maxYmax) && factorY < 0) {
 			if (yMin + yRange < maxYmax) {
 				if (yMin + yRange - deltaY > maxYmax) {
 					highlight_0 = GetTickCount();
@@ -1500,7 +1500,7 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 				highlight_0 = GetTickCount();
 			}
 		}	
-		if (factorY != 0 && !IsNull(factorY)) {	
+		if (factorY != 0 && IsNum(factorY)) {	
 			yMin -= deltaY;
 			yMinUnit += deltaY;
 			AdjustMinUnitY();
@@ -1512,7 +1512,7 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 			}
 		}
 	}
-	if (IsNull(factorX) || IsNull(factorY)) 
+	if (!IsNum(factorX) || !IsNum(factorY)) 
 		Refresh();
 	else if (factorX != 0 || factorY != 0) {	
 		WhenSetXYMin();	
@@ -1667,7 +1667,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 		if (data.IsRange())
 		{
 			Vector<Pointf> filtered_points;
-			filtered_points.AppendRange(FilterRange(points, [](Pointf p) { return !IsNull(p); }));
+			filtered_points.AppendRange(FilterRange(points, [](Pointf p) { return IsNum(p); }));
 			points = pick(filtered_points);
 		}
 	} else if (data.IsParam()) {
@@ -1720,41 +1720,57 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 		if (fastViewX) {
 			double dxpix = (data.x(imax) - data.x(imin))/plotW;
 			int npix = 1;
-			for (int64 i = imin; i <= imax; ) {						
-				double yy = data.y(i);
-				int64 ii;
-				double maxv = data.x(imin) + dxpix*npix; 
-				double maxY = yy, minY = yy;
-				for (ii = 1; (i + ii < imax) && IsNum(data.x(i + ii)) && data.x(i + ii) < maxv; ++ii) {
-					double dd = data.y(i + ii);
-					maxY = max(maxY, dd);
-					minY = min(minY, dd);
-				}
+			for (int64 i = imin; i <= imax; ) {
 				double xx = data.x(i);
 				if (!IsNum(xx)) {
+					points << Null;						
 					++i;
-					points << Null;
 				} else {
-					i += ii;
-					npix++;
-					int ix = ScaleX(xx);
-					int iMax, iMin;
-					if (!IsNum(yy)) 
-						points << Null;							
-					else {
-						iMax = ScaleY(maxY);
-						iMin = ScaleY(minY);
+					double maxv = data.x(imin) + dxpix*npix; 
+					if (xx >= maxv) {					// No saving, data is not grouped in X
+						double yy = data.y(i);
+						if (!IsNum(yy)) 
+							points << Null;
+						else
+							points << Point(ScaleX(xx), ScaleY(yy));
+						++i;
+					} else {
+						double maxY = Null, minY = Null;
+						int64 ii;
+						for (ii = 0; (i + ii < imax) && IsNum(data.x(i + ii)) && data.x(i + ii) < maxv; ++ii) {
+							double dd = data.y(i + ii);
+							if (IsNum(dd)) {
+								if (IsNum(maxY))
+									maxY = max(maxY, dd);
+								else
+									maxY = dd;
+								if (IsNum(minY))
+									minY = min(minY, dd);
+								else
+									minY = dd;
+							}
+						}
+						if (ii == 0 && i == imax)
+							break;
+						
+						if (!IsNum(minY) || !IsNum(maxY)) 
+							points << Null;	
+						
+						int ix = ScaleX(xx);
+						int iMax = ScaleY(maxY);
+						int iMin = ScaleY(minY);
 						points << Point(ix, iMax);
 						if (iMax != iMin)
 							points << Point(ix, iMin);	
+						i += ii;
 					}
+					npix++;
 				}
 			} 
 		} else {
-			for (int64 i = imin; i <= imax; ) {	
+			for (int64 i = imin; i <= imax; ++i) {	
 				double xx = data.x(i);
 				double yy = data.y(i);
-				++i;
 				if (!IsNum(xx) || !IsNum(yy)) 
 					points << Null;
 				else
