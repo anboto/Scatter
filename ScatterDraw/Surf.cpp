@@ -86,15 +86,15 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 	if(lenAxis > 30) { // Not sure what is the best threshold here.
 		// Binary search with "smart" distance guesses
 		double stride_guess = (mx - mn) / (double)(lenAxis-1);
-		ix = (int)(x / stride_guess);
+		ix = (int)((x - mn) / stride_guess);
 		do {
 			ix = std::max<int>(ix, 0);
 			ix = std::min<int>(ix, lenAxis-2);
 			double x_guess = Membercall(getdataAxis)(ix);
-			if(x_guess > x) {
+			if(x < x_guess) {
 				if(ix == 0 || x >= Membercall(getdataAxis)(ix-1)) break;
 				ix -= std::max<int>(1, (int)(x_guess - x)/stride_guess);
-			} else if (x_guess < x) {
+			} else if (x > x_guess) {
 				if(ix == lenAxis-2 || x < Membercall(getdataAxis)(ix+1)) break;
 				ix += std::max<int>(1, (int)(x - x_guess)/stride_guess);
 			} else break;
@@ -103,7 +103,7 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 		ix = std::min<int>(ix, lenAxis-2);
 	} else {
 		// Linear search
-		for (ix = 0; ix < lenAxis-1; ++ix) {
+		for (ix = 0; ix < lenAxis-2; ++ix) {
 			if (Membercall(getdataAxis)(ix+1) > x) break;
 		}
 	}
