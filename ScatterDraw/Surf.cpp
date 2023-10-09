@@ -80,11 +80,11 @@ Color GetRainbowColor(double frac, const Color &col0, const Color &col1, const C
 int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x) {
 	
 	int ix;
+	double mn = Membercall(getdataAxis)(0);
+	double mx = Membercall(getdataAxis)(lenAxis-1);
+	if(x < mn || x >= mx) return -1;
 	if(lenAxis > 30) { // Not sure what is the best threshold here.
 		// Binary search with "smart" distance guesses
-		double mn = Membercall(getdataAxis)(0);
-		double mx = Membercall(getdataAxis)(lenAxis-1);
-		if(x < mn || x >= mx) return -1;
 		double stride_guess = (mx - mn) / (double)(lenAxis-1);
 		ix = (int)(x / stride_guess);
 		do {
@@ -103,7 +103,7 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 		ix = std::min<int>(ix, lenAxis-2);
 	} else {
 		// Linear search
-		for (ix = -1; ix < lenAxis-1; ++ix) {
+		for (ix = 0; ix < lenAxis-1; ++ix) {
 			if (Membercall(getdataAxis)(ix+1) > x) break;
 		}
 	}
