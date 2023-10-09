@@ -73,36 +73,51 @@ Color GetRainbowColor(double frac, const Color &col0, const Color &col1, const C
 	else
 		return InterpolateColor((numScales > 0) ? 2*(frac - 0.5) : Smooth01Left(2*(frac - 0.5)), col1, col2);
 }
+	
 
 #define Membercall(fun)	(this->*fun)
+
+int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x) {
+	
+	int ix;
+	if(lenAxis > 30) { // Not sure what is the best threshold here.
+		// Binary search with "smart" distance guesses
+		double mn = Membercall(getdataAxis)(0);
+		double mx = Membercall(getdataAxis)(lenAxis-1);
+		if(x < mn || x >= mx) return -1;
+		double stride_guess = (mx - mn) / (double)(lenAxis-1);
+		ix = (int)(x / stride_guess);
+		do {
+			ix = std::max<int>(ix, 0);
+			ix = std::min<int>(ix, lenAxis-2);
+			double x_guess = Membercall(getdataAxis)(ix);
+			if(x_guess > x) {
+				if(ix == 0 || x >= Membercall(getdataAxis)(ix-1)) break;
+				ix -= std::max<int>(1, (int)(x_guess - x)/stride_guess);
+			} else if (x_guess < x) {
+				if(ix == lenAxis-2 || x < Membercall(getdataAxis)(ix+1)) break;
+				ix += std::max<int>(1, (int)(x - x_guess)/stride_guess);
+			} else break;
+		} while(true); // Note: The above code will exit always.
+		ix = std::max<int>(ix, 0);
+		ix = std::min<int>(ix, lenAxis-2);
+	} else {
+		// Linear search
+		for (ix = -1; ix < lenAxis-1; ++ix) {
+			if (Membercall(getdataAxis)(ix+1) > x) break;
+		}
+	}
+	return ix;
+}
 	
 double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
 						double x, double y) {
 	if (inter == NO) {
-		int ix, iy;
-		for (ix = 0; ix < lenxAxis; ++ix) {
-			if (Membercall(getdataX)(ix) > x) {
-				if (ix == 0) 
-					return Null;
-				else {
-					ix--;
-					break;
-				}
-			}
-		}
-		if (ix == lenxAxis) 
+		int ix = get_axis_index_area_no_interp(getdataX, lenxAxis, x);
+		if (ix < 0) 
 			return Null;
-		for (iy = 0; iy < lenyAxis; ++iy) {
-			if (Membercall(getdataY)(iy) > y) {
-				if (iy == 0) 
-					return Null;
-				else {
-					iy--;
-					break;
-				}
-			}
-		}
-		if (iy == lenyAxis) 
+		int iy = get_axis_index_area_no_interp(getdataY, lenyAxis, y);
+		if (iy < 0) 
 			return Null;
 		return Membercall(getdata)(ix + iy*(lenxAxis - 1));
 	} else if (inter == BILINEAR) {

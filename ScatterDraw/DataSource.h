@@ -1196,6 +1196,9 @@ public:
 	int lenyAxis;
 	
 protected:
+	
+	int get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x);
+	
 	bool areas;
 };
 
