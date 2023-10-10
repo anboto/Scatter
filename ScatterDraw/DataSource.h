@@ -226,7 +226,7 @@ public:
 	double Integral(double from, double to, double n);
 	
 	double SinEstim_Amplitude(double avg = Null);
-	bool SinEstim_FreqPhase(double &frequency, double &phase, double avg = Null);
+	bool SinEstim_FreqPhase(double &frequency, double &phase, double &firstZero, double avg = Null);
 	Vector<Pointf> FFT(Getdatafun getdata, double tSample, bool frequency = false, 
 					   int type = FFT_TYPE::T_FFT, int window = FFT_WINDOW::HAMMING, 
 					   int numSub = 1, double overlapping = 0);

@@ -22,7 +22,9 @@ struct Equation_functor : NonLinearOptimizationFunctor<double> {
 				   y = (*series).y(i);
 			if (IsNum(x) && IsNum(y)) {
 				double residual = (*fSource).f(x);
-				ASSERT(IsNum(residual));
+				//ASSERT_(IsNum(residual), fSource->GetName());
+				if (!IsNum(residual))
+					residual = 1E200;		// A weird number to stop this optimisation path
 				residual -= y;
 				if (weight)
 					residual *= (*weight)[i];
@@ -867,7 +869,7 @@ INITBLOCK {
 	ExplicitEquation::Register<PolynomialEquation5>("PolynomialEquation5");
 	ExplicitEquation::Register<SinEquation>("SinEquation");
 	ExplicitEquation::Register<DampedSinEquation>("DampedSinusoidal");
-	ExplicitEquation::Register<Sin_DampedSinEquation>("Sin_DampedSinusoidal");
+	//ExplicitEquation::Register<Sin_DampedSinEquation>("Sin_DampedSinusoidal");
 	ExplicitEquation::Register<ExponentialEquation>("ExponentialEquation");
 	ExplicitEquation::Register<RealExponentEquation>("RealExponentEquation");
 	ExplicitEquation::Register<Rational1Equation>("Rational1Equation");

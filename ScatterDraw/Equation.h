@@ -179,8 +179,8 @@ public:
 	virtual void GuessCoeff(DataSource &series)	{
 		coeff[0] = series.AvgY();	
 		coeff[1] = series.SinEstim_Amplitude(coeff[0]);
-		double frequency, phase;
-		if (series.SinEstim_FreqPhase(frequency, phase, coeff[0])) {
+		double frequency, phase, firstZero;
+		if (series.SinEstim_FreqPhase(frequency, phase, firstZero, coeff[0])) {
 			coeff[2] = frequency;
 			coeff[3] = phase;
 		}
@@ -189,21 +189,24 @@ public:
 
 class DampedSinEquation : public ExplicitEquation {
 public:
-	DampedSinEquation() 					{coeff.Clear();	coeff << 0. << 0.1 << 1 << 0.1 << 0.; numcoeff = 5;}
-	DampedSinEquation(double offset, double A, double lambda, double w, double phi) {Init(offset, A, lambda, w, phi);}
-	void Init(double offset, double A, double lambda, double w, double phi) 	{coeff.Clear();	coeff << offset << A << lambda << w << phi; numcoeff = 5;}
+	DampedSinEquation() 					{coeff.Clear();	coeff << 0. << 0.1 << 1. << 0.1 << 0.; numcoeff = 5;}
+	DampedSinEquation(double offset, double A, double lambda, double w, double phi,double dt) {Init(offset, A, lambda, w, dt);}
+	void Init(double offset, double A, double lambda, double w,  double dt) {
+		coeff.Clear();	coeff << offset << A << lambda << w << dt; numcoeff = 5;
+	}
 	double f(double x)				{
-		double ex = -coeff[2]*x;
+		double ex = -coeff[2]*(x + coeff[4]);
 		if (ex > 705)		// Too close to double limits
 			return 0;
-		return coeff[0] + coeff[1]*exp(ex)*cos(coeff[3]*x + coeff[4]);
+		return coeff[0] + coeff[1]*exp(ex)*cos(coeff[3]*(x + coeff[4]));
 	}
 	virtual String GetName() 		{return t_("DampedSinusoidal");}
 	virtual String GetEquation(int _numDigits = 3) {
 		String stheta = IsNull(_numDigits) ? String("ζ") : FormatF(GetDampingRatio(), _numDigits);
 
-		String ret = Format("%s + %s*e^(-%s*t)*cos(%s*t + %s) (ζ: %s)", FormatCoeff(0, _numDigits), 
-			FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), FormatCoeff(3, _numDigits), FormatCoeff(4, _numDigits),
+		String ret = Format("%s + %s*e^(-%s*(t + %s))*cos(%s*(t + %s)) (ζ: %s)", FormatCoeff(0, _numDigits), 
+			FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), FormatCoeff(4, _numDigits), FormatCoeff(3, _numDigits), 
+			FormatCoeff(4, _numDigits),
 			stheta);
 		ret.Replace("+ -", "- ");
 		return ret;
@@ -211,11 +214,11 @@ public:
 	void SetDegree(int )						{NEVER();}
 	virtual void GuessCoeff(DataSource &series)	{
 		coeff[0] = series.AvgY();	
-		coeff[1] = series.SinEstim_Amplitude(coeff[0]);
-		double frequency, phase;
-		if (series.SinEstim_FreqPhase(frequency, phase, coeff[0])) {
+		coeff[1] = series.MaxY() - coeff[0];
+		double frequency, phase, firstZero;
+		if (series.SinEstim_FreqPhase(frequency, phase, firstZero, coeff[0])) {
 			coeff[3] = frequency;
-			coeff[4] = phase;
+			coeff[4] = -(firstZero + 2*M_PI/frequency/4);
 		}
 	}
 	double GetPeriod() 			{return 2*M_PI/abs(coeff[3]);}
@@ -223,13 +226,8 @@ public:
 	FitError Fit(DataSource &data, double &r2) {	
 		FitError ret = ExplicitEquation::Fit(data, r2);		
 		if (ret == NoError) {
-			FitError ret = ExplicitEquation::Fit(data, r2);	// Two tries to get coeff[3]	
-			if (ret == NoError) {
-				if (coeff[3] < 0) {		// cos(a) = cos(-a)
-					coeff[3] = -coeff[3];
-					coeff[4] = -coeff[4];
-				}
-			}
+			if (coeff[3] < 0) 		// cos(a) = cos(-a)
+				coeff[3] = -coeff[3];
 		}
 		return ret;
 	}
@@ -263,8 +261,8 @@ public:
 	virtual void GuessCoeff(DataSource &series)	{
 		coeff[0] = series.AvgY();	
 		coeff[1] = series.SinEstim_Amplitude(coeff[0]);
-		double frequency, phase;
-		if (series.SinEstim_FreqPhase(frequency, phase, coeff[0])) {
+		double frequency, phase, firstZero;
+		if (series.SinEstim_FreqPhase(frequency, phase, firstZero, coeff[0])) {
 			coeff[2] = frequency;
 			coeff[3] = phase;
 		}
@@ -525,7 +523,11 @@ public:
 			return 0;
 		if ((x-x0)/lambda < 0)
 			return 0;
-		return factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
+		if (std::isinf<double>(pow((x-x0)/lambda, k)))
+			return 0;
+		double ret = factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
+		ASSERT(IsNum(ret));
+		return ret;
 	}
 	virtual String GetName() 					{return t_("Weibull");}
 	virtual String GetEquation(int nDig = 3) {

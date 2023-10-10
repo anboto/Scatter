@@ -205,8 +205,8 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.array.Set(row++, 0, t_("RMS"));
 	tabFitRight.array.Set(row++, 0, t_("StdDev"));
 	
-	tabOpRight.xLow.WhenLostFocus = [=] {OnOperation();};
-	tabOpRight.xHigh.WhenLostFocus = [=] {OnOperation();};
+	tabOpRight.xLow.WhenLostFocus  = tabOpRight.xLow.WhenEnter  = 
+	tabOpRight.xHigh.WhenLostFocus = tabOpRight.xHigh.WhenEnter = [=] {OnOperation();};
 	
 	tabBestFitRight.coefficients = 0;
 	tabBestFitRight.coefficients.Tip(t_("To show real equation coefficients with different precisions or just in text"));

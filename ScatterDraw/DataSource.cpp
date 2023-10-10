@@ -329,7 +329,7 @@ double DataSource::SinEstim_Amplitude(double avg) {
 	return sqrt(2.*VarianceY(avg));
 }
 
-bool DataSource::SinEstim_FreqPhase(double &frequency, double &phase, double avg) {
+bool DataSource::SinEstim_FreqPhase(double &frequency, double &phase, double &firstZero, double avg) {
 	if (GetCount() < 4)
 		return false;
 	if (!IsNum(avg))
@@ -339,17 +339,17 @@ bool DataSource::SinEstim_FreqPhase(double &frequency, double &phase, double avg
 		if (!!IsNum(x(firstId)) && !!IsNum(y(firstId)))
 			break;
 	bool firstIsToPositive = (y(firstId) - avg) < 0;
-	bool isPossitive = !firstIsToPositive;
+	bool isPositive = !firstIsToPositive;
 	double T = 0;
 	int numT = 0;
 	double lastZero = Null;
-	double firstZero = Null;
+	firstZero = Null;
 	firstId++;
 	for (int64 id = firstId; id < GetCount(); ++id) {
 		if (!IsNum(x(id)) || !IsNum(y(id)))
 			continue;
-		if (((y(id) - avg) > 0) != isPossitive) {
-			isPossitive = !isPossitive;
+		if (((y(id) - avg) > 0) != isPositive) {
+			isPositive = !isPositive;
 			double zero = x(id-1) - (y(id-1) - avg)*(x(id) - x(id-1))/(y(id) - y(id-1));
 			if (!IsNum(lastZero)) 
 				firstZero = zero;
