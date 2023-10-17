@@ -147,8 +147,8 @@ public:
 	double MaxX(int64& id)  		{return Max(&DataSource::x, id);}	
 	double MaxX() 					{int64 dummy;	return Max(&DataSource::x, dummy);}	
 	
-	double IsSortedY()  			{return IsSorted(&DataSource::y);}		
-	double IsSortedX()  			{return IsSorted(&DataSource::x);}	
+	bool IsSortedY()  				{return IsSorted(&DataSource::y);}		
+	bool IsSortedX()  				{return IsSorted(&DataSource::x);}	
 	
 	int64 Closest(double x,double y){return Closest(&DataSource::x, &DataSource::y, x, y);}	
 	int64 ClosestY(double d)  		{return Closest(&DataSource::y, d);}		
@@ -208,7 +208,7 @@ public:
 	double AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w);
 	int64 Closest(Getdatafun getdata, double d);
 	int64 Closest(Getdatafun getdataX, Getdatafun getdataY, double x, double y);
-	double IsSorted(Getdatafun getdata);
+	bool IsSorted(Getdatafun getdata);
 	double RMS(Getdatafun getdata);
 	double StdDev(Getdatafun getdata, double avg = Null);
 	double Variance(Getdatafun getdata, double avg = Null);
@@ -1196,7 +1196,6 @@ public:
 	int lenyAxis;
 	
 protected:
-	
 	int get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x);
 	
 	bool areas;
@@ -1414,7 +1413,7 @@ void MovingAverage(const Range1 &x, const Range1 &y, typename Range1::value_type
 }
 
 template <class Range>
-void FindZeroCrossing(const Range &x, const Range &y, bool ascending, bool descending, 
+void ZeroCrossing(const Range &x, const Range &y, bool ascending, bool descending, 
 					  Vector<typename Range::value_type> &zeros, Vector<int64> &idzeros) {
 	using Scalar = typename Range::value_type;
 	ASSERT(x.size() == y.size());
@@ -1431,6 +1430,13 @@ void FindZeroCrossing(const Range &x, const Range &y, bool ascending, bool desce
 		x_prev = x[i];
 		y_prev = y[i];
 	}
+}
+
+template <class Range>
+void ZeroCrossing(const Range &x, const Range &y, bool ascending, bool descending, 
+					  Vector<typename Range::value_type> &zeros) {
+	Vector<int64> dummy;
+	ZeroCrossing(x, y, ascending, descending, zeros, dummy);				    
 }
 
 template <class Range>
@@ -1671,7 +1677,7 @@ void CleanNAN_safe(Range &x, Range &y, Range &z) {
 }
 
 template <class Range1, class Range2>
-Range1 ApplyIndex(const Range1 &x, Range2 &indices) {
+Range1 ApplyIndex(const Range1 &x, const Range2 &indices) {
 	ASSERT(x.size() == indices.size());
 	Range1 ret(x.size());
 	for (int i = 0; i < x.size(); ++i)
@@ -1687,10 +1693,11 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry
 	int n = int(rx.size());
 	if (n == 0)
 		return;
-	Vector<int> indices(n);
-	for (int i = 0; i < indices.size(); ++i)
-		indices[i] = i;
-	StableSort(indices,[&](int a, int b)-> bool {return x[a] < x[b];}); 
+	Vector<int> indices = GetSortOrderX(x);
+	//Vector<int> indices(n);
+	//for (int i = 0; i < indices.size(); ++i)
+	//	indices[i] = i;
+	//StableSort(indices,[&](int a, int b)-> bool {return x[a] < x[b];}); 
 	rx = ApplyIndex(rx, indices);
 	ry = ApplyIndex(ry, indices);
 	
@@ -1726,10 +1733,11 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	int n = int(rx.size());
 	if (n == 0)
 		return;
-	Vector<int> indices(n);
-	for (int i = 0; i < indices.size(); ++i)
-		indices[i] = i;
-	StableSort(indices,[&](int a, int b)-> bool {return rx[a] < rx[b];}); 
+	Vector<int> indices = GetSortOrderX(rx);
+	//Vector<int> indices(n);
+	//for (int i = 0; i < indices.size(); ++i)
+	//	indices[i] = i;
+	//StableSort(indices,[&](int a, int b)-> bool {return rx[a] < rx[b];}); 
 	rx = ApplyIndex(rx, indices);
 	ry = ApplyIndex(ry, indices);
 	rz = ApplyIndex(rz, indices);

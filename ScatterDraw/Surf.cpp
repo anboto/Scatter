@@ -78,12 +78,12 @@ Color GetRainbowColor(double frac, const Color &col0, const Color &col1, const C
 #define Membercall(fun)	(this->*fun)
 
 int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x) {
-	
 	int ix;
 	double mn = Membercall(getdataAxis)(0);
 	double mx = Membercall(getdataAxis)(lenAxis-1);
-	if(x < mn || x >= mx) return -1;
-	if(lenAxis > 30) { // Not sure what is the best threshold here.
+	if (x < mn || x >= mx) 
+		return -1;
+	if (lenAxis > 30) { // Not sure what is the best threshold here.
 		// Binary search with "smart" distance guesses
 		double stride_guess = (mx - mn) / (double)(lenAxis-1);
 		ix = (int)((x - mn) / stride_guess);
@@ -97,14 +97,16 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 			} else if (x > x_guess) {
 				if(ix == lenAxis-2 || x < Membercall(getdataAxis)(ix+1)) break;
 				ix += std::max<int>(1, (int)(x - x_guess)/stride_guess);
-			} else break;
-		} while(true); // Note: The above code will exit always.
+			} else 
+				break;
+		} while (true); // Note: The above code will exit always.
 		ix = std::max<int>(ix, 0);
 		ix = std::min<int>(ix, lenAxis-2);
 	} else {
 		// Linear search
 		for (ix = 0; ix < lenAxis-2; ++ix) {
-			if (Membercall(getdataAxis)(ix+1) > x) break;
+			if (Membercall(getdataAxis)(ix+1) > x) 
+				break;
 		}
 	}
 	return ix;

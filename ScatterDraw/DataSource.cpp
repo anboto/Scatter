@@ -185,12 +185,12 @@ double DataSource::RMS(Getdatafun getdata) {
 	return sqrt(ret/count);
 }
 
-double DataSource::IsSorted(Getdatafun getdata) {
+bool DataSource::IsSorted(Getdatafun getdata) {
 	int64 num = size();
 	if (num == 0)
 		return false;
 	if (num == 1)
-		return 1;
+		return true;
 	for (int i = 1; i < num; ++i) {
 		if (Membercall(getdata)(i) < Membercall(getdata)(i - 1))
 			return false;
@@ -317,7 +317,7 @@ void DataSource::ZeroCrossing(Getdatafun getdataY, Getdatafun getdataX, bool asc
 	VectorXd x, y;
 	Copy(getdataX, getdataY, x, y);	
 	
-	FindZeroCrossing(x, y, ascending, descending, zeros, idzeros);
+	Upp::ZeroCrossing(x, y, ascending, descending, zeros, idzeros);
 }
 
 double DataSource::StdDev(Getdatafun getdata, double avg) {
