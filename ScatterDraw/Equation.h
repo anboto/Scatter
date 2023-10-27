@@ -523,11 +523,7 @@ public:
 			return 0;
 		if ((x-x0)/lambda < 0)
 			return 0;
-		if (std::isinf<double>(pow((x-x0)/lambda, k)))
-			return 0;
-		double ret = factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
-		ASSERT(IsNum(ret));
-		return ret;
+		return factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
 	}
 	virtual String GetName() 					{return t_("Weibull");}
 	virtual String GetEquation(int nDig = 3) {

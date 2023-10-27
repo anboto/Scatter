@@ -150,30 +150,30 @@ void ScatterDraw::AdjustMinUnitX() {
 	if (SetGridLinesX)
 		return;
 	xMinUnit = NumberWithLeastSignificantDigits(xMin, xMin + xRange) - xMin;
-	while (xMinUnit < 0)
-		xMinUnit += xMajorUnit;
-	while (xMinUnit - xMajorUnit >= 0)
-		xMinUnit -= xMajorUnit;
+	if (xMinUnit < 0)
+		xMinUnit += abs(floor(xMinUnit/xMajorUnit))*xMajorUnit;
+	else if (xMinUnit - xMajorUnit >= 0)
+		xMinUnit -= abs(floor(xMinUnit/xMajorUnit))*xMajorUnit;
 }
 
 void ScatterDraw::AdjustMinUnitY() {
 	if (SetGridLinesY)
 		return;
 	yMinUnit = NumberWithLeastSignificantDigits(yMin, yMin + yRange) - yMin;
-	while (yMinUnit < 0)
-		yMinUnit += yMajorUnit;
-	while (yMinUnit - yMajorUnit >= 0)
-		yMinUnit -= yMajorUnit;
+	if (yMinUnit < 0)
+		yMinUnit += abs(floor(yMinUnit/yMajorUnit))*yMajorUnit;
+	else if (yMinUnit - yMajorUnit >= 0)
+		yMinUnit -= abs(floor(yMinUnit/yMajorUnit))*yMajorUnit;
 }
 
 void ScatterDraw::AdjustMinUnitY2() {
 	if (SetGridLinesY)
 		return;
 	yMinUnit2 = NumberWithLeastSignificantDigits(yMin2, yMin2 + yRange2) - yMin2;
-	while (yMinUnit2 < 0)
-		yMinUnit2 += yMajorUnit2;
-	while (yMinUnit2 - yMajorUnit2 >= 0)
-		yMinUnit2 -= yMajorUnit2;
+	if (yMinUnit2 < 0)
+		yMinUnit2 += abs(floor(yMinUnit2/yMajorUnit2))*yMajorUnit2;
+	else if (yMinUnit2 - yMajorUnit2 >= 0)
+		yMinUnit2 -= abs(floor(yMinUnit2/yMajorUnit2))*yMajorUnit2;
 }
 
 void ScatterDraw::AdjustMajorUnitX() {

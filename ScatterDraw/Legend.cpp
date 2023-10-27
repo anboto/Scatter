@@ -227,6 +227,9 @@ void ScatterDraw::DrawRainbowPalette(Draw& w) const {
 	w.DrawImage(rect.left, rect.top, out_image);	
 	DrawRectangle(w, rect, plotScaleAvg, 1, rainbowBorderColor);
 	
+	if (!IsNum(surfMaxZ) || !IsNum(surfMinZ))
+		return;
+				
 	double deltaZ = (surfMaxZ - surfMinZ)/double(surfNumColor);
 	for (int i = 0; i <= surfNumColor; ++i) {
 		double val = surfMinZ + deltaZ*i;
