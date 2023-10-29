@@ -364,7 +364,8 @@ void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double o
 			any_at_all = true;
 		}
 	}
-	if(!any_at_all) return;
+	if(!any_at_all) 
+		return;
 	DashScaled(w, dash, scale);
 	w.Opacity(opacity);				// Before Stroke()
 	w.Stroke(thick*scale, color);
