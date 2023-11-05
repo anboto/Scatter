@@ -616,16 +616,19 @@ public:
 		return Format("%s + %s*^x^%s", FormatCoeff(0, numDigits), FormatCoeff(1, numDigits), FormatCoeff(2, numDigits));
 	}
 	virtual void GuessCoeff(DataSource &series) {
+		GuessCoeff(series, 2);
+	}
+	void GuessCoeff(DataSource &series, double exp) {
 		LinearEquation lin;
 		if (lin.Fit(series) != ExplicitEquation::NoError) 
 			throw Exc("Problem fitting linear");
 		
 		coeff[0] = lin.GetCoeff(0);
 		coeff[1] = lin.GetCoeff(1);
-		coeff[2] = 2;
+		coeff[2] = exp;
 	}
-	FitError Fit(DataSource &series) {
-		FitError error = ExplicitEquation::Fit(series);
+	FitError Fit(DataSource &series, double &r2) {
+		FitError error = ExplicitEquation::Fit(series, r2);
 		if (error == ExplicitEquation::NoError) {
 			if (coeff[2] < 1)
 				coeff[2] = Mirror(coeff[2], 1.);
