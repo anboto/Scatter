@@ -1686,7 +1686,7 @@ Range1 ApplyIndex(const Range1 &x, const Range2 &indices) {
 }
 
 template <class Range1, class Range2>
-void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry) {
+void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry, double ratio = 1000) {
 	Range2 rx, ry;
 	CleanNAN(x, y, rx, ry);
 	
@@ -1701,32 +1701,33 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry
 	rx = ApplyIndex(rx, indices);
 	ry = ApplyIndex(ry, indices);
 	
-	Vector<int> num(n, 1);
-	double epsx = (rx[n-1] - rx[0])/1000./n;
-	for (int i = n-1; i >= 1; --i) {
-		if (rx[i] - rx[i-1] < epsx) {
-			num[i-1] += num[i];
-			ry[i-1]  += ry[i];		
-			num[i] = 0;
+	if (!IsNull(ratio)) {
+		Vector<int> num(n, 1);
+		double epsx = (rx[n-1] - rx[0])/n/ratio;
+		for (int i = n-1; i >= 1; --i) {
+			if (rx[i] - rx[i-1] < epsx) {
+				num[i-1] += num[i];
+				ry[i-1]  += ry[i];		
+				num[i] = 0;
+			}
 		}
-	}
-	int id = 0;
-	for (int i = 0; i < num.size(); ++i) {
-		if (num[i] != 0) { 
-			ry[id] = ry[i]/num[i];
-			rx[id] = rx[i];
-			id++;
+		int id = 0;
+		for (int i = 0; i < num.size(); ++i) {
+			if (num[i] != 0) { 
+				ry[id] = ry[i]/num[i];
+				rx[id] = rx[i];
+				id++;
+			}
 		}
+		ResizeConservative(rx, id);
+		ResizeConservative(ry, id);
 	}
-	ResizeConservative(rx, id);
-	ResizeConservative(ry, id);
-	
 	rrx = pick(rx);
 	rry = pick(ry);
 }
 
 template <class Range1, class Range2>
-void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 &rrx, Range2 &rry, Range2 &rrz) {
+void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 &rrx, Range2 &rry, Range2 &rrz, double ratio = 1000) {
 	Range2 rx, ry, rz;
 	CleanNAN(x, y, z, rx, ry, rz);
 	
@@ -1742,29 +1743,30 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	ry = ApplyIndex(ry, indices);
 	rz = ApplyIndex(rz, indices);
 	
-	Vector<int> num(n, 1);
-	double epsx = (rx[n-1] - rx[0])/1000./n;
-	for (int i = n-1; i >= 1; --i) {
-		if (rx[i] - rx[i-1] < epsx) {
-			num[i-1] += num[i];
-			num[i] = 0;
-			ry[i-1]  += ry[i];	
-			rz[i-1]  += rz[i];	
+	if (!IsNull(ratio)) {
+		Vector<int> num(n, 1);
+		double epsx = (rx[n-1] - rx[0])/n/ratio;
+		for (int i = n-1; i >= 1; --i) {
+			if (rx[i] - rx[i-1] < epsx) {
+				num[i-1] += num[i];
+				num[i] = 0;
+				ry[i-1]  += ry[i];	
+				rz[i-1]  += rz[i];	
+			}
 		}
-	}
-	int id = 0;
-	for (int i = 0; i < num.size(); ++i) {
-		if (num[i] != 0) { 
-			rx[id] = rx[i];
-			ry[id] = ry[i]/num[i];
-			rz[id] = rz[i]/num[i];			
-			id++;
+		int id = 0;
+		for (int i = 0; i < num.size(); ++i) {
+			if (num[i] != 0) { 
+				rx[id] = rx[i];
+				ry[id] = ry[i]/num[i];
+				rz[id] = rz[i]/num[i];			
+				id++;
+			}
 		}
+		ResizeConservative(rx, id);
+		ResizeConservative(ry, id);
+		ResizeConservative(rz, id);
 	}
-	ResizeConservative(rx, id);
-	ResizeConservative(ry, id);
-	ResizeConservative(rz, id);
-	
 	rrx = pick(rx);
 	rry = pick(ry);
 	rrz = pick(rz);
@@ -1772,7 +1774,8 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	
 void Resample(const Eigen::VectorXd &sx, const Eigen::VectorXd &sy, 
 			  Eigen::VectorXd &rx, Eigen::VectorXd &ry, double srate);
-void Resample(const Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
+void Resample(const Eigen::VectorXd &x, const Eigen::VectorXd &y, 
+	    const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
 
 template <typename T, typename T2>
 void Resample(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<T, Eigen::Dynamic, 1> &y, 

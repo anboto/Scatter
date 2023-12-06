@@ -745,7 +745,7 @@ Vector<Pointf> DataSource::Derivative(Getdatafun getdataY, Getdatafun getdataX, 
         xv[i] = Membercall(getdataX)(i);
     }
 
-	CleanNANDupXSort(xv, yv, xv, yv);   
+	CleanNANDupXSort(xv, yv, xv, yv, Null);   
     Resample(xv, yv, xv, yv);
 	double from = xv[0];
 	
@@ -841,7 +841,7 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
         xv[i] = Membercall(getdataX)(i);
     }
 
-	CleanNANDupXSort(xv, yv, xv, yv);
+	CleanNANDupXSort(xv, yv, xv, yv, Null);
     Resample(xv, yv, xv, yv);
 	double from = xv[0];
     
@@ -937,7 +937,7 @@ Vector<Pointf> DataSource::FilterFFT(Getdatafun getdataY, Getdatafun getdataX, d
         xv[i] = Membercall(getdataX)(i);
     }
     
-	CleanNANDupXSort(xv, yv, xv, yv);  
+	CleanNANDupXSort(xv, yv, xv, yv, Null);  
     Resample(xv, yv, xv, yv);
 	double from = xv[0];
 	double T = xv[1]-xv[0];
