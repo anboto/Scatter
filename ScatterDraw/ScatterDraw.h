@@ -1575,7 +1575,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 			}
 		}
 	}
-	int borderWidth = fround(gridWidth*plotScaleAvg);
+	double borderWidth = gridWidth;//fround(gridWidth*plotScaleAvg);
 #ifdef flagGUI		// Control highlight
 	if (!IsNull(highlight_0)) {
 		double delayFactor = 4*(1000. - (GetTickCount() - highlight_0))/1000.;
@@ -1583,7 +1583,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 			delayFactor = 1;
 			highlight_0 = Null;
 		} 
-		borderWidth = fround(delayFactor*borderWidth);
+		borderWidth = delayFactor*borderWidth;
 	}
 #endif
 	DrawRectangle(w, 0, 0, plotW, plotH, 1, borderWidth, SColorText());
