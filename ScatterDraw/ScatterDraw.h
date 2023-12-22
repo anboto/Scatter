@@ -1453,7 +1453,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 		if (SetGridLinesX)
 			SetGridLinesX(unitsX);
 		else {
-			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange; i++) 
+			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange + 0.01*gridWidth; i++) 
 				unitsX << xMinUnit + i*xMajorUnit;
 		}
 		if (!unitsX.IsEmpty()) {
@@ -1474,7 +1474,6 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 							UVector <String> texts;
 							UVector <Size> sizes;
 							ParseTextMultiline(gridLabelX, fontXNum, texts, sizes);
-							debug_h();
 							for (int irowtext = 0; irowtext < texts.GetCount(); ++irowtext) {
 								int cy = irowtext == 0 ? 0 : sizes[irowtext - 1].cy;
 								DrawText(w, reticleX - sizes[irowtext].cx/2., 
@@ -1493,7 +1492,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 		if (SetGridLinesY)
 			SetGridLinesY(unitsY);
 		else {
-			for(int i = 0; yMinUnit + i*yMajorUnit <= yRange; i++) 
+			for(int i = 0; yMinUnit + i*yMajorUnit <= yRange + 0.01*gridWidth; i++) 
 				unitsY << yMinUnit + i*yMajorUnit;
 		}
 		if (!unitsY.IsEmpty()) {
@@ -1575,7 +1574,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 			}
 		}
 	}
-	double borderWidth = gridWidth;//fround(gridWidth*plotScaleAvg);
+	double borderWidth = 1.5*gridWidth;//fround(gridWidth*plotScaleAvg);
 #ifdef flagGUI		// Control highlight
 	if (!IsNull(highlight_0)) {
 		double delayFactor = 4*(1000. - (GetTickCount() - highlight_0))/1000.;
@@ -1658,9 +1657,9 @@ void ScatterDraw::Plot(T& w) {
 				}
 			}
 			if (unitsX.GetCount() > 0) {
-				for(int i = 0; i < unitsX.GetCount(); i++) {
+				for (int i = 0; i < unitsX.GetCount(); i++) {
 					double reticleX = factorX*unitsX[i];
-					if (reticleX >=0 && reticleX <= plotW) {
+					if (reticleX > 2*gridWidth*plotScaleAvg && reticleX < plotW - 2*gridWidth*plotScaleAvg) {
 						if (gridDash.GetCount() == 1 && gridDash[0] == '-') {
 							DrawLineOpa(w, reticleX, 0, reticleX, 8*plotScaleAvg, plotScaleAvg, 1, gridWidth, gridColor, LINE_SOLID);
 							DrawLineOpa(w, reticleX, plotH-8*plotScaleAvg, reticleX, plotH, plotScaleAvg, 1, gridWidth, gridColor, LINE_SOLID);
@@ -1689,7 +1688,7 @@ void ScatterDraw::Plot(T& w) {
 				}
 			}
 			if (unitsY.GetCount() > 0) {
-				for(int i = 0; i < unitsY.GetCount(); i++) {
+				for (int i = 0; i < unitsY.GetCount(); i++) {
 					double reticleY = plotH - factorY*unitsY[i];
 					if (reticleY > 2*gridWidth*plotScaleAvg && reticleY < plotH - 2*gridWidth*plotScaleAvg) {
 						if (gridDash.GetCount() == 1 && gridDash[0] == '-') {
