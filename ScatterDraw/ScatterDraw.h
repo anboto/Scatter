@@ -1453,7 +1453,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 		if (SetGridLinesX)
 			SetGridLinesX(unitsX);
 		else {
-			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange + 0.01*gridWidth; i++) 
+			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange + 0.01*gridWidth && i < 1000; i++)  		// Max limit 1000 just in case
 				unitsX << xMinUnit + i*xMajorUnit;
 		}
 		if (!unitsX.IsEmpty()) {
@@ -1492,7 +1492,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 		if (SetGridLinesY)
 			SetGridLinesY(unitsY);
 		else {
-			for(int i = 0; yMinUnit + i*yMajorUnit <= yRange + 0.01*gridWidth; i++) 
+			for(int i = 0; yMinUnit + i*yMajorUnit <= yRange + 0.01*gridWidth && i < 1000; i++) 		// Max limit 1000 just in case
 				unitsY << yMinUnit + i*yMajorUnit;
 		}
 		if (!unitsY.IsEmpty()) {
