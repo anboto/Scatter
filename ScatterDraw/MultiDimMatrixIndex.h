@@ -28,16 +28,26 @@ public:
 	}
 		
 	Vector<int> &GetAxisDim()	{return axisDim;};
-	int GetIndex(const Vector<int> &index) const {
-		ASSERT_(index[0] >= 0 && index[0] < axisDim[0], Format("index[0]=%d", index[0]));
-		int ret = index[0];
-		int factor = 1;
-		for (int ix = 1; ix <= axisDim.size()-1; ++ix) {
-			ASSERT(index[ix] >= 0 && index[ix] < axisDim[ix]);
-			factor *= axisDim[ix-1];
-			ret += factor*index[ix];
+	int GetIndex(const Vector<int> &idx) const {
+		if (colMajor) {
+			int index = 0;
+			int multiplier = 1;
+			for (int ix = 0; ix < axisDim.size(); ++ix) {
+				ASSERT(idx[ix] >= 0 && idx[ix] < axisDim[ix]);
+				index += multiplier*idx[ix];
+				multiplier *= axisDim[ix];
+			}
+			return index;
+		} else {
+			int index = 0;
+			int multiplier = 1;
+			for (int ix = axisDim.size()-1; ix >= 0; --ix) {
+				ASSERT(idx[ix] >= 0 && idx[ix] < axisDim[ix]);
+				index += multiplier*idx[ix];
+				multiplier *= axisDim[ix];
+			}
+			return index;
 		}
-		return ret;
 	}
 	template<typename T, typename... Args>
 	int GetIndex(T t, Args... args) const {
@@ -53,7 +63,10 @@ public:
 	
 	inline int GetIndex(int x, int y) const {
 		ASSERT(IsValid(x, y));
-		return x + axisDim[0]*y;
+		if (colMajor) 
+			return x + axisDim[0]*y;
+		else
+			return y + axisDim[1]*x;
 	}
 	inline int operator()(int x, int y) const  {return GetIndex(x, y);}
 		
@@ -69,6 +82,9 @@ public:
 	}
 	int size() const			{return GetNumData();}
 	int size(int dim) const		{return axisDim[dim];}
+	
+	void ColMajor(bool c = true){colMajor = c;}
+	void RowMajor(bool c = true){colMajor = !c;}
 	
 	void Xmlize(XmlIO xml) {
 		xml
@@ -92,8 +108,18 @@ private:
 		index << t;
 		AddIndex(index, args...);
 	}
+
+protected:
+	bool colMajor = true;
 };
 
+class MultiDimMatrixIndexRowMajor : public MultiDimMatrixIndex {
+public:
+	MultiDimMatrixIndexRowMajor() 				{colMajor = false;};
+	template<typename... Args>
+	MultiDimMatrixIndexRowMajor(Args... args) 	{colMajor = false; SetAxis(args...);}
+};
+	
 }
 
 #endif
