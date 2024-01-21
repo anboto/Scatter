@@ -1058,13 +1058,13 @@ Vector<Pointf> DataSourceSurf::GetIsoline(double thres, const Rectf &area, doubl
 			isoline << Null;
 			imin = 0;
 		} else if (!IsNum(iminT)) {
-			Reverse(isoline);
+			ReverseX(isoline);
 			imin = imin0;
 		} else if (!IsNum(imin0))
 			imin = iminT;
 		else {
 			if (dt > d0) {
-		 		Reverse(isoline);
+		 		ReverseX(isoline);
 				imin = imin0;
 			} else
 				imin = iminT;

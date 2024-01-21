@@ -1660,7 +1660,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 	(double y) { return h - fround(h*(y - y0)/r); };
 	if (data.IsReverse()) {
 		points = DataAddPoints(dynamic_cast<DataWrapper&>(data).Data(), primaryY, sequential);
-		Reverse(points);
+		ReverseX(points);
 	} else if (data.IsAppend()) {
 		for (int i = 0; i < 2; i++)
 			points.Append(DataAddPoints(dynamic_cast<DataAppend&>(data).DataAt(i), primaryY, sequential));
