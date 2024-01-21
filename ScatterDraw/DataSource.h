@@ -1096,8 +1096,8 @@ void GetInterpolatePos(const T x, const T y, const Eigen::Matrix<T, Eigen::Dynam
 				iy1 = iy+1;
 				return;
 			}
-	ix0 = ix1 = vecx.size()-1;
-	iy0 = iy1 = vecy.size()-1;
+	ix0 = ix1 = int(vecx.size()-1);
+	iy0 = iy1 = int(vecy.size()-1);
 }
 
 template <typename T, typename T2>
