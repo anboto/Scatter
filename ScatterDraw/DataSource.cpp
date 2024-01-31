@@ -953,6 +953,7 @@ Vector<Pointf> DataSource::FilterFFT(Getdatafun getdataY, Getdatafun getdataX, d
 }
 
 void ExplicitData::Init(Function<double (double x, double y)> _funz, double _minX, double _maxX, double _minY, double _maxY) {
+	isExplicit = true;
 	ASSERT(maxX >= minX && maxY >= minY);
 	this->funz = _funz;
 	this->minX = _minX;

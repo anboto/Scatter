@@ -328,14 +328,18 @@ public:
 	void Init_DatasetSimple();
 	void Init_Dataset();
 	void Init_DataExplicit();
+	void Init_DataTestCard();
 	
 private:
 	ExplicitData funData;
 	TableDataVector data;
 	TableDataVector dataFun;
+	TableDataEigen testCard;
 	Vector<double> zData, xAxis, yAxis;
 	Vector<double> zDataFun, xAxisFun, yAxisFun;
-	
+	Eigen::VectorXd xDataEigen, yDataEigen;
+	Eigen::MatrixXd zDataEigen;
+	 
 	Vector<Pointf> isolines, numbersPos;
 	Vector<String> labels;
 };

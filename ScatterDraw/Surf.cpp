@@ -114,8 +114,9 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 	return ix;
 }
 	
-double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
+double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdataZ, 
 						double x, double y) {
+	int width = rowMajor ? lenxAxis - 1 : lenyAxis - 1;
 	if (inter == NO) {
 		int ix = get_axis_index_area_no_interp(getdataX, lenxAxis, x);
 		if (ix < 0) 
@@ -123,7 +124,10 @@ double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun ge
 		int iy = get_axis_index_area_no_interp(getdataY, lenyAxis, y);
 		if (iy < 0) 
 			return Null;
-		return Membercall(getdata)(ix + iy*(lenxAxis - 1));
+		if (rowMajor)
+			return Membercall(getdataZ)(ix 		 + iy*width);
+		else 
+			return Membercall(getdataZ)(ix*width + iy);
 	} else if (inter == BILINEAR) {
 		int ix, iy;
 		for (ix = 0; ix < lenxAxis-1; ++ix) {
@@ -151,15 +155,22 @@ double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun ge
 		if (iy == lenyAxis-1)
 			return Null;
 		
-		int width = lenxAxis - 1;
 		double x1 = (Membercall(getdataX)(ix) + Membercall(getdataX)(ix+1))/2.;
 		double x2 = (Membercall(getdataX)(ix+1) + Membercall(getdataX)(ix+2))/2.;
 		double y1 = (Membercall(getdataY)(iy) + Membercall(getdataY)(iy+1))/2.;
 		double y2 = (Membercall(getdataY)(iy+1) + Membercall(getdataY)(iy+2))/2.;
-		double z11 = Membercall(getdata)(ix + iy*width);
-		double z12 = Membercall(getdata)(ix + (iy+1)*width);
-		double z21 = Membercall(getdata)(ix+1+ iy*width);
-		double z22 = Membercall(getdata)(ix+1 + (iy+1)*width);
+		double z11, z12, z21, z22;
+		if (rowMajor) {
+			z11 = Membercall(getdataZ)(ix + iy*width);
+			z12 = Membercall(getdataZ)(ix + (iy+1)*width);
+			z21 = Membercall(getdataZ)(ix+1+ iy*width);
+			z22 = Membercall(getdataZ)(ix+1 + (iy+1)*width);
+		} else {
+			z11 = Membercall(getdataZ)(ix*width 	+ iy);
+			z12 = Membercall(getdataZ)(ix*width     + (iy+1));
+			z21 = Membercall(getdataZ)((ix+1)*width + iy);
+			z22 = Membercall(getdataZ)((ix+1)*width + (iy+1));
+		}
 		if (!IsNum(z11) || !IsNum(z12) || !IsNum(z21) || !IsNum(z22))
 			return Null;
 		return BilinearInterpolate(x, y, x1, x2, y1, y2, z11, z12, z21, z22);
@@ -167,12 +178,14 @@ double TableData::z_area(Getdatafun getdataX, Getdatafun getdataY, Getdatafun ge
 		return Null;
 }
 	
-double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
+double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdataZ, 
 						double x, double y) {
 	if (x < MinX(getdataX) || x > MaxX(getdataX) ||
 		y < MinY(getdataY) || y > MaxY(getdataY))
 		return Null;
 	
+	int width = rowMajor ? lenxAxis : lenyAxis;
+
 	if (inter == NO) {
 		int ix, iy;
 		if (x < (Membercall(getdataX)(0) + Membercall(getdataX)(1))/2.)
@@ -195,7 +208,10 @@ double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun g
 					break;
 			}
 		}
-		return Membercall(getdata)(ix + iy*lenxAxis);
+		if (rowMajor)
+			return Membercall(getdataZ)(ix 			+ iy*width);
+		else
+			return Membercall(getdataZ)(ix*width + iy);
 	} else if (inter == BILINEAR) {
 		int ix, iy;
 		for (ix = 0; ix < lenxAxis-1; ++ix) {
@@ -210,15 +226,23 @@ double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun g
 		}
 		if (iy == lenyAxis-1)
 			return Null;
-		int width = lenxAxis;
+		
 		double x1 = Membercall(getdataX)(ix);
 		double x2 = Membercall(getdataX)(ix+1);
 		double y1 = Membercall(getdataY)(iy);
 		double y2 = Membercall(getdataY)(iy+1);
-		double z11 = Membercall(getdata)(ix + iy*width);
-		double z12 = Membercall(getdata)(ix + (iy+1)*width);
-		double z21 = Membercall(getdata)(ix+1 + iy*width);
-		double z22 = Membercall(getdata)(ix+1 + (iy+1)*width);
+		double z11, z12, z21, z22;
+		if (rowMajor) {
+			z11 = Membercall(getdataZ)(ix + iy*width);
+			z12 = Membercall(getdataZ)(ix + (iy+1)*width);
+			z21 = Membercall(getdataZ)(ix+1 + iy*width);
+			z22 = Membercall(getdataZ)(ix+1 + (iy+1)*width);
+		} else {
+			z11 = Membercall(getdataZ)(ix*width 	+ iy);
+			z12 = Membercall(getdataZ)(ix*width 	+ (iy+1));
+			z21 = Membercall(getdataZ)((ix+1)*width + iy);
+			z22 = Membercall(getdataZ)((ix+1)*width + (iy+1));
+		}
 		if (!IsNum(z11) || !IsNum(z12) || !IsNum(z21) || !IsNum(z22))
 			return Null;
 		return BilinearInterpolate(x, y, x1, x2, y1, y2, z11, z12, z21, z22);
@@ -226,6 +250,17 @@ double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun g
 		return Null;
 }
 
+double TableData::z_data(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdataZ, 
+						int ix, int iy) {
+	int width = rowMajor ? lenxAxis : lenyAxis;
+	if (areas) 
+		width--;				
+	if (rowMajor)
+		return Membercall(getdataZ)(ix 		 + iy*width);
+	else
+		return Membercall(getdataZ)(ix*width + iy);													
+}
+							
 double TableData::MinX(Getdatafun getdata) {
 	return Membercall(getdata)(0);
 }

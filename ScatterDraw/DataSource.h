@@ -894,13 +894,21 @@ public:
 	virtual bool IsEmpty() = 0;
 	bool IsDeleted()	   {return key != 1212121;}
 	bool IsExplicit()	   {return isExplicit;}
- 	
+ 
+	virtual inline double x(int )		{NEVER();	return Null;}
+	virtual inline double y(int )		{NEVER();	return Null;}
+	virtual inline double zdata(int )	{NEVER();	return Null;}
+	virtual inline double z_data(int x, int y) = 0;
+		
 	virtual double MinX() = 0;
 	virtual double MaxX() = 0;
 	virtual double MinY() = 0;
 	virtual double MaxY() = 0;
 	virtual double MinZ() = 0;
 	virtual double MaxZ() = 0;
+	virtual int rows() = 0;
+	virtual int cols() = 0;
+	virtual bool IsAreas() = 0;
 
 	Vector<Pointf> GetIsoline(double thres, const Rectf &area, double deltaX, double deltaY);
 	Vector<Pointf> GetIsolines(const Vector<double> &vals, const Rectf &area, double deltaX, double deltaY);
@@ -1159,19 +1167,20 @@ public:
 					double x, double y);
 	double z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
 					double x, double y);
+	double z_data(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
+					int x, int y);
 
-	virtual inline double x(int )		{NEVER();	return Null;}
-	virtual inline double y(int )		{NEVER();	return Null;}
-	virtual inline double data(int )	{NEVER();	return Null;}
-	
 	double z(double x, double y) {
-		return z(&TableData::x, &TableData::y, &TableData::data, x, y);
+		return z(&TableData::x, &TableData::y, &TableData::zdata, x, y);
 	}
 	double z(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, double x, double y) {
 		if (areas)
 			return z_area(getdataX, getdataY, getdata, x, y);
 		else
 			return z_point(getdataX, getdataY, getdata, x, y);
+	}
+	double z_data(int ix, int iy) {
+		return z_data(&TableData::x, &TableData::y, &TableData::zdata, ix, iy);
 	}
 	
 	bool IsEmpty() {
@@ -1187,10 +1196,14 @@ public:
 	double MaxY(Getdatafun getdata);
 	virtual double MaxY() 				{return MaxY(&TableData::y);}
 	double MinZ(Getdatafun getdata);
-	virtual double MinZ() 				{return MinZ(&TableData::data);}
+	virtual double MinZ() 				{return MinZ(&TableData::zdata);}
 	double MaxZ(Getdatafun getdata);
-	virtual double MaxZ() 				{return MaxZ(&TableData::data);}
+	virtual double MaxZ() 				{return MaxZ(&TableData::zdata);}
 
+	virtual int rows() 					{return lenyAxis;}
+	virtual int cols() 					{return lenxAxis;}
+	virtual bool IsAreas()				{return areas;}
+	
 	int lendata;
 	int lenxAxis;
 	int lenyAxis;
@@ -1199,11 +1212,12 @@ protected:
 	int get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x);
 	
 	bool areas;
+	bool rowMajor;
 };
 
 class TableDataVector : public TableData {
 public:
-	TableDataVector() : pdata(0), pxAxis(0), pyAxis(0) {}
+	TableDataVector() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = true;}
 	TableDataVector(Vector<double> &data, Vector<double> &xAxis, Vector<double> &yAxis, 
 			Interpolate _inter, bool _areas) {Init(data, xAxis, yAxis, _inter, _areas);}
 	void Init(Vector<double> &data, Vector<double> &xAxis, Vector<double> &yAxis, 
@@ -1218,11 +1232,12 @@ public:
 		this->lenyAxis = yAxis.size();
 		this->inter = _inter;
 		this->areas = _areas;
+		this->rowMajor = true;
 	}
 	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
 	virtual inline double x(int id) 		{return (*pxAxis)[id];}
 	virtual inline double y(int id) 		{return (*pyAxis)[id];}
-	virtual inline double data(int id) 		{return (*pdata)[id];}
+	virtual inline double zdata(int id) 	{return (*pdata)[id];}
 	
 private:
 	Vector<double> *pdata;
@@ -1230,9 +1245,39 @@ private:
 	Vector<double> *pyAxis;
 };
 
+class TableDataEigen : public TableData {
+public:
+	TableDataEigen() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = false;}
+	TableDataEigen(Eigen::MatrixXd &data, Eigen::VectorXd &xAxis, Eigen::VectorXd &yAxis, 
+			Interpolate _inter, bool _areas) {Init(data, xAxis, yAxis, _inter, _areas);}
+	void Init(Eigen::MatrixXd &data, Eigen::VectorXd &xAxis, Eigen::VectorXd &yAxis, 
+					Interpolate _inter, bool _areas) {
+		ASSERT(_areas ?  (data.size() == (xAxis.size() - 1)*(yAxis.size() - 1)) : true);
+		ASSERT(!_areas ? (data.size() == xAxis.size()*yAxis.size()) : true);
+		this->pdata = &data;
+		this->lendata = data.size();
+		this->pxAxis = &xAxis;
+		this->lenxAxis = xAxis.size();
+		this->pyAxis = &yAxis;
+		this->lenyAxis = yAxis.size();
+		this->inter = _inter;
+		this->areas = _areas;
+		this->rowMajor = false;
+	}
+	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
+	virtual inline double x(int id) 		{return (*pxAxis)(id);}
+	virtual inline double y(int id) 		{return (*pyAxis)(id);}
+	virtual inline double zdata(int id) 	{return (*pdata).array()(id);}
+	
+private:
+	Eigen::MatrixXd *pdata;
+	Eigen::VectorXd *pxAxis;
+	Eigen::VectorXd *pyAxis;
+};
+
 class TableDataCArray : public TableData {
 public:
-	TableDataCArray() : pdata(0), pxAxis(0), pyAxis(0) {}
+	TableDataCArray() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = true;}
 	TableDataCArray(double *data, int _lendata, double *xAxis, int _lenxAxis, double *yAxis, int _lenyAxis, 
 					Interpolate _inter, bool _areas) {Init(data, _lendata, xAxis, _lenxAxis, yAxis, _lenyAxis, _inter, _areas);}
 	void Init(double *data, int _lendata, double *xAxis, int _lenxAxis, double *yAxis, int _lenyAxis, 
@@ -1247,10 +1292,11 @@ public:
 		this->lenyAxis = _lenyAxis;
 		this->inter = _inter;
 		this->areas = _areas;
+		this->rowMajor = true;
 	}
 	virtual inline double x(int id) 	{return pxAxis[id];}
 	virtual inline double y(int id) 	{return pyAxis[id];}
-	virtual inline double data(int id) 	{return pdata[id];}
+	virtual inline double zdata(int id) {return pdata[id];}
 	
 private:
 	double *pdata;
@@ -1261,7 +1307,7 @@ private:
 
 class ExplicitData : public DataSourceSurf {
 public:
-	ExplicitData() {}
+	ExplicitData() {isExplicit = true;}
 	ExplicitData(Function<double (double x, double y)> _funz, double _minX, double _maxX, double _minY, double _maxY) {
 		Init(_funz, _minX, _maxX, _minY, _maxY);
 	}
@@ -1277,6 +1323,10 @@ public:
 	double MaxY()	{return maxY;}
 	double MinZ()	{return minZ;}
 	double MaxZ()	{return maxZ;}
+	virtual double z_data(int ix, int iy) 	{NEVER();	return Null;}
+	virtual int rows() 						{NEVER();	return Null;}
+	virtual int cols() 						{NEVER();	return Null;}
+	virtual bool IsAreas()					{NEVER();	return Null;}
 		
 private:
 	double minX, maxX, minY, maxY, minZ, maxZ;

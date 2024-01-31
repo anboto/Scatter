@@ -1579,67 +1579,98 @@ void ScatterDraw::AddId(Vector<Vector<int>> &idGroups, int id) {
 
 String ScatterDraw::GetCSV() {
 	String ret;
+	String sep = GetDefaultCSVSeparator();
+	
 	if (!GetTitle().IsEmpty())	
 		ret << GetTitle() + "\n";
-	Vector<Vector<int>> idGroups;
-	for (int i = 0; i < series.GetCount(); ++i) {
-		const ScatterSeries &serie = series[i]; 
-		const DataSource &data = serie.Data();
-		if (!serie.IsDeleted() && serie.opacity > 0  && !data.IsExplicit()) {
-			int64 sz = data.GetCount();
-			if (!IsNull(sz) && sz > 0) 
-				AddId(idGroups, i);
-		}
-	}
-	String sep = GetDefaultCSVSeparator();
-	sep.Replace("\t", "	");
-	for (int i = 0; i < idGroups.size(); i++) {
-		for (int ii = 0; ii < idGroups[i].size(); ii++) {
-			const ScatterSeries &serie = series[idGroups[i][ii]];
-			if (ii == 0) {
-				String str = GetLabelX();
-				if (!serie.unitsX.IsEmpty()) {
-					if (!GetLabelX().IsEmpty())
-						str << " ";
-					str << "[" << serie.unitsX << "]";
+	
+	if (IsSurf()) {
+		if (GetSurf().IsExplicit())
+			ret << t_("Impossible to save explicit data (data from a equation, not from a data table)");
+		else {
+			DataSourceSurf& surf = GetSurf();
+			if (surf.IsAreas()) {
+				for (int iy = 0; iy < surf.rows()-1; ++iy) {
+					ret << (FDS(surf.y(iy), 8) + " - " + FDS(surf.y(iy+1), 8)) << sep;
+					for (int ix = 0; ix < surf.cols()-1; ++ix) {
+						if (iy == 0)
+							ret << (FDS(surf.x(ix), 8) + " - " + FDS(surf.x(ix+1), 8)) << sep;
+						ret << surf.z_data(ix, iy) << sep;
+					}
+					ret << "\n";
 				}
-				if (i > 0)
-					ret << sep;
-				ret << str;
+			} else {
+				for (int iy = 0; iy < surf.rows(); ++iy) {
+					ret << FDS(surf.y(iy), 8) << sep;
+					for (int ix = 0; ix < surf.cols(); ++ix) {
+						if (iy == 0)
+							ret << FDS(surf.x(ix), 8) << sep;
+						ret << surf.z_data(ix, iy) << sep;
+					}
+					ret << "\n";
+				}
 			}
-			String str = serie.legend;
-			if (!serie.unitsY.IsEmpty()) {
-				if (!serie.legend.IsEmpty())
-					str << " ";
-				str << "[" << serie.unitsY << "]";
-			}
-			ret << sep << str;
 		}
-	}
-	bool thereIsData = true;
-	for (int64 row = 0; thereIsData; row++) {
-		String line = "\n";
-		thereIsData = false;
+	} else {
+		Vector<Vector<int>> idGroups;
+		for (int i = 0; i < series.GetCount(); ++i) {
+			const ScatterSeries &serie = series[i]; 
+			const DataSource &data = serie.Data();
+			if (!serie.IsDeleted() && serie.opacity > 0  && !data.IsExplicit()) {
+				int64 sz = data.GetCount();
+				if (!IsNull(sz) && sz > 0) 
+					AddId(idGroups, i);
+			}
+		}
+		//sep.Replace("\t", "	");
 		for (int i = 0; i < idGroups.size(); i++) {
-			bool plot = series[idGroups[i][0]].Data().size() > row;
-			if (plot)
-				thereIsData = true;
-			if (i > 0)
-				line << sep;
 			for (int ii = 0; ii < idGroups[i].size(); ii++) {
-				//ScatterSeries &serie = series[idGroups[i][ii]];
-				//DataSource &data = serie.Data();
+				const ScatterSeries &serie = series[idGroups[i][ii]];
 				if (ii == 0) {
-					if (plot) 
-						line << GetStringX(idGroups[i][ii], row, true); //data.x(row);
+					String str = GetLabelX();
+					if (!serie.unitsX.IsEmpty()) {
+						if (!GetLabelX().IsEmpty())
+							str << " ";
+						str << "[" << serie.unitsX << "]";
+					}
+					if (i > 0)
+						ret << sep;
+					ret << str;
 				}
-				line << sep;
-				if (plot)
-					line << GetStringY(idGroups[i][ii], row, true); //data.y(row);
+				String str = serie.legend;
+				if (!serie.unitsY.IsEmpty()) {
+					if (!serie.legend.IsEmpty())
+						str << " ";
+					str << "[" << serie.unitsY << "]";
+				}
+				ret << sep << str;
 			}
 		}
-		if (thereIsData)
-			ret << line;	
+		bool thereIsData = true;
+		for (int64 row = 0; thereIsData; row++) {
+			String line = "\n";
+			thereIsData = false;
+			for (int i = 0; i < idGroups.size(); i++) {
+				bool plot = series[idGroups[i][0]].Data().size() > row;
+				if (plot)
+					thereIsData = true;
+				if (i > 0)
+					line << sep;
+				for (int ii = 0; ii < idGroups[i].size(); ii++) {
+					//ScatterSeries &serie = series[idGroups[i][ii]];
+					//DataSource &data = serie.Data();
+					if (ii == 0) {
+						if (plot) 
+							line << GetStringX(idGroups[i][ii], row, true); //data.x(row);
+					}
+					line << sep;
+					if (plot)
+						line << GetStringY(idGroups[i][ii], row, true); //data.y(row);
+				}
+			}
+			if (thereIsData)
+				ret << line;	
+		}
 	}
 	return ret;
 }

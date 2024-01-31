@@ -161,8 +161,8 @@ LAYOUT(SeriesRight, 296, 256)
 	ITEM(Upp::Option, showLegend, SetLabel(t_("Show legend")).LeftPosZ(4, 96).TopPosZ(188, 16))
 END_LAYOUT
 
-LAYOUT(DataSeries, 400, 200)
-	ITEM(Upp::ArrayCtrl, data, HSizePosZ(0, 0).VSizePosZ(0, 0))
+LAYOUT(DataSeries, 416, 212)
+	ITEM(Upp::ArrayCtrl, array, HSizePosZ(0, 0).VSizePosZ(0, 0))
 	ITEM(Upp::EditInt, scatterIndex, LeftPosZ(12, 64).TopPosZ(168, 19))
 END_LAYOUT
 

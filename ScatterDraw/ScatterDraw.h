@@ -853,8 +853,9 @@ public:
 	bool GetMouseHandlingY()	{return mouseHandlingY;}
 	
 	ScatterDraw& AddSurf(DataSourceSurf &surf);
-	bool IsSurf()								{return surf;}
+	DataSourceSurf& GetSurf()					{return *surf;}
 	ScatterDraw& RemoveSurf()					{surf = nullptr;	return *this;}
+	bool IsSurf()								{return surf;}
 	ScatterDraw& SetSurfMinZ(double val)		{surfMinZ = val;	return *this;}
 	double GetSurfMinZ() const					{return surfMinZ;}
 	ScatterDraw& SetSurfMaxZ(double val)		{surfMaxZ = val;	return *this;}
@@ -1152,8 +1153,17 @@ public:
 	}
 	
 	String GetCSV();
-	static void SetDefaultCSVSeparator(String sep) 	{defaultCSVseparator = sep;}
-	static String GetDefaultCSVSeparator() 			{return defaultCSVseparator;}
+	static void SetDefaultCSVSeparator(String sep) {
+		if (sep == "\\t")
+			defaultCSVseparator = "\t";
+		else
+			defaultCSVseparator = sep;
+	}
+	static String GetDefaultCSVSeparator() {
+		if (defaultCSVseparator == "\t")
+			return "\\t";
+		return defaultCSVseparator;
+	}
 
 	String VariableFormatX(double d) const  {return FormatDoubleAutosize(d, xRange);}
 	String VariableFormatY(double d) const  {return FormatDoubleAutosize(d, yRange);} 
