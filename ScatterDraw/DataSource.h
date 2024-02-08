@@ -1824,7 +1824,7 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	
 void Resample(const Eigen::VectorXd &sx, const Eigen::VectorXd &sy, 
 			  Eigen::VectorXd &rx, Eigen::VectorXd &ry, double srate);
-void Resample(const Eigen::VectorXd &x, const Eigen::VectorXd &y, 
+void ResampleY(const Eigen::VectorXd &x, const Eigen::VectorXd &y, 
 	    const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
 
 template <typename T, typename T2>

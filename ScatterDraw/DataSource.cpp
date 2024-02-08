@@ -746,7 +746,7 @@ Vector<Pointf> DataSource::Derivative(Getdatafun getdataY, Getdatafun getdataX, 
     }
 
 	CleanNANDupXSort(xv, yv, xv, yv, Null);   
-    Resample(xv, yv, xv, yv);
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
 	
 	// From https://en.wikipedia.org/wiki/Finite_difference_coefficient
@@ -842,7 +842,7 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
     }
 
 	CleanNANDupXSort(xv, yv, xv, yv, Null);
-    Resample(xv, yv, xv, yv);
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
     
     VectorXd coeff = SavitzkyGolay_Coeff(size/2, size/2, deg, der);
@@ -892,7 +892,7 @@ void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry
 	rry = pick(ry);
 }
 
-void Resample(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
+void ResampleY(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
 	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
@@ -938,7 +938,7 @@ Vector<Pointf> DataSource::FilterFFT(Getdatafun getdataY, Getdatafun getdataX, d
     }
     
 	CleanNANDupXSort(xv, yv, xv, yv, Null);  
-    Resample(xv, yv, xv, yv);
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
 	double T = xv[1]-xv[0];
     
