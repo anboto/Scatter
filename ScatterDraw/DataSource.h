@@ -4,8 +4,8 @@
 #define _ScatterDraw_DataSource_h_
 
 #include <Eigen/Eigen.h>
-#include <numeric>
-#include <complex>
+//#include <numeric>
+//#include <complex>
 #include <Functions4U/Functions4U.h>
 
 namespace Upp {
@@ -1057,8 +1057,8 @@ void GetInterpolatePos(const typename Range::value_type x, const Range &vecx, in
 
 template <class T>
 T LinearInterpolateDir(const T x, const T *vecx, const T *vecy, int len) {
-	ASSERT(len > 1);
-	if (x < vecx[0])
+	ASSERT(len > 0);
+	if (len == 1 || x < vecx[0])
 		return vecy[0];
 	for (int i = 0; i < len-1; ++i) 
 		if (vecx[i+1] >= x && vecx[i] <= x) 
@@ -1069,8 +1069,8 @@ T LinearInterpolateDir(const T x, const T *vecx, const T *vecy, int len) {
 
 template <class T>
 T LinearInterpolateRev(const T x, const T *vecx, const T *vecy, int len) {
-	ASSERT(len > 1);
-	if (x < vecx[len-1])
+	ASSERT(len > 0);
+	if (len == 1 || x < vecx[len-1])
 		return vecy[len-1];
 	for (int i = len-1; i > 0; --i) 
 		if (vecx[i-1] >= x && vecx[i] <= x) 
@@ -1081,8 +1081,8 @@ T LinearInterpolateRev(const T x, const T *vecx, const T *vecy, int len) {
 
 template <class T>
 T LinearInterpolate(const T x, const T *vecx, const T *vecy, size_t len) {
-	ASSERT(len > 1);
-	if (vecx[1] > vecx[0])
+	ASSERT(len > 0);
+	if (vecx[1] > vecx[0] || len == 1)
 		return LinearInterpolateDir(x, vecx, vecy, int(len));
 	else
 		return LinearInterpolateRev(x, vecx, vecy, int(len));		
