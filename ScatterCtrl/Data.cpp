@@ -42,26 +42,27 @@ void DataDlg::Init(ScatterCtrl& scatter) {
 	OnTab();
 	
 	if (!scatter.IsSurf()) {
-		bool addedAll = false;
 		if (scatter.IsDeletedDataSource(0))
 			return;
+		bool addedAll = true;
 		DataSource &serie0 = scatter.GetDataSource(0);
-		for(int c = 1; c < scatter.GetCount(); c++) {
+		for (int c = 1; c < scatter.GetCount(); c++) {
 			if (!IsNull(scatter.GetCount(c) && !scatter.IsDeletedDataSource(c))) {
 				DataSource &serie = scatter.GetDataSource(c);
-				if (serie0.SameX(serie)) {
-					if (!addedAll) {
-						addedAll = true;
-						WithDataSeries <StaticRect> &dataseries = series.Insert(0);
-						CtrlLayout(dataseries);
-						dataseries.scatterIndex.Hide();
-						dataseries.scatterIndex = -1;
-						tab.Insert(0, dataseries.SizePos(), t_("All"));
-						tab.Set(0);
-						OnTab();
-					}
+				if (!serie0.SameX(serie)) {
+					addedAll = false;
+					break;
 				}
 			}
+		}
+		if (addedAll) {
+			WithDataSeries <StaticRect> &dataseries = series.Insert(0);
+			CtrlLayout(dataseries);
+			dataseries.scatterIndex.Hide();
+			dataseries.scatterIndex = -1;
+			tab.Insert(0, dataseries.SizePos(), t_("All"));
+			tab.Set(0);
+			OnTab();
 		}
 	}
 }
