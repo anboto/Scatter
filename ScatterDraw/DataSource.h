@@ -1255,11 +1255,11 @@ public:
 		ASSERT(_areas ?  (data.size() == (xAxis.size() - 1)*(yAxis.size() - 1)) : true);
 		ASSERT(!_areas ? (data.size() == xAxis.size()*yAxis.size()) : true);
 		this->pdata = &data;
-		this->lendata = data.size();
+		this->lendata = int(data.size());
 		this->pxAxis = &xAxis;
-		this->lenxAxis = xAxis.size();
+		this->lenxAxis = int(xAxis.size());
 		this->pyAxis = &yAxis;
-		this->lenyAxis = yAxis.size();
+		this->lenyAxis = int(yAxis.size());
 		this->inter = _inter;
 		this->areas = _areas;
 		this->rowMajor = false;
