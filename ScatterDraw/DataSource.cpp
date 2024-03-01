@@ -812,7 +812,7 @@ VectorXd SavitzkyGolay_Coeff(int nleft, int nright, int deg, int der) {
     VectorXd y = (At * A).inverse() * (At * B);
     
     VectorXd coeff(nleft + nright + 1);
-    double factor = der > 0 ? pow(2, der-1) : 1;
+    double factor = der > 0 ? PowInt(2., der-1) : 1;
     coeff.setZero();
     int ic = 0;
     for(int k = -nleft; k <= nright; k++) {

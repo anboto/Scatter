@@ -1685,18 +1685,17 @@ bool ScatterDraw::CheckDash(const char *dash) {
 
 Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool sequential) {
 	Vector<Pointf> points;
-	auto ScaleX = [w=plotW, x0=xMin, r=xRange](double x) { return fround(w*(x - x0)/r); };
-	auto ScaleY =
-	[h=plotH, y0=primaryY ? yMin : yMin2, r=primaryY ? yRange : yRange2]
-	(double y) { return h - fround(h*(y - y0)/r); };
+	
+	auto ScaleX = [w=plotW, x0=xMin, r=xRange](double x) {return fround(w*(x - x0)/r);};
+	auto ScaleY = [h=plotH, y0=primaryY ? yMin : yMin2, r = primaryY ? yRange : yRange2] (double y) {return h - fround(h*(y - y0)/r);};
+	
 	if (data.IsReverse()) {
 		points = DataAddPoints(dynamic_cast<DataWrapper&>(data).Data(), primaryY, sequential);
 		ReverseX(points);
 	} else if (data.IsAppend()) {
 		for (int i = 0; i < 2; i++)
 			points.Append(DataAddPoints(dynamic_cast<DataAppend&>(data).DataAt(i), primaryY, sequential));
-		if (data.IsRange())
-		{
+		if (data.IsRange()) {
 			Vector<Pointf> filtered_points;
 			filtered_points.AppendRange(FilterRange(points, [](Pointf p) { return IsNum(p); }));
 			points = pick(filtered_points);
@@ -1809,6 +1808,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 			}
 		}
 	}
+	
 	return points;
 }
 

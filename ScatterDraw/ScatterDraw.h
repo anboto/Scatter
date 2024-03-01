@@ -363,6 +363,9 @@ public:
 	double GetPlotScaleY()	{return plotScaleY;}
 	double GetPlotScaleAvg(){return plotScaleAvg;}
 	
+	ScatterDraw& SetLogX(double base)	{ASSERT(base >= 2);	logBaseX = base;	return *this;}
+	ScatterDraw& SetLogY(double base)	{ASSERT(base >= 2);	logBaseY = base;	return *this;}
+	
 	ScatterDraw& SetColor(const Color& _color);
 	ScatterDraw& SetTitle(const String& _title);
 	const String& GetTitle();
@@ -1042,6 +1045,8 @@ public:
 				("showLegend", showLegend)
 				("legend_w_units", legend_w_units)
 				("sciExpTop", sciExpTop)
+				("logBaseX", logBaseX)
+				("logBaseY", logBaseY)
 			;
 			if (io.IsLoading()) {
 				labelsChanged = true;
@@ -1301,6 +1306,7 @@ private:
 	double plotScaleX = 1, plotScaleY = 1, plotScaleAvg = 1;
 	bool responsive = false;
 	double responsivenessFactor = 1;
+	double logBaseX = -1, logBaseY = -1;
 	
 	static void ParseTextMultiline(const String &text, Upp::Font &fnt, 
 								   UVector <String> &texts, UVector <Size> &sizes);
@@ -1527,7 +1533,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 							minExp = min(minExp, exp);
 						}
 					}
-					double div = pow(10, minExp);
+					double div = Pow10Int<double>(minExp);
 					for(int i = 0; i < gridY.size(); ++i) 
 						gridY[i] /= div;
 				}
@@ -1538,7 +1544,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 							minExp2 = min(minExp2, exp);
 						}
 					}	
-					double div2 = pow(10, minExp2);
+					double div2 = Pow10Int<double>(minExp2);
 					for(int i = 0; i < gridY2.size(); ++i) 
 						gridY2[i] /= div2;
 				}
@@ -1666,8 +1672,8 @@ void ScatterDraw::Plot(T& w) {
 						unitsX << xMinUnit + i*xMajorUnit;
 				}
 			}
-			if (unitsX.GetCount() > 0) {
-				for (int i = 0; i < unitsX.GetCount(); i++) {
+			if (unitsX.size() > 0) {
+				for (int i = 0; i < unitsX.size(); i++) {
 					double reticleX = factorX*unitsX[i];
 					if (reticleX > 2*gridWidth*plotScaleAvg && reticleX < plotW - 2*gridWidth*plotScaleAvg) {
 						if (gridDash.GetCount() == 1 && gridDash[0] == '-') {
