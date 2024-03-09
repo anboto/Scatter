@@ -194,7 +194,10 @@ void ScatterDraw::AdjustMajorUnitY2() {
 	yMajorUnit2 = GetRangeMajorUnits(yMin2, yMin2 + yRange2);
 }
 
-ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
+ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {		// Use of range is unsafe for log10
+	//rx = FixLog10(rx, logX);			// No FixLog10 allowed. Its unsafe. For example, if range is from 0.0001 to 1E30, range will be 1E30...
+	//ry = FixLog10(ry, logY);
+	//ry2= FixLog10(ry2, logY);
 	ASSERT(!IsNum(rx)  || rx  >= 0);
 	ASSERT(!IsNum(ry)  || ry  >= 0);
 	ASSERT(!IsNum(ry2) || ry2 >= 0);
@@ -218,26 +221,47 @@ ScatterDraw &ScatterDraw::SetRange(double rx, double ry, double ry2) {
 	return *this;
 }
 
-ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
-	if (IsNum(nx)) {
-		//xMajorUnitNum = nx;
-		xMajorUnit = xRange/nx;
-		//AdjustMinUnitX();
+ScatterDraw &ScatterDraw::SetRange(double rxmax, double rxmin, double rymax, double rymin, double ry2max, double ry2min) {
+	rxmax = FixLog10(rxmax, logX);	rxmin = FixLog10(rxmin, logX);
+	rymax = FixLog10(rymax, logY);	rymin = FixLog10(rymin, logY);
+	ry2max= FixLog10(ry2max, logY);	ry2min= FixLog10(ry2min, logY);
+	ASSERT(!IsNum(rxmax)  || !IsNum(rxmin)  || rxmax-rxmin  >= 0);
+	ASSERT(!IsNum(rymax)  || !IsNum(rymin)  || rymax-rymin  >= 0);
+	ASSERT(!IsNum(ry2max)  || !IsNum(ry2min)  || ry2max-ry2min  >= 0);
+	
+	if (IsNum(rxmax) && IsNum(rxmax)) {
+		xRange = rxmax - rxmin;
+		AdjustMajorUnitX();
+		AdjustMinUnitX();
 	}
+	if (IsNum(rymax) && IsNum(rymin)) {
+		yRange = rymax - rymin;
+		AdjustMajorUnitY(); 
+		AdjustMinUnitY();
+	}
+	if (IsNum(ry2max) && IsNum(ry2min)) {
+		yRange2 = ry2max - ry2min;
+		AdjustMajorUnitY2();
+		AdjustMinUnitY2();
+	}
+	WhenSetRange();
+	return *this;
+}
+
+ScatterDraw &ScatterDraw::SetMajorUnitsNum(int nx, int ny) {
+	if (IsNum(nx)) 
+		xMajorUnit = xRange/nx;
 	if (IsNum(ny)) {
-		//yMajorUnitNum = ny;
 		yMajorUnit = yRange/ny;
 		yMajorUnit2 = yMajorUnit*yRange2/yRange;
-		//AdjustMinUnitY();
-		//AdjustMinUnitY2();
 	}
 	return *this;
 }
 
 ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
-	ASSERT(!IsNum(ux)  || ux   >= 0);
-	ASSERT(!IsNum(uy)  || uy   >= 0);
-	ASSERT(!IsNum(uy2) || uy2  >= 0);
+	ASSERT(!IsNum(ux)  || ux  >= 0);
+	ASSERT(!IsNum(uy)  || uy  >= 0);
+	ASSERT(!IsNum(uy2) || uy2 >= 0);
 	
 	if (IsNum(ux)) {
 		xMajorUnit = ux;
@@ -258,35 +282,59 @@ ScatterDraw &ScatterDraw::SetMajorUnits(double ux, double uy, double uy2) {
 }
 
 ScatterDraw &ScatterDraw::SetMinUnits(double ux, double uy) {
+	TimeStop t;		// Added parachute
+	double maxs = maxRefresh_ms*1000;
 	if (IsNum(ux)) {
 		xMinUnit = xMinUnit0 = ux;
-		while (xMinUnit < 0)
+		while (xMinUnit < 0 && t.Seconds() < maxs)
 			xMinUnit += xMajorUnit;
-		while (xMinUnit - xMajorUnit >= 0)
+		while (xMinUnit - xMajorUnit >= 0 && t.Seconds() < maxs)
 			xMinUnit -= xMajorUnit;
 	}
 	if (IsNum(uy)) {	
 		yMinUnit = yMinUnit0 = uy;
 		yMinUnit2 = yMinUnit20 = yRange2*yMinUnit/yRange;
-		while (yMinUnit < 0)
+		while (yMinUnit < 0 && t.Seconds() < maxs)
 			yMinUnit += yMajorUnit;
-		while (yMinUnit - yMajorUnit >= 0)
+		while (yMinUnit - yMajorUnit >= 0 && t.Seconds() < maxs)
 			yMinUnit -= yMajorUnit;
-		while (yMinUnit2 < 0)
+		while (yMinUnit2 < 0 && t.Seconds() < maxs)
 			yMinUnit2 += yMajorUnit2;
-		while (yMinUnit2 - yMajorUnit2 >= 0)
+		while (yMinUnit2 - yMajorUnit2 >= 0 && t.Seconds() < maxs)
 			yMinUnit2 -= yMajorUnit2;	
 	}
+	ASSERT(t.Seconds() < maxs);
 	return *this;
 }
 
-ScatterDraw &ScatterDraw::SetXYMin(double xmin, double ymin, double ymin2) {
-	if (IsNum(xmin))
-		xMin = xmin;
-	if (IsNum(ymin))
-		yMin = ymin;
-	if (IsNum(ymin2))
-		yMin2 = ymin2;
+ScatterDraw &ScatterDraw::SetXYMin(double x, double y, double y2) {
+	x = FixLog10(x, logX);
+	y = FixLog10(y, logY);
+	y2= FixLog10(y2,logY);
+	
+	if (IsNum(x)) 
+		xMin = x;
+	if (IsNum(y)) 
+		yMin = y;
+	if (IsNum(y2)) 
+		yMin2 = y2;
+
+	WhenSetXYMin();
+	return *this;
+}
+
+ScatterDraw &ScatterDraw::SetXYMax(double x, double y, double y2) {
+	x = FixLog10(x, logX);
+	y = FixLog10(y, logY);
+	y2= FixLog10(y2,logY);
+	
+	if (IsNum(x)) 
+		xRange = x - xMin;
+	if (IsNum(y)) 
+		yRange = y - yMin;
+	if (IsNum(y2)) 
+		yRange2 = y2 - yMin2;
+
 	WhenSetXYMin();
 	return *this;
 }
@@ -311,49 +359,31 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 	maxx = maxy = maxy2 = DOUBLE_NULL;
 	
 	try {
-		if (horizontal) {
+		if (horizontal || vertical) {	// Both at the same time to avoid a Null point to set the limits
 			for (int j = 0; j < series.size(); j++) {
 				ScatterSeries &serie = series[j]; 
 				if (serie.IsDeleted() || serie.opacity == 0 || serie.Data().IsExplicit())
 					continue;
-				double mn = serie.Data().MinX();
-				if (IsNum(mn))
-					minx = min(minx, mn);
-				double mx = serie.Data().MaxX();
-				if (IsNum(mx))
-					maxx = max(maxx, mx);
+				for (int64 i = 0; i < serie.Data().size(); ++i) {
+					double px = FixLog10(serie.Data().x(i), logX);
+					double py = FixLog10(serie.Data().y(i), logY);
+					if (!IsNum(px) || !IsNum(py)) 
+						continue;
+					minx = min(minx, px);
+					maxx = max(maxx, px);
+					if (serie.primaryY) {
+						miny = min(miny, py);
+						maxy = max(maxy, py);
+					} else {
+						miny2 = min(miny2, py);
+						maxy2 = max(maxy2, py);
+					}
+				}
 			}
 			if (minx != -DOUBLE_NULL && maxx != DOUBLE_NULL) {
 				double deltaX = (maxx - minx)*factorH;
 				minx -= deltaX;
 				maxx += deltaX;
-			}
-			if (surf) {
-				minx = min(minx, surf->MinX());
-				maxx = max(maxx, surf->MaxX());
-			}
-		}
-		if (vertical) {
-			for (int j = 0; j < series.size(); j++) {
-				ScatterSeries &serie = series[j]; 
-				if (serie.IsDeleted() || serie.opacity == 0 || serie.Data().IsExplicit())
-					continue;
-				for (int64 i = 0; i < serie.Data().size(); i++) {
-					double py = serie.Data().y(i);
-					if (!IsNum(py))
-						continue;
-					if (serie.primaryY) {
-						if (py < miny)
-							miny = py;
-						if (py > maxy)
-							maxy = py;
-					} else {
-						if (py < miny2)
-							miny2 = py;
-						if (py > maxy2)
-							maxy2 = py;
-					}
-				}
 			}
 			if (miny != -DOUBLE_NULL && maxy != DOUBLE_NULL) {
 				double deltaY = (maxy - miny)*factorV;
@@ -366,6 +396,8 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				maxy2 += deltaY2;		
 			}
 			if (surf) {
+				minx = min(minx, surf->MinX());
+				maxx = max(maxx, surf->MaxX());
 				miny = min(miny, surf->MinY());
 				maxy = max(maxy, surf->MaxY());
 			}
@@ -1259,23 +1291,23 @@ Image ScatterDraw::GetImage() {
 
 
 double ScatterDraw::GetXByPoint(double x) {
-	return (x - hPlotLeft)*GetXRange()/(GetSize().cx - (hPlotLeft + hPlotRight) - 1) + GetXMin();		
+	return FixPow10((x - hPlotLeft)*xRange/(GetSize().cx - (hPlotLeft + hPlotRight) - 1) + GetXMin(), logX);
 }
 
 double ScatterDraw::GetYByPoint(double y) {
-	return (GetSize().cy - vPlotTop - y - 1)*GetYRange()/(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1) + GetYMin();
+	return FixPow10((GetSize().cy - vPlotTop - y - 1)*yRange/(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1) + GetYMin(), logY);
 }
 
 double ScatterDraw::GetY2ByPoint(double y) {
-	return (GetSize().cy - vPlotTop - y - 1)*GetY2Range()/(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1) + GetYMin2();
+	return FixPow10((GetSize().cy - vPlotTop - y - 1)*yRange2/(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1) + GetYMin2(), logY);
 }
 
 double ScatterDraw::GetXPointByValue(double x) {
-	return (x - GetXMin())/GetXRange()*(GetSize().cx - (hPlotLeft + hPlotRight) - 1) + hPlotLeft;
+	return FixPow10((x - GetXMin())/xRange*(GetSize().cx - (hPlotLeft + hPlotRight) - 1) + hPlotLeft, logX);
 }
 
 double ScatterDraw::GetYPointByValue(double y) {
-	return (GetSize().cy - vPlotTop - 1) - (y - GetYMin())/GetYRange()*(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1);
+	return FixPow10((GetSize().cy - vPlotTop - 1) - (y - GetYMin())/yRange*(GetSize().cy - (vPlotTop + vPlotBottom) - GetTitleFont().GetHeight() - GetTitleFont().GetDescent() - 1), logY);
 }
 
 ScatterDraw &ScatterDraw::SetRangeLinked(double rx, double ry, double ry2) {
@@ -1294,19 +1326,35 @@ ScatterDraw &ScatterDraw::SetRangeLinked(double rx, double ry, double ry2) {
 	return *this;
 }
 
-ScatterDraw &ScatterDraw::SetXYMinLinked(double xmin, double ymin, double ymin2) {
+ScatterDraw &ScatterDraw::SetXYMinLinked(double x, double y, double y2) {
 	if (linkedMaster) {
-		linkedMaster->SetXYMinLinked(xmin, ymin, ymin2);
+		linkedMaster->SetXYMinLinked(x, y, y2);
 		linkedMaster->Refresh();
 		return *this;
 	}
-	SetXYMin(xmin, ymin, ymin2);
+	SetXYMin(x, y, y2);
 	if (!linkedCtrls.IsEmpty()) {
 		for (int i = 0; i < linkedCtrls.GetCount(); ++i) {
-	    	linkedCtrls[i]->SetXYMin(xmin, ymin, ymin2);
+	    	linkedCtrls[i]->SetXYMin(x, y, y2);
 	    	linkedCtrls[i]->Refresh();
 		}
+	}	
+	return *this;
+}
+
+ScatterDraw &ScatterDraw::SetXYMaxLinked(double x, double y, double y2) {
+	if (linkedMaster) {
+		linkedMaster->SetXYMaxLinked(x, y, y2);
+		linkedMaster->Refresh();
+		return *this;
 	}
+	SetXYMax(x, y, y2);
+	if (!linkedCtrls.IsEmpty()) {
+		for (int i = 0; i < linkedCtrls.GetCount(); ++i) {
+	    	linkedCtrls[i]->SetXYMax(x, y, y2);
+	    	linkedCtrls[i]->Refresh();
+		}
+	}	
 	return *this;
 }
 
@@ -1685,10 +1733,7 @@ bool ScatterDraw::CheckDash(const char *dash) {
 
 Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool sequential) {
 	Vector<Pointf> points;
-	
-	auto ScaleX = [w=plotW, x0=xMin, r=xRange](double x) {return fround(w*(x - x0)/r);};
-	auto ScaleY = [h=plotH, y0=primaryY ? yMin : yMin2, r = primaryY ? yRange : yRange2] (double y) {return h - fround(h*(y - y0)/r);};
-	
+		
 	if (data.IsReverse()) {
 		points = DataAddPoints(dynamic_cast<DataWrapper&>(data).Data(), primaryY, sequential);
 		ReverseX(points);
@@ -1709,7 +1754,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 			if (!IsNum(xx) || !IsNum(yy))
 				points << Null;
 			else
-				points << Point(ScaleX(xx), ScaleY(yy));
+				points << Pointf(GetPosX(xx), GetPosY(yy, primaryY));
 		}
 	} else if (data.IsExplicit()) {
 		double xmin = xMin - 1;
@@ -1720,7 +1765,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 			if (!IsNum(yy))
 				points << Null;
 			else
-				points << Point(ScaleX(xx), ScaleY(yy));
+				points << Pointf(GetPosX(xx), GetPosY(yy, primaryY));
 		}
 	} else {
 		int64 imin, imax;
@@ -1762,7 +1807,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 						if (!IsNum(yy)) 
 							points << Null;
 						else
-							points << Point(ScaleX(xx), ScaleY(yy));
+							points << Pointf(GetPosX(xx), GetPosY(yy, primaryY));
 						++i;
 					} else {
 						double maxY = Null, minY = Null;
@@ -1786,12 +1831,12 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 						if (!IsNum(minY) || !IsNum(maxY)) 
 							points << Null;	
 						
-						int ix = ScaleX(xx);
-						int iMax = ScaleY(maxY);
-						int iMin = ScaleY(minY);
-						points << Point(ix, iMax);
+						int ix = GetPosX(xx);
+						int iMax = GetPosY(maxY, primaryY);
+						int iMin = GetPosY(minY, primaryY);
+						points << Pointf(ix, iMax);
 						if (iMax != iMin)
-							points << Point(ix, iMin);	
+							points << Pointf(ix, iMin);	
 						i += ii;
 					}
 					npix++;
@@ -1804,11 +1849,10 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				if (!IsNum(xx) || !IsNum(yy)) 
 					points << Null;
 				else
-					points << Point(ScaleX(xx), ScaleY(yy));
+					points << Pointf(GetPosX(xx), GetPosY(yy, primaryY));
 			}
 		}
 	}
-	
 	return points;
 }
 
@@ -1860,6 +1904,63 @@ double ScatterDraw::GetSeriesMinY() {
 	return mn;
 }
 
+void ScatterDraw::InitPlot() {
+	plotW = size.cx - fround((hPlotLeft + hPlotRight)*plotScaleX);
+	plotH = size.cy - fround((vPlotTop + vPlotBottom)*plotScaleY) - titleHeight;
+	
+	gridX.Clear();
+	gridXLog.Clear();
+	
+	if (SetGridLinesX)
+		SetGridLinesX(gridX);
+	else if (logX) {
+		int count = 0;
+		for(int i = 0; xMinUnit + i*xMajorUnit <= xRange && count < 100; i++) 
+			gridX << xMinUnit + i*xMajorUnit;
+		count = 0;
+		for(int i = -1; xMinUnit + i*xMajorUnit <= xRange && count < 100; i++, count++) {		// Log subgrid
+			for (int ii = 1; ii < 10; ++ii) {
+				double d = xMinUnit + (i + log10(ii))*xMajorUnit;
+				if (d > 0)
+					gridXLog << d;
+			}
+		}
+	} else {
+		if (xMajorUnit > 0) {
+			int count = 0;
+			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange && count < 100; i++, count++) // 100 max just in case
+				gridX << xMinUnit + i*xMajorUnit;
+			ASSERT(count < 100);
+		}
+	}
+
+	gridY.Clear();
+	gridYLog.Clear();
+	
+	if (SetGridLinesY)
+		SetGridLinesY(gridY);
+	else if (logY) {
+		int count = 0;
+		for(int i = 0; yMinUnit + i*yMajorUnit <= yRange && count < 100; i++) 
+			gridY << yMinUnit + i*yMajorUnit;
+		count = 0;
+		for(int i = -1; yMinUnit + i*yMajorUnit <= yRange && count < 100; i++, count++) {		// Log subgrid
+			for (int ii = 1; ii < 10; ++ii) {
+				double d = yMinUnit + (i + log10(ii))*yMajorUnit;
+				if (d > 0)
+					gridYLog << d;
+			}
+		}
+	} else {
+		if (yMajorUnit > 0) {
+			int count = 0;
+			for(int i = 0; yMinUnit + i*yMajorUnit <= yRange && count < 100; i++, count++) // 100 max just in case
+				gridY << yMinUnit + i*yMajorUnit;
+			ASSERT(count < 100);
+		}
+	}
+}
+	
 INITBLOCK {
 	SeriesPlot::Register<LineSeriesPlot>("Line");
 	SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");

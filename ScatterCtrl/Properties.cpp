@@ -22,27 +22,35 @@ void PropertiesDlg::Perform(){
 	measures.Change();
 }
 
+void MeasuresTab::UpdateVals() {
+	ScatterCtrl &scatter = *pscatter;
+	
+	xMin <<= scatter.GetXMin();
+	xMax <<= scatter.GetXMax();
+	yMin <<= scatter.GetYMin();
+	yMax <<= scatter.GetYMax();
+	yMin2 <<= scatter.GetYMin2();
+	yMax2 <<= scatter.GetYMax2();
+	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
+	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
+	xMajorUnit	<<= scatter.GetMajorUnitsX();
+	yMajorUnit	<<= scatter.GetMajorUnitsY();
+}
+
 void MeasuresTab::Init(ScatterCtrl& scatter) {
 	CtrlLayout(*this);
 	SizePos();
 	
 	pscatter = &scatter;
 	
-	xMin <<= scatter.GetXMin();
-	xMax <<= scatter.GetXRange() + scatter.GetXMin();
-	yMin <<= scatter.GetYMin();
-	yMax <<= scatter.GetYRange() + scatter.GetYMin();
-	yMin2 <<= scatter.GetYMin2();
-	yMax2 <<= scatter.GetY2Range() + scatter.GetYMin2();
-	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
-	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
-	xMajorUnit	<<= scatter.GetMajorUnitsX();
-	yMajorUnit	<<= scatter.GetMajorUnitsY();
+	UpdateVals();
 	
 	opAttachX <<= !scatter.GetMouseHandlingX();
 	opAttachY <<= !scatter.GetMouseHandlingY();
 	opReticleX <<= scatter.GetDrawXReticle();
 	opReticleY <<= scatter.GetDrawYReticle();
+	opLogX <<= scatter.GetLogX();
+	opLogY <<= scatter.GetLogY();
 	opReticleY2 <<= scatter.GetDrawY2Reticle();
 	opReticleXNumbers <<= scatter.GetDrawXReticleNumbers();
 	opReticleYNumbers <<= scatter.GetDrawYReticleNumbers();
@@ -73,14 +81,11 @@ void MeasuresTab::Init(ScatterCtrl& scatter) {
 	xMajorUnit.WhenEnter = [=]{Change();};
 	yMajorUnit.WhenEnter = [=]{Change();};
 	
-	opAttachX.WhenAction = [=]{Change();};
-	opAttachY.WhenAction = [=]{Change();};
-	opReticleX.WhenAction = [=]{Change();};
-	opReticleY.WhenAction = [=]{Change();};
-	opReticleY2.WhenAction = [=]{Change();};
-	opReticleXNumbers.WhenAction = [=]{Change();};
-	opReticleYNumbers.WhenAction = [=]{Change();};
-	opReticleY2Numbers.WhenAction = [=]{Change();};
+	opAttachX.WhenAction = opAttachY.WhenAction = [=]{Change();};
+	opReticleX.WhenAction = opReticleY.WhenAction = opReticleY2.WhenAction = [=]{Change();};
+	opLogX.WhenAction = [=]{zoomX = true;	Change();};
+	opLogY.WhenAction = [=]{zoomY = true;	Change();};
+	opReticleXNumbers.WhenAction = opReticleYNumbers.WhenAction = opReticleY2Numbers.WhenAction = [=]{Change();};
 	reticlethickness.WhenAction = [=]{Change();};
 	
 	linecolor.WhenAction = [=]{Change();};
@@ -111,28 +116,31 @@ void MeasuresTab::Change() {
 	
 	ScatterCtrl &scatter = *pscatter;
 
-	scatter.SetMouseHandlingLinked(!opAttachX, !opAttachY);
+	scatter.SetMouseHandling(!opAttachX, !opAttachY);
 	scatter.SetDrawXReticle(opReticleX).SetDrawYReticle(opReticleY).SetDrawY2Reticle(opReticleY2);
 	scatter.SetDrawXReticleNumbers(opReticleXNumbers).SetDrawYReticleNumbers(opReticleYNumbers).SetDrawY2ReticleNumbers(opReticleY2Numbers);
 	scatter.SetAxisWidth(~reticlethickness);
 	
-    scatter.SetXYMinLinked(xMin, yMin, yMin2);
-	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
+    scatter.SetXYMin(xMin, yMin, yMin2);
+	scatter.SetXYMax(xMax, yMax, yMax2);
 
 	scatter.SetMinUnits(xMinUnit-xMin, yMinUnit-yMin);
 	scatter.SetMajorUnits(xMajorUnit, yMajorUnit);
 
-	scatter.SetRangeLinked(xMax - xMin, yMax - yMin, yMax2 - yMin2);
-	
-	xMinUnit	<<= scatter.GetXMinUnit() + scatter.GetXMin();
-	yMinUnit	<<= scatter.GetYMinUnit() + scatter.GetYMin();
-	xMajorUnit	<<= scatter.GetMajorUnitsX();
-	yMajorUnit	<<= scatter.GetMajorUnitsY();
-
 	scatter.SetGridDash(DashStyle::Style(DashStyle::TypeIndex(~dashStyle)));
 	scatter.SetGridColor(~linecolor);
 	scatter.SetGridWidth(~linethickness);
+	
+	scatter.SetLogX(opLogX);		// Log are set at the end. If not, the previous will be se wrong
+	scatter.SetLogY(opLogY);
+	
+	if (zoomX || zoomY) {
+		scatter.ZoomToFit(zoomX, zoomY);
+		UpdateVals();
+	}
 
+	zoomX = zoomY = false;
+	
 	scatter.SetModify();
 	scatter.Refresh();
 }

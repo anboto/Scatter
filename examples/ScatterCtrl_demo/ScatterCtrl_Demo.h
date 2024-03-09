@@ -112,6 +112,8 @@ public:
 
 private:
 	Vector<Pointf> s1;
+	
+	void WhenOp();
 };
 
 class Tab7_Operations : public WithTab7Operations<ScatterDemo> {
@@ -293,7 +295,7 @@ public:
 			}
 			if (scatter.GetYMin() < p.y && scatter.GetYMax() > p.y) {
 				double posx = scatter.GetPosX(p.x);
-				double posy = scatter.GetPosY(p.y);
+				double posy = scatter.GetPosY(p.y, true);
 				double sizex = scatter.GetSizeX(0.2);
 				FillRectangleOpa(w, posx - sizex/2., posy - sizex/2., 
 									posx + sizex/2., posy + sizex/2., 

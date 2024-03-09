@@ -38,7 +38,8 @@ LAYOUT(Tab5Dynamic, 400, 288)
 END_LAYOUT
 
 LAYOUT(Tab6Logarithmic, 400, 280)
-	ITEM(ScatterCtrl, scatter, SetTitle(t_("Logarithmic Scale")).SetTitleFont(Upp::StdFontZ(14).Bold()).SetPlotAreaLeftMargin(60).SetPlotAreaTopMargin(20).SetLegendAnchor(2).HSizePosZ(12, 12).VSizePosZ(16, 16))
+	ITEM(ScatterCtrl, scatter, SetTitle(t_("Logarithmic Scale")).SetTitleFont(Upp::StdFontZ(14).Bold()).SetPlotAreaLeftMargin(60).SetPlotAreaTopMargin(20).SetLegendAnchor(2).HSizePosZ(12, 12).VSizePosZ(16, 28))
+	ITEM(Upp::Switch, opLog, SetLabel(t_("Example Log10 in X axis\nExample Log10 in Y axis")).RightPosZ(4, 284).BottomPosZ(4, 16))
 END_LAYOUT
 
 LAYOUT(Tab7Operations, 388, 300)

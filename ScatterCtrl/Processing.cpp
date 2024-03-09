@@ -24,7 +24,7 @@ void PropertiesDlg::Init(ScatterCtrl& scatter)
 	tab.Add(legend,   t_("Legend"));
 	tab.Add(series,   t_("Series"));
 	tab.Add(general,  t_("General"));
-	OnTab();
+	//OnTab();
 	
 	tab.WhenAction = [=]{OnTab();};
 	butOK.WhenAction = [=] {Close();};

@@ -97,6 +97,9 @@ public:
 
 private:
 	ScatterCtrl *pscatter;
+	bool zoomX = false, zoomY = false;
+	
+	void UpdateVals();
 };
 
 class TextsTab : public WithTexts<StaticRect> {
