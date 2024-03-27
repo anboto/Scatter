@@ -81,6 +81,7 @@ public:
 	#define LINE_DOTTED 	  "4 10"
 	#define LINE_DOTTED_SEP	  "4 20"
 	#define LINE_DASHED 	  "12 12"
+	#define LINE_DASHED_LONG  "12 4"
 	#define LINE_DASH_DOT 	  "12 8 3 8"	// Reduced. Previous was too long
 	#define LINE_BEGIN_END	  "2"
 	
