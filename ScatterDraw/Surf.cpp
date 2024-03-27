@@ -83,22 +83,27 @@ int TableData::get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis
 	double mx = Membercall(getdataAxis)(lenAxis-1);
 	if (x < mn || x >= mx) 
 		return -1;
+	
 	if (lenAxis > 30) { // Not sure what is the best threshold here.
-		// Binary search with "smart" distance guesses
+		// Binary search with "smart" initial guess.
 		double stride_guess = (mx - mn) / (double)(lenAxis-1);
 		ix = (int)((x - mn) / stride_guess);
+		int dist = std::max(1, (lenAxis-1)/2);
 		do {
 			ix = std::max<int>(ix, 0);
 			ix = std::min<int>(ix, lenAxis-2);
 			double x_guess = Membercall(getdataAxis)(ix);
-			if(x < x_guess) {
-				if(ix == 0 || x >= Membercall(getdataAxis)(ix-1)) break;
-				ix -= std::max<int>(1, (int)(x_guess - x)/stride_guess);
-			} else if (x > x_guess) {
-				if(ix == lenAxis-2 || x < Membercall(getdataAxis)(ix+1)) break;
-				ix += std::max<int>(1, (int)(x - x_guess)/stride_guess);
-			} else 
-				break;
+			if(x_guess > x) {
+				if((ix == 0) || x >= Membercall(getdataAxis)(ix-1)) {
+					ix--;
+					break;
+				}
+				ix-=dist;
+			} else if (x_guess <= x) {
+				if((ix == lenAxis-2) || x < Membercall(getdataAxis)(ix+1)) break;
+				ix+=dist;
+			}
+			dist = std::max(1, dist/2);
 		} while (true); // Note: The above code will exit always.
 		ix = std::max<int>(ix, 0);
 		ix = std::min<int>(ix, lenAxis-2);

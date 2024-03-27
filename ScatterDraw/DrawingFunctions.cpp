@@ -350,6 +350,7 @@ void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double o
 	if (dash == LINE_NONE)
 		return;
 	
+	bool any_at_all = false;
 	bool broken = true;
 	for (int i = 0; i < p.size(); ++i) {
 		if (!IsNum(p[i]))
@@ -360,8 +361,10 @@ void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double o
 				broken = false;
 			} else			
 				w.Line(p[i]);
+			any_at_all = true;
 		}
 	}
+	if(!any_at_all) return;
 	DashScaled(w, dash, scale);
 	w.Opacity(opacity);				// Before Stroke()
 	w.Stroke(thick*scale, color);
