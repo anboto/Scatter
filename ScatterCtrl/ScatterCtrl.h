@@ -317,9 +317,6 @@ public:
 		return *this;
 	}
 		
-	ScatterCtrl& SetMaxRefreshTime(int _maxRefresh_ms) 	{maxRefresh_ms = _maxRefresh_ms; return *this;}
-	int GetMaxRefreshTime() 							{return maxRefresh_ms;}
-		
 	ScatterCtrl &SetMouseHandling(bool valx = true, bool valy = false)			{ScatterDraw::SetMouseHandling(valx, valy);			return *this;} 
 	ScatterCtrl &SetMouseHandlingLinked(bool valx = true, bool valy = false) 	{ScatterDraw::SetMouseHandlingLinked(valx, valy);	return *this;}
 	
@@ -418,7 +415,6 @@ private:
 	
 	int lastRefresh_ms = Null;
 	dword lastRefresh0_ms;
-	int maxRefresh_ms = 500;
 	
 	bool highlighting = false;
 	

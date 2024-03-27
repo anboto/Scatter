@@ -24,7 +24,7 @@ void PropertiesDlg::Init(ScatterCtrl& scatter)
 	tab.Add(legend,   t_("Legend"));
 	tab.Add(series,   t_("Series"));
 	tab.Add(general,  t_("General"));
-	OnTab();
+	//OnTab();
 	
 	tab.WhenAction = [=]{OnTab();};
 	butOK.WhenAction = [=] {Close();};
@@ -618,7 +618,7 @@ void ProcessingTab::OnUpdateSensitivity()
 		double toT = ~tabFitRight.toT;
 		
 		if ((!IsNull(fromT) || !IsNull(toT)) && (fromT < toT))  {
-			fftFilter = data.FilterFFTY(~tabFitRight.fromT, ~tabFitRight.toT);
+			fftFilter = data.FilterFFTY(fromT, toT);
 			if (fftFilter.IsEmpty())
 				tabFitLeft.comments.SetText(t_("Impossible to filter series"));
 			refresh = true;	

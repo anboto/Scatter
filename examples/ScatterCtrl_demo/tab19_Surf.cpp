@@ -81,6 +81,16 @@ void Tab19_Surf::Init()
 	
 	funData.Init([=](double x, double y) {return sin(sqrt(x*x + y*y + 64))/sqrt(x*x + y*y + 64);}, -10, 10, -10, 10);
 	
+	xDataEigen.resize(4);
+	xDataEigen << 0, 1, 2, 3;
+	yDataEigen.resize(3);
+	yDataEigen << 0, 1, 2;
+	zDataEigen.resize(3, 4);
+	zDataEigen << 0, 1, 2, 3,
+				  1, 1, 2, 3,
+				  2, 2, 2, 3;
+	testCard.Init(zDataEigen, xDataEigen, yDataEigen, TableInterpolate::NO, false);
+	
 	OnChange();
 }
 
@@ -95,6 +105,8 @@ void Tab19_Surf::OnChange() {
 		Init_Dataset();
 	else if (dataType == 2)
 		Init_DataExplicit();
+	else if (dataType == 3)
+		Init_DataTestCard();
 	else 
 		scatter.RemoveSurf();
 	
@@ -126,6 +138,13 @@ void Tab19_Surf::Init_Dataset() {
 void Tab19_Surf::Init_DataExplicit() {
 	scatter.RemoveAllSeries();
 	scatter.AddSurf(funData);	
+	scatter.SetRainbowPaletteTextColor(Black);
+	scatter.ZoomToFitZ();
+}
+
+void Tab19_Surf::Init_DataTestCard() {
+	scatter.RemoveAllSeries();
+	scatter.AddSurf(testCard);	
 	scatter.SetRainbowPaletteTextColor(Black);
 	scatter.ZoomToFitZ();
 }

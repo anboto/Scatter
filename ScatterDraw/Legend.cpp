@@ -89,10 +89,11 @@ void ScatterDraw::DrawLegend(Draw& w) const {
 	if (legendAnchor != TOP) 
 		rectHeight = int(rowHeight*(nrows + 0.2)) + loclegendRowSpacing*nrows;
 	
-	double left = plotLeft + legendPos.x*textScale;
-	double right = plotWLeg + (hPlotLeft - hPlotRight)*plotScaleX - legendPos.x*textScale - rectWidth;
-	double top = plotTop + legendPos.y*textScale;
-	double bottom = plotHLeg - legendPos.y*textScale - rectHeight;
+	double left = plotLeft + legendPos.x*plotScaleX;
+	double right = plotWLeg + (hPlotLeft - hPlotRight)*plotScaleX - legendPos.x*plotScaleX - rectWidth;
+	double top = plotTop + legendPos.y*plotScaleY;
+	double bottom = size.cy - vPlotBottom*plotScaleY - legendPos.y*plotScaleY - rectHeight;
+	//plotHLeg - legendPos.y*plotScaleY - rectHeight;
 	Rectf rect;
 	switch(legendAnchor) {
 	case TOP:			rect.Set(plotScaleX*hPlotLeft, 0, rectWidth, rectHeight);		break;
@@ -227,6 +228,9 @@ void ScatterDraw::DrawRainbowPalette(Draw& w) const {
 	w.DrawImage(rect.left, rect.top, out_image);	
 	DrawRectangle(w, rect, plotScaleAvg, 1, rainbowBorderColor);
 	
+	if (!IsNum(surfMaxZ) || !IsNum(surfMinZ))
+		return;
+				
 	double deltaZ = (surfMaxZ - surfMinZ)/double(surfNumColor);
 	for (int i = 0; i <= surfNumColor; ++i) {
 		double val = surfMinZ + deltaZ*i;

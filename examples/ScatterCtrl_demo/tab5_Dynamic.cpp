@@ -30,7 +30,7 @@ void Tab5_Dynamic::Animate()
 	scatter.Refresh();
 	t += 0.1;
 	if((t-scatter.GetXMin()) >= scatter.GetXRange())
-		scatter.SetXYMin(scatter.GetXMin() + 0.1, 0);
+		scatter.SetXYMin(scatter.GetXMin() + 0.1, Null);
 }
 
 void Tab5_Dynamic::Start()

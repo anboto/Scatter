@@ -17,7 +17,6 @@ file
 	DrawingFunctions.cpp,
 	DrawingFunctions.h,
 	SeriesPlot.h,
-	MultiDimMatrixIndex.h,
 	Histogram.cpp,
 	Histogram.h,
 	MarkPlot.h,

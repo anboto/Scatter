@@ -112,6 +112,8 @@ public:
 
 private:
 	Vector<Pointf> s1;
+	
+	void WhenOp();
 };
 
 class Tab7_Operations : public WithTab7Operations<ScatterDemo> {
@@ -293,7 +295,7 @@ public:
 			}
 			if (scatter.GetYMin() < p.y && scatter.GetYMax() > p.y) {
 				double posx = scatter.GetPosX(p.x);
-				double posy = scatter.GetPosY(p.y);
+				double posy = scatter.GetPosY(p.y, true);
 				double sizex = scatter.GetSizeX(0.2);
 				FillRectangleOpa(w, posx - sizex/2., posy - sizex/2., 
 									posx + sizex/2., posy + sizex/2., 
@@ -328,14 +330,18 @@ public:
 	void Init_DatasetSimple();
 	void Init_Dataset();
 	void Init_DataExplicit();
+	void Init_DataTestCard();
 	
 private:
 	ExplicitData funData;
 	TableDataVector data;
 	TableDataVector dataFun;
+	TableDataEigen testCard;
 	Vector<double> zData, xAxis, yAxis;
 	Vector<double> zDataFun, xAxisFun, yAxisFun;
-	
+	Eigen::VectorXd xDataEigen, yDataEigen;
+	Eigen::MatrixXd zDataEigen;
+	 
 	Vector<Pointf> isolines, numbersPos;
 	Vector<String> labels;
 };

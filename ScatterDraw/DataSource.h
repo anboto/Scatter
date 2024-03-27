@@ -4,8 +4,8 @@
 #define _ScatterDraw_DataSource_h_
 
 #include <Eigen/Eigen.h>
-#include <numeric>
-#include <complex>
+//#include <numeric>
+//#include <complex>
 #include <Functions4U/Functions4U.h>
 
 namespace Upp {
@@ -894,13 +894,21 @@ public:
 	virtual bool IsEmpty() = 0;
 	bool IsDeleted()	   {return key != 1212121;}
 	bool IsExplicit()	   {return isExplicit;}
- 	
+ 
+	virtual inline double x(int )		{NEVER();	return Null;}
+	virtual inline double y(int )		{NEVER();	return Null;}
+	virtual inline double zdata(int )	{NEVER();	return Null;}
+	virtual inline double z_data(int x, int y) = 0;
+		
 	virtual double MinX() = 0;
 	virtual double MaxX() = 0;
 	virtual double MinY() = 0;
 	virtual double MaxY() = 0;
 	virtual double MinZ() = 0;
 	virtual double MaxZ() = 0;
+	virtual int rows() = 0;
+	virtual int cols() = 0;
+	virtual bool IsAreas() = 0;
 
 	Vector<Pointf> GetIsoline(double thres, const Rectf &area, double deltaX, double deltaY);
 	Vector<Pointf> GetIsolines(const Vector<double> &vals, const Rectf &area, double deltaX, double deltaY);
@@ -1049,8 +1057,8 @@ void GetInterpolatePos(const typename Range::value_type x, const Range &vecx, in
 
 template <class T>
 T LinearInterpolateDir(const T x, const T *vecx, const T *vecy, int len) {
-	ASSERT(len > 1);
-	if (x < vecx[0])
+	ASSERT(len > 0);
+	if (len == 1 || x < vecx[0])
 		return vecy[0];
 	for (int i = 0; i < len-1; ++i) 
 		if (vecx[i+1] >= x && vecx[i] <= x) 
@@ -1061,8 +1069,8 @@ T LinearInterpolateDir(const T x, const T *vecx, const T *vecy, int len) {
 
 template <class T>
 T LinearInterpolateRev(const T x, const T *vecx, const T *vecy, int len) {
-	ASSERT(len > 1);
-	if (x < vecx[len-1])
+	ASSERT(len > 0);
+	if (len == 1 || x < vecx[len-1])
 		return vecy[len-1];
 	for (int i = len-1; i > 0; --i) 
 		if (vecx[i-1] >= x && vecx[i] <= x) 
@@ -1073,8 +1081,8 @@ T LinearInterpolateRev(const T x, const T *vecx, const T *vecy, int len) {
 
 template <class T>
 T LinearInterpolate(const T x, const T *vecx, const T *vecy, size_t len) {
-	ASSERT(len > 1);
-	if (vecx[1] > vecx[0])
+	ASSERT(len > 0);
+	if (vecx[1] > vecx[0] || len == 1)
 		return LinearInterpolateDir(x, vecx, vecy, int(len));
 	else
 		return LinearInterpolateRev(x, vecx, vecy, int(len));		
@@ -1096,8 +1104,8 @@ void GetInterpolatePos(const T x, const T y, const Eigen::Matrix<T, Eigen::Dynam
 				iy1 = iy+1;
 				return;
 			}
-	ix0 = ix1 = vecx.size()-1;
-	iy0 = iy1 = vecy.size()-1;
+	ix0 = ix1 = int(vecx.size()-1);
+	iy0 = iy1 = int(vecy.size()-1);
 }
 
 template <typename T, typename T2>
@@ -1159,19 +1167,20 @@ public:
 					double x, double y);
 	double z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
 					double x, double y);
+	double z_data(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
+					int x, int y);
 
-	virtual inline double x(int )		{NEVER();	return Null;}
-	virtual inline double y(int )		{NEVER();	return Null;}
-	virtual inline double data(int )	{NEVER();	return Null;}
-	
 	double z(double x, double y) {
-		return z(&TableData::x, &TableData::y, &TableData::data, x, y);
+		return z(&TableData::x, &TableData::y, &TableData::zdata, x, y);
 	}
 	double z(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, double x, double y) {
 		if (areas)
 			return z_area(getdataX, getdataY, getdata, x, y);
 		else
 			return z_point(getdataX, getdataY, getdata, x, y);
+	}
+	double z_data(int ix, int iy) {
+		return z_data(&TableData::x, &TableData::y, &TableData::zdata, ix, iy);
 	}
 	
 	bool IsEmpty() {
@@ -1187,10 +1196,14 @@ public:
 	double MaxY(Getdatafun getdata);
 	virtual double MaxY() 				{return MaxY(&TableData::y);}
 	double MinZ(Getdatafun getdata);
-	virtual double MinZ() 				{return MinZ(&TableData::data);}
+	virtual double MinZ() 				{return MinZ(&TableData::zdata);}
 	double MaxZ(Getdatafun getdata);
-	virtual double MaxZ() 				{return MaxZ(&TableData::data);}
+	virtual double MaxZ() 				{return MaxZ(&TableData::zdata);}
 
+	virtual int rows() 					{return lenyAxis;}
+	virtual int cols() 					{return lenxAxis;}
+	virtual bool IsAreas()				{return areas;}
+	
 	int lendata;
 	int lenxAxis;
 	int lenyAxis;
@@ -1199,11 +1212,12 @@ protected:
 	int get_axis_index_area_no_interp(Getdatafun getdataAxis, int lenAxis, double x);
 	
 	bool areas;
+	bool rowMajor;
 };
 
 class TableDataVector : public TableData {
 public:
-	TableDataVector() : pdata(0), pxAxis(0), pyAxis(0) {}
+	TableDataVector() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = true;}
 	TableDataVector(Vector<double> &data, Vector<double> &xAxis, Vector<double> &yAxis, 
 			Interpolate _inter, bool _areas) {Init(data, xAxis, yAxis, _inter, _areas);}
 	void Init(Vector<double> &data, Vector<double> &xAxis, Vector<double> &yAxis, 
@@ -1218,11 +1232,12 @@ public:
 		this->lenyAxis = yAxis.size();
 		this->inter = _inter;
 		this->areas = _areas;
+		this->rowMajor = true;
 	}
 	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
 	virtual inline double x(int id) 		{return (*pxAxis)[id];}
 	virtual inline double y(int id) 		{return (*pyAxis)[id];}
-	virtual inline double data(int id) 		{return (*pdata)[id];}
+	virtual inline double zdata(int id) 	{return (*pdata)[id];}
 	
 private:
 	Vector<double> *pdata;
@@ -1230,9 +1245,39 @@ private:
 	Vector<double> *pyAxis;
 };
 
+class TableDataEigen : public TableData {
+public:
+	TableDataEigen() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = false;}
+	TableDataEigen(Eigen::MatrixXd &data, Eigen::VectorXd &xAxis, Eigen::VectorXd &yAxis, 
+			Interpolate _inter, bool _areas) {Init(data, xAxis, yAxis, _inter, _areas);}
+	void Init(Eigen::MatrixXd &data, Eigen::VectorXd &xAxis, Eigen::VectorXd &yAxis, 
+					Interpolate _inter, bool _areas) {
+		ASSERT(_areas ?  (data.size() == (xAxis.size() - 1)*(yAxis.size() - 1)) : true);
+		ASSERT(!_areas ? (data.size() == xAxis.size()*yAxis.size()) : true);
+		this->pdata = &data;
+		this->lendata = int(data.size());
+		this->pxAxis = &xAxis;
+		this->lenxAxis = int(xAxis.size());
+		this->pyAxis = &yAxis;
+		this->lenyAxis = int(yAxis.size());
+		this->inter = _inter;
+		this->areas = _areas;
+		this->rowMajor = false;
+	}
+	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
+	virtual inline double x(int id) 		{return (*pxAxis)(id);}
+	virtual inline double y(int id) 		{return (*pyAxis)(id);}
+	virtual inline double zdata(int id) 	{return (*pdata).array()(id);}
+	
+private:
+	Eigen::MatrixXd *pdata;
+	Eigen::VectorXd *pxAxis;
+	Eigen::VectorXd *pyAxis;
+};
+
 class TableDataCArray : public TableData {
 public:
-	TableDataCArray() : pdata(0), pxAxis(0), pyAxis(0) {}
+	TableDataCArray() : pdata(0), pxAxis(0), pyAxis(0) {rowMajor = true;}
 	TableDataCArray(double *data, int _lendata, double *xAxis, int _lenxAxis, double *yAxis, int _lenyAxis, 
 					Interpolate _inter, bool _areas) {Init(data, _lendata, xAxis, _lenxAxis, yAxis, _lenyAxis, _inter, _areas);}
 	void Init(double *data, int _lendata, double *xAxis, int _lenxAxis, double *yAxis, int _lenyAxis, 
@@ -1247,10 +1292,11 @@ public:
 		this->lenyAxis = _lenyAxis;
 		this->inter = _inter;
 		this->areas = _areas;
+		this->rowMajor = true;
 	}
 	virtual inline double x(int id) 	{return pxAxis[id];}
 	virtual inline double y(int id) 	{return pyAxis[id];}
-	virtual inline double data(int id) 	{return pdata[id];}
+	virtual inline double zdata(int id) {return pdata[id];}
 	
 private:
 	double *pdata;
@@ -1261,7 +1307,7 @@ private:
 
 class ExplicitData : public DataSourceSurf {
 public:
-	ExplicitData() {}
+	ExplicitData() {isExplicit = true;}
 	ExplicitData(Function<double (double x, double y)> _funz, double _minX, double _maxX, double _minY, double _maxY) {
 		Init(_funz, _minX, _maxX, _minY, _maxY);
 	}
@@ -1277,6 +1323,10 @@ public:
 	double MaxY()	{return maxY;}
 	double MinZ()	{return minZ;}
 	double MaxZ()	{return maxZ;}
+	virtual double z_data(int ix, int iy) 	{NEVER();	return Null;}
+	virtual int rows() 						{NEVER();	return Null;}
+	virtual int cols() 						{NEVER();	return Null;}
+	virtual bool IsAreas()					{NEVER();	return Null;}
 		
 private:
 	double minX, maxX, minY, maxY, minZ, maxZ;
@@ -1686,7 +1736,7 @@ Range1 ApplyIndex(const Range1 &x, const Range2 &indices) {
 }
 
 template <class Range1, class Range2>
-void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry) {
+void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry, double ratio = 1000) {
 	Range2 rx, ry;
 	CleanNAN(x, y, rx, ry);
 	
@@ -1701,32 +1751,33 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry
 	rx = ApplyIndex(rx, indices);
 	ry = ApplyIndex(ry, indices);
 	
-	Vector<int> num(n, 1);
-	double epsx = (rx[n-1] - rx[0])/1000./n;
-	for (int i = n-1; i >= 1; --i) {
-		if (rx[i] - rx[i-1] < epsx) {
-			num[i-1] += num[i];
-			ry[i-1]  += ry[i];		
-			num[i] = 0;
+	if (!IsNull(ratio)) {
+		Vector<int> num(n, 1);
+		double epsx = (rx[n-1] - rx[0])/n/ratio;
+		for (int i = n-1; i >= 1; --i) {
+			if (rx[i] - rx[i-1] < epsx) {
+				num[i-1] += num[i];
+				ry[i-1]  += ry[i];		
+				num[i] = 0;
+			}
 		}
-	}
-	int id = 0;
-	for (int i = 0; i < num.size(); ++i) {
-		if (num[i] != 0) { 
-			ry[id] = ry[i]/num[i];
-			rx[id] = rx[i];
-			id++;
+		int id = 0;
+		for (int i = 0; i < num.size(); ++i) {
+			if (num[i] != 0) { 
+				ry[id] = ry[i]/num[i];
+				rx[id] = rx[i];
+				id++;
+			}
 		}
+		ResizeConservative(rx, id);
+		ResizeConservative(ry, id);
 	}
-	ResizeConservative(rx, id);
-	ResizeConservative(ry, id);
-	
 	rrx = pick(rx);
 	rry = pick(ry);
 }
 
 template <class Range1, class Range2>
-void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 &rrx, Range2 &rry, Range2 &rrz) {
+void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 &rrx, Range2 &rry, Range2 &rrz, double ratio = 1000) {
 	Range2 rx, ry, rz;
 	CleanNAN(x, y, z, rx, ry, rz);
 	
@@ -1742,29 +1793,30 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	ry = ApplyIndex(ry, indices);
 	rz = ApplyIndex(rz, indices);
 	
-	Vector<int> num(n, 1);
-	double epsx = (rx[n-1] - rx[0])/1000./n;
-	for (int i = n-1; i >= 1; --i) {
-		if (rx[i] - rx[i-1] < epsx) {
-			num[i-1] += num[i];
-			num[i] = 0;
-			ry[i-1]  += ry[i];	
-			rz[i-1]  += rz[i];	
+	if (!IsNull(ratio)) {
+		Vector<int> num(n, 1);
+		double epsx = (rx[n-1] - rx[0])/n/ratio;
+		for (int i = n-1; i >= 1; --i) {
+			if (rx[i] - rx[i-1] < epsx) {
+				num[i-1] += num[i];
+				num[i] = 0;
+				ry[i-1]  += ry[i];	
+				rz[i-1]  += rz[i];	
+			}
 		}
-	}
-	int id = 0;
-	for (int i = 0; i < num.size(); ++i) {
-		if (num[i] != 0) { 
-			rx[id] = rx[i];
-			ry[id] = ry[i]/num[i];
-			rz[id] = rz[i]/num[i];			
-			id++;
+		int id = 0;
+		for (int i = 0; i < num.size(); ++i) {
+			if (num[i] != 0) { 
+				rx[id] = rx[i];
+				ry[id] = ry[i]/num[i];
+				rz[id] = rz[i]/num[i];			
+				id++;
+			}
 		}
+		ResizeConservative(rx, id);
+		ResizeConservative(ry, id);
+		ResizeConservative(rz, id);
 	}
-	ResizeConservative(rx, id);
-	ResizeConservative(ry, id);
-	ResizeConservative(rz, id);
-	
 	rrx = pick(rx);
 	rry = pick(ry);
 	rrz = pick(rz);
@@ -1772,7 +1824,8 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, const Range1 &z, Range2 
 	
 void Resample(const Eigen::VectorXd &sx, const Eigen::VectorXd &sy, 
 			  Eigen::VectorXd &rx, Eigen::VectorXd &ry, double srate);
-void Resample(const Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
+void ResampleY(const Eigen::VectorXd &x, const Eigen::VectorXd &y, 
+	    const Eigen::VectorXd &xmaster, Eigen::VectorXd &rry);			
 
 template <typename T, typename T2>
 void Resample(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matrix<T, Eigen::Dynamic, 1> &y, 

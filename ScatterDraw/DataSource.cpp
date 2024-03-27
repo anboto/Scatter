@@ -745,8 +745,8 @@ Vector<Pointf> DataSource::Derivative(Getdatafun getdataY, Getdatafun getdataX, 
         xv[i] = Membercall(getdataX)(i);
     }
 
-	CleanNANDupXSort(xv, yv, xv, yv);   
-    Resample(xv, yv, xv, yv);
+	CleanNANDupXSort(xv, yv, xv, yv, Null);   
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
 	
 	// From https://en.wikipedia.org/wiki/Finite_difference_coefficient
@@ -812,7 +812,7 @@ VectorXd SavitzkyGolay_Coeff(int nleft, int nright, int deg, int der) {
     VectorXd y = (At * A).inverse() * (At * B);
     
     VectorXd coeff(nleft + nright + 1);
-    double factor = der > 0 ? pow(2, der-1) : 1;
+    double factor = der > 0 ? PowInt(2., der-1) : 1;
     coeff.setZero();
     int ic = 0;
     for(int k = -nleft; k <= nright; k++) {
@@ -841,8 +841,8 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
         xv[i] = Membercall(getdataX)(i);
     }
 
-	CleanNANDupXSort(xv, yv, xv, yv);
-    Resample(xv, yv, xv, yv);
+	CleanNANDupXSort(xv, yv, xv, yv, Null);
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
     
     VectorXd coeff = SavitzkyGolay_Coeff(size/2, size/2, deg, der);
@@ -892,7 +892,7 @@ void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry
 	rry = pick(ry);
 }
 
-void Resample(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
+void ResampleY(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, VectorXd &rry) {
 	ASSERT(x.size() == y.size());
 	VectorXd rx, ry;
 		
@@ -937,8 +937,8 @@ Vector<Pointf> DataSource::FilterFFT(Getdatafun getdataY, Getdatafun getdataX, d
         xv[i] = Membercall(getdataX)(i);
     }
     
-	CleanNANDupXSort(xv, yv, xv, yv);  
-    Resample(xv, yv, xv, yv);
+	CleanNANDupXSort(xv, yv, xv, yv, Null);  
+    ResampleY(xv, yv, xv, yv);
 	double from = xv[0];
 	double T = xv[1]-xv[0];
     
@@ -953,6 +953,7 @@ Vector<Pointf> DataSource::FilterFFT(Getdatafun getdataY, Getdatafun getdataX, d
 }
 
 void ExplicitData::Init(Function<double (double x, double y)> _funz, double _minX, double _maxX, double _minY, double _maxY) {
+	isExplicit = true;
 	ASSERT(maxX >= minX && maxY >= minY);
 	this->funz = _funz;
 	this->minX = _minX;
@@ -1058,13 +1059,13 @@ Vector<Pointf> DataSourceSurf::GetIsoline(double thres, const Rectf &area, doubl
 			isoline << Null;
 			imin = 0;
 		} else if (!IsNum(iminT)) {
-			Reverse(isoline);
+			ReverseX(isoline);
 			imin = imin0;
 		} else if (!IsNum(imin0))
 			imin = iminT;
 		else {
 			if (dt > d0) {
-		 		Reverse(isoline);
+		 		ReverseX(isoline);
 				imin = imin0;
 			} else
 				imin = iminT;

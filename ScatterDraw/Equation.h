@@ -523,11 +523,7 @@ public:
 			return 0;
 		if ((x-x0)/lambda < 0)
 			return 0;
-		if (std::isinf<double>(pow((x-x0)/lambda, k)))
-			return 0;
-		double ret = factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
-		ASSERT(IsNum(ret));
-		return ret;
+		return factor*(k/lambda)*(::pow((x-x0)/lambda, k-1))*::exp(double(-::pow((x-x0)/lambda, k)));
 	}
 	virtual String GetName() 					{return t_("Weibull");}
 	virtual String GetEquation(int nDig = 3) {
@@ -620,16 +616,19 @@ public:
 		return Format("%s + %s*^x^%s", FormatCoeff(0, numDigits), FormatCoeff(1, numDigits), FormatCoeff(2, numDigits));
 	}
 	virtual void GuessCoeff(DataSource &series) {
+		GuessCoeff(series, 2);
+	}
+	void GuessCoeff(DataSource &series, double exp) {
 		LinearEquation lin;
 		if (lin.Fit(series) != ExplicitEquation::NoError) 
 			throw Exc("Problem fitting linear");
 		
 		coeff[0] = lin.GetCoeff(0);
 		coeff[1] = lin.GetCoeff(1);
-		coeff[2] = 2;
+		coeff[2] = exp;
 	}
-	FitError Fit(DataSource &series) {
-		FitError error = ExplicitEquation::Fit(series);
+	FitError Fit(DataSource &series, double &r2) {
+		FitError error = ExplicitEquation::Fit(series, r2);
 		if (error == ExplicitEquation::NoError) {
 			if (coeff[2] < 1)
 				coeff[2] = Mirror(coeff[2], 1.);
