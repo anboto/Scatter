@@ -1831,9 +1831,9 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 						if (!IsNum(minY) || !IsNum(maxY)) 
 							points << Null;	
 						
-						int ix = GetPosX(xx);
-						int iMax = GetPosY(maxY, primaryY);
-						int iMin = GetPosY(minY, primaryY);
+						double ix = GetPosX(xx);
+						double iMax = GetPosY(maxY, primaryY);
+						double iMin = GetPosY(minY, primaryY);
 						points << Pointf(ix, iMax);
 						if (iMax != iMin)
 							points << Pointf(ix, iMin);	

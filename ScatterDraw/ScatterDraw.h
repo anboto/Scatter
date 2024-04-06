@@ -1767,14 +1767,14 @@ void ScatterDraw::Plot(T& w) {
 					}
 				} else {
 					for (int64 i = 0; i < data.GetCount(); ++i) {
-						int ix = GetPosX(data.x(i));
-						int iy = GetPosY(data.y(i), serie.primaryY);
+						int ix = (int)GetPosX(data.x(i));
+						int iy = (int)GetPosY(data.y(i), serie.primaryY);
 						Vector<int> dataX, dataY;
 						Vector<double> dataFixed;
 						for (int ii = 0; ii < data.GetznxCount(i); ++ii) 
-							dataX << GetPosX(data.znx(ii, i));
+							dataX << (int)GetPosX(data.znx(ii, i));
 						for (int ii = 0; ii < data.GetznyCount(i); ++ii) 
-							dataY << GetPosY(data.zny(ii, i), serie.primaryY);
+							dataY << (int)GetPosY(data.zny(ii, i), serie.primaryY);
 						for (int ii = 0; ii < data.GetznFixedCount(); ++ii) 
 							dataFixed << data.znFixed(ii, i);
 						serie.markPlot->Paint(w, plotScaleAvg, ix, iy, dataX, dataY, dataFixed, 
