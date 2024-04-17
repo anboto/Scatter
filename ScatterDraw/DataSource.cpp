@@ -410,7 +410,7 @@ Vector<Pointf> FFT(const VectorXd &_data, double tSample, bool frequency, int ty
     double threshold = 0;
     if (type == FFT_TYPE::T_PHASE) {
         for (int i = 0; i < int(freqbuf.size()); ++i) {    
-            if (threshold < std::abs(freqbuf[i]))
+    		if (threshold < std::abs(freqbuf[i]))
                 threshold = std::abs(freqbuf[i]);
         }
     }
@@ -461,7 +461,7 @@ Vector<Pointf> DataSource::FFT(Getdatafun getdata, double tSample, bool frequenc
     int num = 0;
     for (int i = 0; i < numData; ++i) {
         double d = Membercall(getdata)(i);
-        if (!!IsNum(d)) {
+		if (!!IsNum(d)) {
 			data[i] = d;
 			num++;
         }
@@ -917,7 +917,7 @@ void FilterFFT(VectorXd &data, double T, double fromT, double toT) {
     for (int i = 0; i < freqbuf.size(); ++i) {
         double freq = i*samplingFrecuency/numData;
         double T = 1/freq;
-        if ((!IsNum(fromT) || T > fromT) && (!IsNum(toT) || T < toT))
+		if ((!IsNum(fromT) || T > fromT) && (!IsNum(toT) || T < toT))
             freqbuf[i] = 0;
     }
 	fft.inv(data, freqbuf);

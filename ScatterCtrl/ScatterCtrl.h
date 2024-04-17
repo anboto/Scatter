@@ -551,7 +551,7 @@ private:
 class ScatterWindowPool {
 public:
 	static ScatterWindow &Get()			{return pool.Add();}
-	static void Get(ScatterWindow *w)	{w = &pool.Add();}
+	//static void Get(ScatterWindow *w)	{w = &pool.Add();}
 
 private:
 	static Array<ScatterWindow> pool;

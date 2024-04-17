@@ -10,10 +10,10 @@ ScatterDraw::ScatterDraw() {
 	lastxRange = xRange;
 	lastyRange = yRange;
 }
-
+/*
 void debug_h() {
 	int dummy = 0;		// It does nothing. It just serves as a place to set a breakpoint for templated functions
-}
+}*/
 
 ScatterDraw& ScatterDraw::SetColor(const Color& _color) {
 	graphColor = _color;

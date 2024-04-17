@@ -1607,7 +1607,7 @@ template <class Range>
 typename Range::value_type CosWindow(Range &data, int numOver) {
 	size_t numData = data.size();
 	typename Range::value_type numDataFact = 0;
-	for (size_t i = 0; i < numOver; ++i) {
+	for (int i = 0; i < numOver; ++i) {
         typename Range::value_type windowFact = 0.5*(1 - cos(M_PI*i/numOver));
         numDataFact += windowFact;
     	data[i] *= windowFact;	
