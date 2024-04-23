@@ -27,7 +27,8 @@ void Tab8_Secondary::Init()
 	scatter.SetMaxRange(40).SetMinRange(2, 20)
 		   .SetLabelY("Temperature")
 	       .SetLabelY2("Pressure")
-		   .SetMarkWidth(1, 4);
+		   .SetMarkWidth(1, 4)
+		   .SetLabelYAngle(90);
 	scatter.ShowInfo()
 		   .ShowContextMenu().ShowPropertiesDlg().ShowProcessDlg();	
 }

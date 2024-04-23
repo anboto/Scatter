@@ -1960,6 +1960,11 @@ void ScatterDraw::InitPlot() {
 		}
 	}
 }
+
+bool IsQTF(const String &str) {
+	return str[0] == '\1' || str[0] == '[';
+}
+
 	
 INITBLOCK {
 	SeriesPlot::Register<LineSeriesPlot>("Line");

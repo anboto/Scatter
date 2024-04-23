@@ -378,14 +378,22 @@ public:
 	Upp::Font& GetTitleFont() {return titleFont;};
 	ScatterDraw& SetTitleColor(const Color& colorTitle);
 	Upp::Color& GetTitleColor() {return titleColor;};
+	ScatterDraw& SetTitleAngle(double angle)		{titleAngle = (int)angle*10; return *this;}
+	double GetTitleAngle() {return titleAngle/10.;};
 	
 	ScatterDraw& SetLabels(const String& _xLabel, const String& _yLabel, const String& _yLabel2 = "");
 	ScatterDraw& SetLabelX(const String& _xLabel);
 	const String &GetLabelX()	{return xLabel_base;} 
+	ScatterDraw& SetLabelXAngle(double angle)		{xLabel_angle = (int)angle*10; return *this;}
+	double GetLabelXAngle()	{return xLabel_angle/10.;} 
 	ScatterDraw& SetLabelY(const String& _yLabel);
 	const String &GetLabelY()	{return yLabel_base;} 
+	ScatterDraw& SetLabelYAngle(double angle)		{yLabel_angle = (int)angle*10; return *this;}
+	double GetLabelYAngle()	{return yLabel_angle/10.;} 
 	ScatterDraw& SetLabelY2(const String& _yLabel);
 	const String &GetLabelY2()	{return yLabel2_base;}
+	ScatterDraw& SetLabelY2Angle(double angle)		{yLabel2_angle = (int)angle*10; return *this;}
+	double GetLabelY2Angle()	{return yLabel2_angle/10.;} 
 	ScatterDraw& SetLabelsFont(const Upp::Font& fontLabels);
 	Upp::Font GetLabelsFont() 	{return labelsFont;};
 	ScatterDraw& SetLabelsColor(const Color& colorLabels);
@@ -1076,6 +1084,10 @@ public:
 				("sciExpTop", sciExpTop)
 				("logX", logX)
 				("logY", logY)
+				("titleAngle", titleAngle)
+				("xLabel_angle", xLabel_angle) 
+				("yLabel_angle", yLabel_angle)
+				("yLabel2_angle", yLabel2_angle)
 			;
 			if (io.IsLoading()) {
 				labelsChanged = true;
@@ -1173,6 +1185,12 @@ public:
 				% showLegend
 				% legend_w_units
 				% sciExpTop
+				% logX
+				% logY
+				% titleAngle
+				% xLabel_angle
+				% yLabel_angle
+				% yLabel2_angle
 			;
 			if (s.IsLoading()) {
 				labelsChanged = true;
@@ -1220,6 +1238,8 @@ protected:
 	String xLabel_base, yLabel_base, yLabel2_base;
 	Upp::Font labelsFont = GetStdFont();
 	Color labelsColor = SColorText();
+	
+	int titleAngle = 0, xLabel_angle = 0, yLabel_angle = 900, yLabel2_angle = 900;
 	
 	int   hPlotLeft = 30, hPlotRight = 30, 
 		  vPlotTop = 30, vPlotBottom = 30;
@@ -1367,11 +1387,17 @@ private:
 	Vector<double> gridX, gridXLog, gridY, gridYLog;
 };
 
+bool IsQTF(const String &str);
+
 template <class T>
 void ScatterDraw::SetDrawing(T& w, bool ctrl) {
 	w.DrawRect(size, graphColor);
 	
-	titleHeight = !title.IsEmpty() ? fround(min(plotScaleX, plotScaleY)*(titleFont.GetHeight()+titleFont.GetDescent())) : 0;
+	if (title.IsEmpty())
+		titleHeight = 0;
+	else if (!IsQTF(title))
+		titleHeight = fround(min(plotScaleX, plotScaleY)*(titleFont.GetHeight()+titleFont.GetDescent()));
+		
 	
 	InitPlot();
 			
@@ -1394,7 +1420,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 			fontTitle6.Height(fround((fontTitle6.GetHeight()+fontTitle6.GetDescent())*size.cx*(0.95/sz.cx)));
 			sz = GetTextSizeSpace(title, fontTitle6);
 		}
-		DrawText(w, fround((size.cx - sz.cx)/2.), plotScaleY*2, 0, title, fontTitle6, titleColor);   
+		DrawText(w, fround((size.cx - sz.cx)/2.), plotScaleY*2, titleAngle, title, fontTitle6, titleColor);   
 	}	
 	if(showLegend) 
 		DrawLegend(w);
@@ -1472,9 +1498,9 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	Size lx  = GetTextSizeSpace(xLabel, 	fontX);
 	Size ly  = GetTextSizeSpace(yLabel, 	fontY);
 	Size ly2 = GetTextSizeSpace(yLabel2, fontY2);
-	DrawText(w, (plotW - lx.cx)/2., plotH + plotScaleY*(vPlotBottom - 2) - lx.cy, 0, xLabel, fontX, labelsColor);
-	DrawText(w, plotScaleX*(2 - hPlotLeft), (plotH + ly.cx)/2., 900, yLabel,  fontY, labelsColor);
-	DrawText(w, size.cx - plotScaleX*(2 + hPlotLeft) - ly2.cy, (plotH + ly2.cx)/2., 900, yLabel2, fontY2, labelsColor);
+	DrawText(w, (plotW - lx.cx)/2., plotH + plotScaleY*(vPlotBottom - 2) - lx.cy, xLabel_angle, xLabel, fontX, labelsColor);
+	DrawText(w, plotScaleX*(2 - hPlotLeft), (plotH + ly.cx)/2., yLabel_angle, yLabel,  fontY, labelsColor);
+	DrawText(w, size.cx - plotScaleX*(2 + hPlotLeft) - ly2.cy, (plotH + ly2.cx)/2., yLabel2_angle, yLabel2, fontY2, labelsColor);
 
 	drawXReticle  &= (xRange != 0  && xMajorUnit != 0);
 	drawYReticle  &= (yRange != 0  && yMajorUnit != 0);

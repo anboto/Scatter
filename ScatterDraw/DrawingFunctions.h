@@ -41,7 +41,7 @@ void ClipEnd(Draw &w);
 void ClipEnd(Painter &w);
 double GetDashLength(const char *dash);
 
-Size GetTextSizeSpace(const String& text, Font font);
+Size GetTextSizeSpace(const String& text, Font font, int angle = 0);
 	
 }
 	

@@ -141,7 +141,7 @@ void DrawHArrow(Painter &w, double x0, double y0, double x1, double y1, double w
 		w.Move(x1, y0).Line(x1-aHeight, y0+aWidth).Line(x1-aHeight, y0-aWidth).Fill(SColorHighlight());
 	}
 }
-
+						
 void DrawText(Draw &w, double x, double y, int angle, const String &text, Upp::Font font, Color color) {
 	Vector<String> str = Split(text, '\n');
 	int h = font.GetHeight() + font.GetDescent();
@@ -395,13 +395,22 @@ void FillPolylineOpa(Painter& w, const Vector<Pointf> &p, double , double opacit
 	w.Fill(fillColor);		// Before Stroke()
 }
 
-Size GetTextSizeSpace(const String& text, Font font) {
-	Size ret(0, 0);
-	WString wtext(text);
-	for (int i = 0; i < wtext.GetCount(); ++i)  
-		ret.cx += font.GetLeftSpace(wtext[i]) + font.GetWidth(wtext[i]);
-	ret.cy = font.GetHeight() + font.GetDescent();
+Size GetTextSizeSpace(const String& text, Font font, int angle) {
+	Vector<String> str = Split(text, '\n');
+	Size ret(0, str.size()*(font.GetHeight() + font.GetDescent()));
+	for (const String &s : str) {
+		WString wtext(s);
+		int cx = 0;
+		for (int i = 0; i < wtext.GetCount(); ++i)  
+			cx += font.GetLeftSpace(wtext[i]) + font.GetWidth(wtext[i]);
+		ret.cx = max(ret.cx, cx);
+	}
+	if (angle != 0) {
+		double ang = angle * M_PI/1800;
+		ret.cx /= cos(ang);
+		ret.cy /= sin(ang);
+	}
 	return ret;
 }
-
+						
 }
