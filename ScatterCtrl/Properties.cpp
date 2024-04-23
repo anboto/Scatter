@@ -183,6 +183,10 @@ void TextsTab::Init(ScatterCtrl& scatter) {
 	butFontGrid.WhenAction = [=]{OnFontGrid();};
 	sciExpTop <<= scatter.GetSciExpTop();
 	sciExpTop.WhenAction = [=]{Change();};
+	opOrientY <<= scatter.GetLabelYOrientation();
+	opOrientY.WhenAction = [=]{Change();};
+	opOrientY2 <<= scatter.GetLabelY2Orientation();
+	opOrientY2.WhenAction = [=]{Change();};
 	
 	Change();
 }
@@ -230,7 +234,7 @@ void TextsTab::Change() {
 	ScatterCtrl &scatter = *pscatter;
 	
 	scatter.SetTitle(~title);
-    scatter.SetLabels(~xLabel, ~yLabel, ~yLabel2);
+    scatter.SetLabels(~xLabel, ~yLabel, ~yLabel2).SetLabelYOrientation(~opOrientY).SetLabelY2Orientation(~opOrientY2);
 	scatter.SetPlotAreaMargin(~leftMargin, ~rightMargin, ~topMargin, ~bottomMargin);
 	scatter.SetPlotAreaColor(~backcolor);
 	scatter.SetTitleColor(~colorTitle);

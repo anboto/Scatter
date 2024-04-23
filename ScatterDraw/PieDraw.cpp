@@ -95,7 +95,7 @@ void PieDraw::PaintPie(Draw& w, int scale) {
 		FontTitle6 = titleFont;
 		FontTitle6.Height(scale*(titleFont.GetHeight()+ + titleFont.GetDescent()));
 		FontTitle6.Width(scale*titleFont.GetWidth());
-		textsize = GetTextSizeSpace(title, FontTitle6);
+		textsize = GetTextSizeSpace(title, FontTitle6, 0);
 		if(titlePos == TOP) 
 			w.DrawText((scale*GetSize().cx - textsize.cx)/2, scale*titleGap, title, FontTitle6, titleColor);
 		else  
@@ -149,7 +149,7 @@ void PieDraw::PaintPie(Draw& w, int scale) {
 			Upp::Font scaledFont;
 			scaledFont.Height(scale*(StdFont().GetHeight() + StdFont().GetDescent()));
 			scaledFont.Width(scale*StdFont().GetWidth());
-			Size szz = GetTextSizeSpace(percent, scaledFont);
+			Size szz = GetTextSizeSpace(percent, scaledFont, 0);
 		
 			int px = int(circ_x + scale*circ_r*cos(M_PI*(alfa0+a0)/3600)/1.3 - szz.cx/2.);
 			int py = int(circ_y + scale*circ_r*sin(M_PI*(alfa0+a0)/3600)/1.3 - szz.cy/2.);
@@ -168,7 +168,7 @@ void PieDraw::PaintPie(Draw& w, int scale) {
 		int legendWidth = 0;
 		int legendHeight = (1 + nr)*(scaledFont.GetHeight()+scaledFont.GetDescent());
 		for(int i = 0; i < nr; i++) 
-			legendWidth = max<int>(legendWidth, GetTextSizeSpace(vNames[i], scaledFont).cx);
+			legendWidth = max<int>(legendWidth, GetTextSizeSpace(vNames[i], scaledFont, 0).cx);
 		legendWidth += fround(2.2*fh);
 		
 		double leg_x = -legendLeft + sz.cx - legendWidth;

@@ -85,7 +85,6 @@ void NullDataDemo(String fileName) {
 		double sizex = scatter.GetSizeX(0.5);
 		DrawText(p, scatter.GetPosX(4) - sizex, scatter.GetPosY(35), 0, "This is a Null", Arial(14), Black());
 		DrawText(p, scatter.GetPosX(7) - sizex, scatter.GetPosY(40), 0, "This is another Null", Arial(14), Black());
-		
 	};
 	
 	fileName = fileName + " null data.png";
