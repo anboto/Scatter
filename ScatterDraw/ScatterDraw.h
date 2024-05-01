@@ -1219,6 +1219,8 @@ protected:
 	virtual void Refresh() {};
 	Function<void()> OnAddSeries;
 
+	void PaintBackground(Draw& w)	{w.DrawRect(size, graphColor);}
+	
 	int mode = MD_ANTIALIASED;
 	Color graphColor = SColorPaper();	
 	String title;
@@ -1390,7 +1392,6 @@ void ScatterDraw::SetDrawing(T& w, bool ctrl) {
 	else if (!IsQTF(title))
 		titleHeight = fround(min(plotScaleX, plotScaleY)*(titleFont.GetHeight()+titleFont.GetDescent()));
 		
-	
 	InitPlot();
 			
 	Plot(w);
