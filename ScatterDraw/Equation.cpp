@@ -384,18 +384,18 @@ EvalExpr::EvalExpr() {
 	functions.Add("radToDeg", uRadToDeg);
 }
 
-doubleUnit EvalExpr::Term(CParserPP& p) {
-	p.Char('+');
-	bool isneg = p.Char('-');
-	if (p.IsId()) {
-		String strId = p.ReadIdPP();
+doubleUnit EvalExpr::Term(CParserPP& pp) {
+	pp.Char('+');
+	bool isneg = pp.Char('-');
+	if (pp.IsId()) {
+		String strId = pp.ReadIdPP();
 		if(doubleUnit (*function)(doubleUnit) = functions.Get(strId, 0)) {
-			p.PassChar('(');
-			doubleUnit x(Exp(p));
-			p.PassChar(')');
+			pp.PassChar('(');
+			doubleUnit x(Exp(pp));
+			pp.PassChar(')');
 			doubleUnit ret(function(x));
 			if (IsNull(ret))
-				EvalThrowError(p, Format(t_("Error in %s(%f)"), strId, x.val));	
+				EvalThrowError(pp, Format(t_("Error in %s(%f)"), strId, x.val));	
 			if (isneg)
 				ret.Neg();
 			return ret;
@@ -415,7 +415,7 @@ doubleUnit EvalExpr::Term(CParserPP& p) {
 					lastError = Format(t_("Unknown identifier '%s'"), strId);
 					return Null;
 				}
-					//EvalThrowError(p, Format(t_("Unknown identifier '%s'"), strId));	
+					//EvalThrowError(pp, Format(t_("Unknown identifier '%s'"), strId));	
 				lastVariableSetId = variables.FindAdd(strIdSearch, 0);
 				ret = variables[lastVariableSetId];
 			}
@@ -423,68 +423,68 @@ doubleUnit EvalExpr::Term(CParserPP& p) {
 		if (isneg)
 			ret.Neg();
 		return ret;
-	} else if (p.Char('(')) {
-		doubleUnit x(Exp(p));
-		p.PassChar(')');
+	} else if (pp.Char('(')) {
+		doubleUnit x(Exp(pp));
+		pp.PassChar(')');
 		if (isneg)
 			x.Neg();
 		return x;
 	} else {
-		if (p.IsChar2('.', '.'))
-			p.ThrowError("missing number");
-		doubleUnit x(p.ReadDouble());
+		if (pp.IsChar2('.', '.'))
+			pp.ThrowError("missing number");
+		doubleUnit x(pp.ReadDouble());
 		if (isneg)
 			x.Neg();
 		return x;
 	}
 }
 
-doubleUnit EvalExpr::Pow(CParserPP& p) {
-	doubleUnit x(Term(p));
+doubleUnit EvalExpr::Pow(CParserPP& pp) {
+	doubleUnit x(Term(pp));
 	for(;;) 
-		if(p.Char('^')) {
+		if(pp.Char('^')) {
 			//if (x.val < 0)
 			//	EvalThrowError(p, t_("Complex number"));
-			x.Exp(Term(p));
+			x.Exp(Term(pp));
 		} else
 			return x;
 }
 
-doubleUnit EvalExpr::Mul(CParserPP& p) {
-	doubleUnit x(Pow(p));
+doubleUnit EvalExpr::Mul(CParserPP& pp) {
+	doubleUnit x(Pow(pp));
 	for(;;) 
-		if(p.Char('*'))
-			x.Mult(Pow(p));
-		else if (p.Char2('|', '|')) 
-			x.ResParallel(Pow(p));
-		else if(memcmp(p.GetPtr(), "·", strlen("·")) == 0) {
-			CParserPP::Pos pos = p.GetPos();
+		if(pp.Char('*'))
+			x.Mult(Pow(pp));
+		else if (pp.Char2('|', '|')) 
+			x.ResParallel(Pow(pp));
+		else if(memcmp(pp.GetPtr(), "·", strlen("·")) == 0) {
+			CParserPP::Pos pos = pp.GetPos();
 			pos.ptr += strlen("·");
-			p.SetPos(pos);
-			p.Spaces();
-			x.Mult(Pow(p));
-		} else if(p.Char('/')) {
-			x.Div(Pow(p));
-		} else if(memcmp(p.GetPtr(), "º", strlen("º")) == 0) { 
-			CParserPP::Pos pos = p.GetPos();
+			pp.SetPos(pos);
+			pp.Spaces();
+			x.Mult(Pow(pp));
+		} else if(pp.Char('/')) {
+			x.Div(Pow(pp));
+		} else if(memcmp(pp.GetPtr(), "º", strlen("º")) == 0) { 
+			CParserPP::Pos pos = pp.GetPos();
 			pos.ptr += strlen("º");
-			p.SetPos(pos);
-			p.Spaces();
+			pp.SetPos(pos);
+			pp.Spaces();
 			x.Mult(doubleUnit(M_PI/180.));
 		} else
 			return x;
 }
 
-doubleUnit EvalExpr::Exp(CParserPP& p) {
-	doubleUnit x(Mul(p));
+doubleUnit EvalExpr::Exp(CParserPP& pp) {
+	doubleUnit x(Mul(pp));
 	for(;;) 
-		if(p.Char('+'))
-			x.Sum(Mul(p));
-		else if(p.Char('-'))
-			x.Sub(Mul(p));
-		else if(p.Char(':')) {
+		if(pp.Char('+'))
+			x.Sum(Mul(pp));
+		else if(pp.Char('-'))
+			x.Sub(Mul(pp));
+		else if(pp.Char(':')) {
 			x.Mult(doubleUnit(60));
-			x.Sum(Mul(p));
+			x.Sum(Mul(pp));
 		} else
 			return x;
 }
@@ -592,13 +592,13 @@ doubleUnit EvalExpr::Eval(String line) {
 	}
 }
 
-String EvalExpr::TermStr(CParserPP& p, int numDigits) {
-	if(p.IsId()) {
-		String strId = p.ReadIdPP();
+String EvalExpr::TermStr(CParserPP& pp, int numDigits) {
+	if(pp.IsId()) {
+		String strId = pp.ReadIdPP();
 		if(functions.Find(strId) >= 0) {
-			p.PassChar('(');
-			String x = ExpStr(p, numDigits);
-			p.PassChar(')');
+			pp.PassChar('(');
+			String x = ExpStr(pp, numDigits);
+			pp.PassChar(')');
 			return strId + "(" + x + ")";
 		}
 		if (noCase)
@@ -616,43 +616,43 @@ String EvalExpr::TermStr(CParserPP& p, int numDigits) {
 			}
 		}
 	}
-	if(p.Char('(')) {
-		String x = ExpStr(p, numDigits);
-		p.PassChar(')');
+	if(pp.Char('(')) {
+		String x = ExpStr(pp, numDigits);
+		pp.PassChar(')');
 		return "(" + x + ")";
 	}
-	return FormatF(p.ReadDouble(), IsNull(numDigits) ? 3 : numDigits);
+	return FormatF(pp.ReadDouble(), IsNull(numDigits) ? 3 : numDigits);
 }
 
-String EvalExpr::PowStr(CParserPP& p, int numDigits) {
-	String x = TermStr(p, numDigits);
+String EvalExpr::PowStr(CParserPP& pp, int numDigits) {
+	String x = TermStr(pp, numDigits);
 	for(;;)
-		if(p.Char('^'))
-			x = x + "^" + TermStr(p, numDigits);
+		if(pp.Char('^'))
+			x = x + "^" + TermStr(pp, numDigits);
 		else
 			return x;
 }
 
-String EvalExpr::MulStr(CParserPP& p, int numDigits) {
-	String x = PowStr(p, numDigits);
+String EvalExpr::MulStr(CParserPP& pp, int numDigits) {
+	String x = PowStr(pp, numDigits);
 	for(;;)
-		if(p.Char('*'))
-			x = x + "*" + MulStr(p, numDigits);
-		else if(p.Char('/')) 
-			x = x + "/" + PowStr(p, numDigits);
+		if(pp.Char('*'))
+			x = x + "*" + MulStr(pp, numDigits);
+		else if(pp.Char('/')) 
+			x = x + "/" + PowStr(pp, numDigits);
 		else
 			return x;
 }
 
-String EvalExpr::ExpStr(CParserPP& p, int numDigits) {
+String EvalExpr::ExpStr(CParserPP& pp, int numDigits) {
 	String x = MulStr(p, numDigits);
 	for(;;) 
-		if(p.Char('+'))
-			x = x + " + " + MulStr(p, numDigits);
-		else if(p.Char('-'))
-			x = x + " - " + MulStr(p, numDigits);
-		else if(p.Char(':'))
-			x = x + ":" + MulStr(p, numDigits);
+		if(pp.Char('+'))
+			x = x + " + " + MulStr(pp, numDigits);
+		else if(pp.Char('-'))
+			x = x + " - " + MulStr(pp, numDigits);
+		else if(pp.Char(':'))
+			x = x + ":" + MulStr(pp, numDigits);
 		else {
 			x.Replace("+ -", "- ");
 			return x;
@@ -664,21 +664,21 @@ String EvalExpr::EvalStr(String line, int numDigits) {
 	if (line.IsEmpty())
 		return Null;
 	
-	CParserPP p(line);
+	CParserPP pp(line);
 	try {
-		if(p.IsId()) {
-			CParserPP::Pos pos = p.GetPos();
-			String var = p.ReadIdPP();
-			if(p.Char('=')) {
-				String ret = ExpStr(p, numDigits);
+		if(pp.IsId()) {
+			CParserPP::Pos pos = pp.GetPos();
+			String var = pp.ReadIdPP();
+			if(pp.Char('=')) {
+				String ret = ExpStr(pp, numDigits);
 				lastVariableSetId = variables.FindAdd(var, 0);
 				return var + " = " + ret;
 			} else {
-				p.SetPos(pos);
-				return ExpStr(p, numDigits);
+				pp.SetPos(pos);
+				return ExpStr(pp, numDigits);
 			}
 		} else
-			return ExpStr(p, numDigits);
+			return ExpStr(pp, numDigits);
 	} catch(CParserPP::Error e) {
 		lastError = Format(t_("Error evaluating '%s': %s"), line, e);
 		return Null;

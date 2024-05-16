@@ -5,7 +5,7 @@
 namespace Upp {
 
 ScatterDraw& ScatterDraw::AddSurf(DataSourceSurf &_surf) {
-	surf = &_surf;
+	psurf = &_surf;
 	if (!IsNum(surfMinZ))
 		surfMinZ = _surf.MinZ();
 	if (!IsNum(surfMaxZ))

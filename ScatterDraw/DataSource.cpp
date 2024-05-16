@@ -916,8 +916,8 @@ void FilterFFT(VectorXd &data, double T, double fromT, double toT) {
 	
     for (int i = 0; i < freqbuf.size(); ++i) {
         double freq = i*samplingFrecuency/numData;
-        double T = 1/freq;
-		if ((!IsNum(fromT) || T > fromT) && (!IsNum(toT) || T < toT))
+        double T2 = 1/freq;
+		if ((!IsNum(fromT) || T2 > fromT) && (!IsNum(toT) || T2 < toT))
             freqbuf[i] = 0;
     }
 	fft.inv(data, freqbuf);
@@ -1020,7 +1020,7 @@ Vector<Pointf> DataSourceSurf::GetIsoline(double thres, const Rectf &area, doubl
 	}
 	
 	Vector<Pointf> points;
-	for (int iy = 0; iy < height; iy++) {
+	for (iy = 0; iy < height; iy++) {
 		for (int ix = 0; ix < width-1; ix++) {
 			double z0 = zp[ix + iy*width];
 			double z1 = zp[ix+1 + iy*width];
@@ -1033,7 +1033,7 @@ Vector<Pointf> DataSourceSurf::GetIsoline(double thres, const Rectf &area, doubl
 		}
 	}
 	for (int ix = 0; ix < width; ix++) {
-		for (int iy = 0; iy < height-1; iy++) {
+		for (iy = 0; iy < height-1; iy++) {
 			double z0 = zp[ix + iy*width];
 			double z1 = zp[ix + (iy+1)*width];
 			if (!IsNum(z0) || !IsNum(z1))

@@ -443,12 +443,12 @@ void ScatterCtrl::ProcessPopUp(Point &pt) {
 			strdy << "\n" + popTextY2 + ": " + dstry2;
 		}
 	}
-	if (surf) {
-		double _z  = surf->z(_x, _y);
+	if (psurf) {
+		double _z  = psurf->z(_x, _y);
 		if (!IsNull(_z)) {
 			_str << "\n" << popTextZ << ": " << VariableFormatZ(_z);
 			if (strx != _strx || stry != _stry) {
-				double z = surf->z(x, y);
+				double z = psurf->z(x, y);
 				if (!IsNull(z)) 
 					str << "\n" << popTextZ << ": " << VariableFormatZ(z) << "; " 
 								<< t_("Δ") << popTextZ << ": " << VariableFormatZ(z - _z);	

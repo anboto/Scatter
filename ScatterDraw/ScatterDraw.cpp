@@ -395,11 +395,11 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				miny2 -= deltaY2;
 				maxy2 += deltaY2;		
 			}
-			if (surf) {
-				minx = min(minx, surf->MinX());
-				maxx = max(maxx, surf->MaxX());
-				miny = min(miny, surf->MinY());
-				maxy = max(maxy, surf->MaxY());
+			if (psurf) {
+				minx = min(minx, psurf->MinX());
+				maxx = max(maxx, psurf->MaxX());
+				miny = min(miny, psurf->MinY());
+				maxy = max(maxy, psurf->MaxY());
 			}
 		}
 		if (horizontal) {

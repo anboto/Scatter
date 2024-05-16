@@ -347,15 +347,15 @@ void ProcessingTab::OnOp()
 			sinusFirst = false;
 	}
 	if (~tabFitRight.opSinusTend && sinusTendFirst) {
-		DataXRange dataXRange;
-		dataXRange.Init(data, Null, Null);		
+		DataXRange dataXRange2;
+		dataXRange2.Init(data, Null, Null);		
 		double r2SinusTendBest = Null;
 		SinEquation sinusTendBest;
 		for (int iLow = 9; iLow >= 0; iLow--) {
 			double xLow = data.x(int64(data.GetCount()*iLow/10.));
-			dataXRange.SetXLow(xLow);
-			sinusTend.GuessCoeff(dataXRange);
-			if (sinusTend.Fit(dataXRange, r2SinusTend) < 0)
+			dataXRange2.SetXLow(xLow);
+			sinusTend.GuessCoeff(dataXRange2);
+			if (sinusTend.Fit(dataXRange2, r2SinusTend) < 0)
 				break;
 			if (!IsNull(r2SinusTendBest) && r2SinusTendBest > r2SinusTend)
 				break;
@@ -380,23 +380,23 @@ void ProcessingTab::OnOp()
 	}
 	OnUpdateSensitivity();
 	
-	int id = 0;
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opSeries);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opAverage);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opLinear);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opCuadratic);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opCubic);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opSinus);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opSinusTend);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opSpline);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opDerivative);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opSG);
-	tabFitLeft.scatter.ScatterDraw::Show(id++, tabFitRight.opFFT);
-	tabFitLeft.scatter.ScatterDraw::Show(id++,tabFitRight.opMax);
-	tabFitLeft.scatter.ScatterDraw::Show(id++,tabFitRight.opMin);
-	tabFitLeft.scatter.ScatterDraw::Show(id++,tabFitRight.opMovAvg);
-	tabFitLeft.scatter.ScatterDraw::Show(id++,tabFitRight.opSecAvg);
-	tabFitLeft.scatter.ScatterDraw::Show(id++,tabFitRight.opCumAvg);
+	int iid = 0;
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSeries);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opAverage);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opLinear);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opCuadratic);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opCubic);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSinus);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSinusTend);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSpline);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opDerivative);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSG);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opFFT);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMax);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMin);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMovAvg);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opSecAvg);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opCumAvg);
 	
 	UpdateEquations();
 	OnShowEquation();
@@ -407,7 +407,7 @@ void ProcessingTab::OnAutoSensSector()
 	if (tabFitLeft.scatter.IsDeletedDataSource(0))
 		return;
 	DataSource &data = tabFitLeft.scatter.GetDataSource(0);
-	Vector<Pointf> secAvg;
+	//Vector<Pointf> secAvg;
 	double baseWidth;
 	
 	baseWidth = 0;

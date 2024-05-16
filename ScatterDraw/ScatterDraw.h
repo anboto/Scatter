@@ -889,18 +889,18 @@ public:
 	bool GetMouseHandlingY()	{return mouseHandlingY;}
 	
 	ScatterDraw& AddSurf(DataSourceSurf &surf);
-	DataSourceSurf& GetSurf()					{return *surf;}
-	ScatterDraw& RemoveSurf()					{surf = nullptr;	return *this;}
-	bool IsSurf()								{return surf;}
+	DataSourceSurf& GetSurf()					{return *psurf;}
+	ScatterDraw& RemoveSurf()					{psurf = nullptr;	return *this;}
+	bool IsSurf()								{return psurf;}
 	ScatterDraw& SetSurfMinZ(double val)		{surfMinZ = val;	return *this;}
 	double GetSurfMinZ() const					{return surfMinZ;}
 	ScatterDraw& SetSurfMaxZ(double val)		{surfMaxZ = val;	return *this;}
 	double GetSurfMaxZ() const					{return surfMaxZ;}
-	double GetSurfMinX()						{return surf->MinX();}
-	double GetSurfMinY()						{return surf->MinY();}
-	double GetSurfMaxX()						{return surf->MaxX();}
-	double GetSurfMaxY()						{return surf->MaxY();}
-	ScatterDraw& ZoomToFitZ()					{surfMinZ = surf->MinZ();	surfMaxZ = surf->MaxZ(); return *this;}
+	double GetSurfMinX()						{return psurf->MinX();}
+	double GetSurfMinY()						{return psurf->MinY();}
+	double GetSurfMaxX()						{return psurf->MaxX();}
+	double GetSurfMaxY()						{return psurf->MaxY();}
+	ScatterDraw& ZoomToFitZ()					{surfMinZ = psurf->MinZ();	surfMaxZ = psurf->MaxZ(); return *this;}
 	
 	ScatterDraw& SurfNumColor(int num, bool cont){surfNumColor = num; continuousColor = cont; return *this;}
 	ScatterDraw& SurfRainbow(RAINBOW val)		{surfRainbow = val;  return *this;}
@@ -1323,7 +1323,7 @@ protected:
 	
 	bool mouseHandlingX = true, mouseHandlingY = true;
 	
-	DataSourceSurf *surf = nullptr;
+	DataSourceSurf *psurf = nullptr;
 	RAINBOW surfRainbow = BLUE_YELLOW_RED;
 	int surfNumColor = 4;
 	bool continuousColor = true;
@@ -1418,7 +1418,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	if(showLegend) 
 		DrawLegend(w);
 	
-	if (surf && showRainbow)
+	if (psurf && showRainbow)
 		DrawRainbowPalette(w);
 		
 	if (plotW < 0 || plotH < 0)
@@ -1673,7 +1673,7 @@ void ScatterDraw::Plot(T& w) {
 	
 	double left, top, d = min(plotW, plotH);//, r = d/2.;
 	if (!isPolar) {
-		if (!surf)
+		if (!psurf)
 			w.DrawRect(0, 0, plotW, plotH, plotAreaColor);
 		else {
 			ImageBuffer out_image(plotW, plotH);
@@ -1692,7 +1692,7 @@ void ScatterDraw::Plot(T& w) {
 						for (int iy = 0; iy < plotH; ++iy) {
 							double x = xMin + (ix + 0.5)/factorX;
 							double y = yMin + (iy + 0.5)/factorY;
-							double z = surf->z(x, y);
+							double z = psurf->z(x, y);
 							if (IsNum(z))
 								out_image[plotH - iy - 1][ix] = GetRainbowColor((z - surfMinZ)/deltaz, 
 										surfRainbow, continuousColor ? 0 : surfNumColor);	
