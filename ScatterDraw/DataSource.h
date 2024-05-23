@@ -923,7 +923,7 @@ private:
 template <class T, class T2>
 inline T2 LinearInterpolate(T x, T x0, T x1, T2 y0, T2 y1) {
 	T x1_0 = x1 - x0;
-	if (abs(x1_0) < T(FLT_EPSILON))
+	if (abs(x1_0) < 1E-10)
 		return (y0 + y1)/T(2);
 	
   	return y0 + (x - x0)*(y1 - y0)/x1_0;
@@ -932,7 +932,7 @@ inline T2 LinearInterpolate(T x, T x0, T x1, T2 y0, T2 y1) {
 template <class T, class T2>
 inline void LinearInterpolate(T x, T x0, T x1, T2 y0, T2 y1, T2 &y, T2 &dy) {
 	T x1_0 = x1 - x0;
-	if (abs(x1_0) < T(FLT_EPSILON)) {
+	if (abs(x1_0) < 1E-10) {
 		y = (y0 + y1)/T(2);
 		dy = 0;
 		return;
@@ -946,11 +946,11 @@ inline T QuadraticInterpolate(T x, T x0, T x1, T x2, T y0, T y1, T y2) {
 	T x0_1 = x0 - x1;
 	T x0_2 = x0 - x2;
 	T x1_2 = x1 - x2;
-	if (abs(x0_1) < T(FLT_EPSILON))
+	if (abs(x0_1) < 1E-10)
 		return LinearInterpolate(x, x0, x2, (y0 + y1)/T(2), y2);
-	else if (abs(x0_2) < T(FLT_EPSILON))
+	else if (abs(x0_2) < 1E-10)
 		return LinearInterpolate(x, x0, x1, (y0 + y2)/T(2), y1);
-	else if (abs(x1_2) < T(FLT_EPSILON))
+	else if (abs(x1_2) < 1E-10)
 		return LinearInterpolate(x, x0, x1, y0, (y1 + y2)/T(2));
 	
 	T x_0 = x - x0;
@@ -969,15 +969,15 @@ inline void QuadraticInterpolate(T x, T x0, T x1, T x2, T y0, T y1, T y2, T &y, 
 	T x0_1 = x0 - x1;
 	T x0_2 = x0 - x2;
 	T x1_2 = x1 - x2;
-	if (abs(x0_1) < T(FLT_EPSILON)) {
+	if (abs(x0_1) < 1E-10) {
 		d2y = 0;
 		LinearInterpolate(x, x0, x2, (y0 + y1)/T(2), y2, y, dy);
 		return;
-	} else if (abs(x0_2) < T(FLT_EPSILON)) {
+	} else if (abs(x0_2) < 1E-10) {
 		d2y = 0;
 		LinearInterpolate(x, x0, x1, (y0 + y2)/T(2), y1, y, dy);
 		return;
-	} else if (abs(x1_2) < T(FLT_EPSILON)) {
+	} else if (abs(x1_2) < 1E-10) {
 		d2y = 0;
 		LinearInterpolate(x, x0, x1, y0, (y1 + y2)/T(2), y, dy);
 		return;
