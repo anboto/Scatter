@@ -3,7 +3,7 @@
 #ifndef _Mathlib_Histogram_h_
 #define _Mathlib_Histogram_h_
 
-#include <Eigen/MultiDimMatrixIndex.h>
+#include <Eigen/MultiDimMatrix.h>
 
 namespace Upp {
 
