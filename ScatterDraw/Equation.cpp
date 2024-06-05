@@ -645,7 +645,7 @@ String EvalExpr::MulStr(CParserPP& pp, int numDigits) {
 }
 
 String EvalExpr::ExpStr(CParserPP& pp, int numDigits) {
-	String x = MulStr(p, numDigits);
+	String x = MulStr(pp, numDigits);
 	for(;;) 
 		if(pp.Char('+'))
 			x = x + " + " + MulStr(pp, numDigits);
