@@ -973,7 +973,12 @@ ScatterDraw& ScatterDraw::Legend(int index, const String legend) {
 	ASSERT(IsValid(index));
 	ASSERT(!series[index].IsDeleted());
 	
-	series[index].legend = legend;
+	if (legend.IsEmpty())
+		series[index].showLegend = false;
+	else {
+		series[index].showLegend = true;
+		series[index].legend = legend;
+	}
 	return *this;
 }
 
