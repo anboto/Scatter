@@ -776,18 +776,15 @@ bool ScatterCtrl::Key(dword key, int )
 	return true;
 }
 
-void ScatterCtrl::GotFocus()
-{
+void ScatterCtrl::GotFocus() {
 	Refresh();
 }
 
-void ScatterCtrl::LostFocus()
-{
+void ScatterCtrl::LostFocus() {
 	Refresh();	
 }
 
-void ScatterCtrl::LeftDown(Point pt, dword keyFlags) 
-{
+void ScatterCtrl::LeftDown(Point pt, dword keyFlags)  {
 	MousePointRot(pt);
 	if(!HasFocus()) 
 		SetFocus();
@@ -795,8 +792,7 @@ void ScatterCtrl::LeftDown(Point pt, dword keyFlags)
 	WhenMouseClick(pt, keyFlags, mouseAction = LEFT_DOWN);
 }
 
-void ScatterCtrl::LeftDouble(Point pt, dword keyFlags)
-{
+void ScatterCtrl::LeftDouble(Point pt, dword keyFlags) {
 	MousePointRot(pt);
 	if(!HasFocus()) 
 		SetFocus();
