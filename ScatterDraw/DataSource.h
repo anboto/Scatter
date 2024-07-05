@@ -924,9 +924,9 @@ template <class T, class T2>
 inline T2 LinearInterpolate(T x, T x0, T x1, T2 y0, T2 y1) {
 	T x1_0 = x1 - x0;
 	if (abs(x1_0) < 1E-10)
-		return (y0 + y1)/T(2);
+		return T2((y0 + y1)/T(2));
 	
-  	return y0 + (x - x0)*(y1 - y0)/x1_0;
+  	return T2(y0 + (x - x0)*(y1 - y0)/x1_0);
 }
 
 template <class T, class T2>

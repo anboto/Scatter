@@ -407,8 +407,8 @@ Size GetTextSizeSpace(const String& text, Font font, int angle) {
 	}
 	if (angle != 0) {
 		double ang = angle * M_PI/1800;
-		ret.cx /= cos(ang);
-		ret.cy /= sin(ang);
+		ret.cx = (int)(ret.cx/cos(ang));
+		ret.cy = (int)(ret.cy/sin(ang));
 	}
 	return ret;
 }
