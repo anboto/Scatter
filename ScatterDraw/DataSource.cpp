@@ -866,7 +866,7 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
     if (!Upp::SavitzkyGolay(yv, xv, deg, size, der, resy, resx))
 		return res;
     
-    res.SetCount(resx.size());
+    res.SetCount((int)resx.size());
     for (int i = 0; i < resx.size(); ++i) {
 		res[i].y = resy(i);
 		res[i].x = resx(i);
