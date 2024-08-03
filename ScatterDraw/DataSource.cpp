@@ -830,6 +830,27 @@ bool SavitzkyGolay_Check(const VectorXd &coeff) {
 	return abs(1-unity) < 0.0000001 || abs(unity) < 0.0000001;  
 }
 
+bool SavitzkyGolay(const VectorXd &y, const VectorXd &x, int deg, int size, int der, VectorXd &resy, VectorXd &resx) {
+    VectorXd xv, yv;
+	CleanNANDupXSort(x, y, xv, yv, Null);
+    ResampleY(xv, yv, xv, yv);
+    
+    VectorXd coeff = SavitzkyGolay_Coeff(size/2, size/2, deg, der);
+	if (!SavitzkyGolay_Check(coeff))
+		return false;
+	
+	double h = xv[1]-xv[0];
+	VectorXd resE = Convolution(yv, coeff, 1/pow(h, der));
+
+	resx.resize(resE.size());
+	resy.resize(resE.size());
+	for (int i = 0; i < resE.size(); ++i) {
+		resy[i] = resE(i);
+		resx[i] = xv(i);
+	}
+	return true;
+}
+
 Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdataX, int deg, int size, int der) {
 	Vector<Pointf> res;
 	
@@ -840,26 +861,17 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
         yv[i] = Membercall(getdataY)(i);
         xv[i] = Membercall(getdataX)(i);
     }
-
-	CleanNANDupXSort(xv, yv, xv, yv, Null);
-    ResampleY(xv, yv, xv, yv);
-	double from = xv[0];
     
-    VectorXd coeff = SavitzkyGolay_Coeff(size/2, size/2, deg, der);
-	if (!SavitzkyGolay_Check(coeff))
+    VectorXd resy, resx;
+    if (!Upp::SavitzkyGolay(yv, xv, deg, size, der, resy, resx))
 		return res;
-	
-	double h = xv[1]-xv[0];
-	VectorXd resE = Convolution(yv, coeff, 1/pow(h, der));
-
-	int nnumData = int(yv.size())-size;
-	res.SetCount(nnumData);
-	int frame = size/2;
-	for (int i = 0; i < nnumData; ++i) {
-		res[i].y = resE(i);
-		res[i].x = from + (i+frame)*h;
+    
+    res.SetCount(resx.size());
+    for (int i = 0; i < resx.size(); ++i) {
+		res[i].y = resy(i);
+		res[i].x = resx(i);
 	}
-	return res;
+    return res;
 }
 
 double LinearInterpolate(double x, const VectorXd &vecx, const VectorXd &vecy) {

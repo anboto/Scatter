@@ -72,6 +72,8 @@ Value DataDlg::DataSourceX::Format(const Value& q) const {
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
 		return Null;
+	if (pscatter->GetDataSource(index).IsExplicit())
+		return Null;
 	Value ret = pscatter->GetStringX(index, q, true);
 	return ret;
 }
@@ -80,6 +82,8 @@ Value DataDlg::DataSourceY::Format(const Value& q) const {
 	if (pscatter->IsDeletedDataSource(index))
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
+		return Null;
+	if (pscatter->GetDataSource(index).IsExplicit())
 		return Null;
 	Value ret = pscatter->GetStringY(index, q, true);
 	return ret;

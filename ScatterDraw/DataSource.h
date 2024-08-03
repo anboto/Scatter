@@ -1342,14 +1342,23 @@ Eigen::VectorXd SavitzkyGolay_Coeff(int nleft, int nright, int deg, int der);
 template<class T>
 typename T::PlainObject Convolution(const Eigen::MatrixBase<T>& orig, const Eigen::MatrixBase<T>& kernel, const double factor = 1) {
 	const Eigen::Index ksize = kernel.size();
+	const Eigen::Index origSize = orig.size();
 	
 	ASSERT_(ksize % 2 != 0, "Only support odd sized kernels");
-	ASSERT(orig.size() > ksize);
+	ASSERT(origSize > ksize);
 	
-	typename T::PlainObject dest(orig.size() - 2 * (ksize/2));
+	const Eigen::Index padding = ksize/2;
 	
-	for (typename T::Index row = 0; row < dest.size(); ++row)
-	  	dest(row) = orig.segment(row, ksize).cwiseProduct(kernel).sum();
+	typename T::PlainObject paddedOrig(origSize + 2*padding);
+    paddedOrig.segment(padding, origSize) = orig;
+    for (Eigen::Index i = 0; i < padding; ++i) {	// Data extended using begin and end linear interpolation
+		paddedOrig[padding - i - 1] = orig[0] - (orig[i+1] - orig[0]);
+		paddedOrig[origSize + padding + i] = orig[origSize-1] - (orig[origSize-2-i] - orig[origSize-1]);
+    }
+	typename T::PlainObject dest(origSize);
+	
+	for (typename T::Index row = 0; row < origSize; ++row)
+	  	dest(row) = paddedOrig.segment(row, ksize).cwiseProduct(kernel).sum();
 	if (factor != 1)
 		dest *= factor;
 	return dest;
@@ -1360,8 +1369,8 @@ typename T::PlainObject Convolution2D(const Eigen::MatrixBase<T>& orig, const Ei
 	const Eigen::Index krows = kernel.rows();
 	const Eigen::Index kcols = kernel.cols();
 	
-	ASSERT_(krows % 2 != 0, "Only support odd sized kernels (even rows)");
-	ASSERT_(kcols % 2 != 0, "Only support odd sized kernels (even cols)");
+	ASSERT_(krows % 2 != 0, "Only supports odd sized kernels (even rows)");
+	ASSERT_(kcols % 2 != 0, "Only supports odd sized kernels (even cols)");
 	ASSERT(orig.rows() > krows);
 	ASSERT(orig.cols() > kcols);
 	
@@ -2077,6 +2086,8 @@ void GapFilling(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x, const Eigen::Matri
 Vector<Pointf> FFT(const Eigen::VectorXd &data, double tSample, bool frequency, int type = FFT_TYPE::T_FFT, 
 						 int window = FFT_WINDOW::NO_WINDOW, int numOver = 0);
 void FilterFFT(Eigen::VectorXd &data, double T, double fromT, double toT);
+
+bool SavitzkyGolay(const Eigen::VectorXd &y, const Eigen::VectorXd &x, int deg, int size, int der, Eigen::VectorXd &resy, Eigen::VectorXd &resx);
 
 }
 
