@@ -1373,6 +1373,8 @@ typename T::PlainObject Convolution2D(const Eigen::MatrixBase<T>& orig, const Ei
 	ASSERT_(kcols % 2 != 0, "Only supports odd sized kernels (even cols)");
 	ASSERT(orig.rows() > krows);
 	ASSERT(orig.cols() > kcols);
+
+	// TODO Implement padding
 	
 	typename T::PlainObject dest(orig.rows() - 2*(krows/2), orig.cols() - 2*(kcols/2));
 	
@@ -1752,7 +1754,7 @@ void CleanNANDupXSort(const Range1 &x, const Range1 &y, Range2 &rrx, Range2 &rry
 	int n = int(rx.size());
 	if (n == 0)
 		return;
-	Vector<int> indices = GetSortOrderX(x);
+	Vector<int> indices = GetSortOrderX(rx);
 	//Vector<int> indices(n);
 	//for (int i = 0; i < indices.size(); ++i)
 	//	indices[i] = i;
