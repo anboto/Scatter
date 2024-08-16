@@ -1690,7 +1690,7 @@ void CleanNAN(const Range1 &x, const Range1 &y, Range2 &retx, Range2 &rety) {
 	int n = 0;
 	for (int i = 0; i < num; ++i) {		
 		if (IsNum(x[i]) && IsNum(y[i])) {
-			retx[n]   = x[i];
+			retx[n] = x[i];
 			rety[n] = y[i];
 			n++;
 		}

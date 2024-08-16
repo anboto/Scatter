@@ -1582,7 +1582,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 						minExp = min(minExp, exp);
 					}
 				}
-				double div = Pow10Int<double>(minExp);
+				double div = minExp < std::numeric_limits<int>::max() ? Pow10Int<double>(minExp) : 1;
 				for(int i = 0; i < gY.size(); ++i) 
 					gY[i] /= div;
 			}
@@ -1593,7 +1593,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 						minExp2 = min(minExp2, exp);
 					}
 				}	
-				double div2 = Pow10Int<double>(minExp2);
+				double div2 = minExp2 < std::numeric_limits<int>::max() ? Pow10Int<double>(minExp2) : 1;
 				for(int i = 0; i < gY2.size(); ++i) 
 					gY2[i] /= div2;
 			}
