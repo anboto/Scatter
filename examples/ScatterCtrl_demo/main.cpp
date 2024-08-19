@@ -32,6 +32,7 @@ void RegisterExample(const char *name, ScatterDemo* (*ctrl)(), String fileName)
 
 bool CompareExamples(Example &a, Example &b) {return a.index < b.index;}
 
+
 GUI_APP_MAIN
 {
 	Sort(Examples(), CompareExamples);
