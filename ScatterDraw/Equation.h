@@ -170,7 +170,7 @@ public:
 	double f(double x)				{return coeff[0] + coeff[1]*sin(coeff[2]*x + coeff[3]);}
 	virtual String GetName() 		{return t_("Sine");}
 	virtual String GetEquation(int _numDigits = 3) {
-		String ret = Format("%s + %s*sin(%s*t + %s)", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits)
+		String ret = Format("%s + %s*sin(%s*x + %s)", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits)
 													, FormatCoeff(2, _numDigits), FormatCoeff(3, _numDigits));
 		ret.Replace("+ -", "- ");
 		return ret;
@@ -204,7 +204,7 @@ public:
 	virtual String GetEquation(int _numDigits = 3) {
 		String stheta = IsNull(_numDigits) ? String("ζ") : FormatF(GetDampingRatio(), _numDigits);
 
-		String ret = Format("%s + %s*e^(-%s*(t + %s))*cos(%s*(t + %s)) (ζ: %s)", FormatCoeff(0, _numDigits), 
+		String ret = Format("%s + %s*e^(-%s*(x + %s))*cos(%s*(x + %s)) (ζ: %s)", FormatCoeff(0, _numDigits), 
 			FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), FormatCoeff(4, _numDigits), FormatCoeff(3, _numDigits), 
 			FormatCoeff(4, _numDigits),
 			stheta);
@@ -220,6 +220,8 @@ public:
 			coeff[3] = frequency;
 			coeff[4] = -(firstZero + 2*M_PI/frequency/4);
 		}
+		double dampingRatio = 0.1;		// Hypothesis
+		coeff[2] = dampingRatio*frequency/sqrt(1 - sqr(dampingRatio));
 	}
 	double GetPeriod() 			{return 2*M_PI/abs(coeff[3]);}
 	double GetDampingRatio()	{return coeff[2]/sqrt(sqr(coeff[2]) + sqr(coeff[3]));}
@@ -250,7 +252,7 @@ public:
 	}
 	virtual String GetName() 		{return t_("Sin_DampedSinusoidal");}
 	virtual String GetEquation(int _numDigits = 3) {
-		String ret = Format("%s + %s*cos(%s*t + %s) + %s*e^(-%s*t)*cos(%s*t + %s)", 
+		String ret = Format("%s + %s*cos(%s*x + %s) + %s*e^(-%s*x)*cos(%s*x + %s)", 
 			FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), 
 			FormatCoeff(3, _numDigits), FormatCoeff(4, _numDigits), FormatCoeff(5, _numDigits),
 			FormatCoeff(6, _numDigits), FormatCoeff(7, _numDigits));
@@ -387,6 +389,8 @@ public:
 		if (x < 0)
 			return 0;
 		double k =  coeff[0];
+		if (k < 0)
+			return 0;
 		double lambda = coeff[1];
 		if (lambda == 0)
 			return 0; 
@@ -429,6 +433,8 @@ public:
 		if (x < 0)
 			return 0;
 		double k =  coeff[0];
+		if (k < 0)
+			return 0;
 		double lambda = coeff[1];
 		if (lambda == 0)
 			return 0; 
@@ -514,6 +520,8 @@ public:
 		ASSERT(k > 0);	ASSERT(lambda > 0);	SetCoeff(k, lambda, factor, x0);}
 	double f(double x) {
 		double k =  coeff[0];
+		if (k < 0)
+			return 0;
 		double lambda = coeff[1]; 
 		double factor = coeff[2];
 		if (lambda == 0)
@@ -569,7 +577,7 @@ public:
 		String c = FormatCoeff(0, nDig);
 		String mean = FormatCoeff(1, nDig);
 		String std = FormatCoeff(2, nDig);
-		String ret = Format("(%s/(%s*sqrt(2*PI)))*e^(-(1/2)*((x-%s)/%s)^2)", c, std, mean, std);
+		String ret = Format("(%s/(%s*sqrt(2*π)))*e^(-(1/2)*((x-%s)/%s)^2)", c, std, mean, std);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -642,7 +650,9 @@ class AsymptoticEquation : public ExplicitEquation {
 public:
 	AsymptoticEquation() 		{SetCoeff(0, 1, 1);}
 	AsymptoticEquation(int deg)	{ASSERT(deg > 2); SetNumCoeff(deg);}
-	double f(double x) 			{
+	double f(double x) {
+		if (x == 0)
+			return Null;		
 		double ret = coeff[0];
 		for (int i = 1; i < numcoeff; ++i)
 			ret += double(coeff[i]/::pow(x, double(i)));
