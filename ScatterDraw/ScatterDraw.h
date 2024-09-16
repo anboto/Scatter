@@ -1421,7 +1421,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	if (psurf && showRainbow)
 		DrawRainbowPalette(w);
 		
-	if (plotW < 0 || plotH < 0)
+	if (plotW < 0 || plotH < 0 || xRange <= 0 || yRange <= 0)
 		return false;
 	
 	w.Offset(Point(fround(plotScaleX*hPlotLeft), fround(plotScaleY*vPlotTop + titleHeight)));
@@ -1501,12 +1501,12 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	else
 		DrawText(w, size.cx - plotScaleX*(2 + hPlotLeft), (plotH - ly2.cx)/2., -900, yLabel2, fontY2, labelsColor);
 
-	drawXReticle  &= (xRange != 0  && xMajorUnit != 0);
-	drawYReticle  &= (yRange != 0  && yMajorUnit != 0);
-	drawY2Reticle &= (yRange2 != 0 && yMajorUnit != 0);
-	drawXReticleNumbers  &= (xRange != 0  && xMajorUnit != 0);
-	drawYReticleNumbers  &= (yRange != 0  && yMajorUnit != 0);
-	drawY2ReticleNumbers &= (yRange2 != 0 && yMajorUnit != 0);
+	drawXReticle  &= (xMajorUnit != 0);
+	drawYReticle  &= (yMajorUnit != 0);
+	drawY2Reticle &= (yMajorUnit != 0);
+	drawXReticleNumbers  &= (xMajorUnit != 0);
+	drawYReticleNumbers  &= (yMajorUnit != 0);
+	drawY2ReticleNumbers &= (yMajorUnit != 0);
 	
 	Upp::Font standard6 = reticleFont;
 	standard6.Height(fround(min(plotScaleX, plotScaleY)*(standard6.GetHeight()+standard6.GetDescent())));
@@ -1662,14 +1662,14 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	
 template <class T>
 void ScatterDraw::Plot(T& w) {
-	if (plotW < 0 || plotH < 0)
+	if (plotW < 0 || plotH < 0 || xRange <= 0 || yRange <= 0)
 		return;
+		
+	double factorX = plotW/xRange;
+	double factorY = plotH/yRange;
 	
 	w.Offset(Point(fround(plotScaleX*hPlotLeft), fround(plotScaleY*vPlotTop + titleHeight)));
 	Clip(w, 0, 0, plotW, plotH);
-	
-	double factorX = plotW/xRange;
-	double factorY = plotH/yRange;
 	
 	double left, top, d = min(plotW, plotH);//, r = d/2.;
 	if (!isPolar) {

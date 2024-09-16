@@ -4,8 +4,6 @@
 #define _ScatterDraw_DataSource_h_
 
 #include <Eigen/Eigen.h>
-//#include <numeric>
-//#include <complex>
 #include <Functions4U/Functions4U.h>
 
 namespace Upp {
