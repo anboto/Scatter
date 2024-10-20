@@ -355,8 +355,8 @@ ScatterDraw &ScatterDraw::ZoomToFit(bool horizontal, bool vertical, double facto
 			
 ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, double factorH, double factorV) {
 	double minx, maxx, miny, miny2, maxy, maxy2;
-	minx = miny = miny2 = -DOUBLE_NULL;
-	maxx = maxy = maxy2 = DOUBLE_NULL;
+	minx = miny = miny2 = std::numeric_limits<double>::max();
+	maxx = maxy = maxy2 = std::numeric_limits<double>::lowest();
 	
 	try {
 		if (horizontal || vertical) {	// Both at the same time to avoid a Null point to set the limits
@@ -380,17 +380,17 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 					}
 				}
 			}
-			if (minx != -DOUBLE_NULL && maxx != DOUBLE_NULL) {
+			if (minx != std::numeric_limits<double>::max() && maxx != std::numeric_limits<double>::lowest()) {
 				double deltaX = (maxx - minx)*factorH;
 				minx -= deltaX;
 				maxx += deltaX;
 			}
-			if (miny != -DOUBLE_NULL && maxy != DOUBLE_NULL) {
+			if (miny != std::numeric_limits<double>::max() && maxy != std::numeric_limits<double>::lowest()) {
 				double deltaY = (maxy - miny)*factorV;
 				miny -= deltaY;
 				maxy += deltaY;		
 			}
-			if (miny2 != -DOUBLE_NULL && maxy2 != DOUBLE_NULL) {
+			if (miny2 != std::numeric_limits<double>::max() && maxy2 != std::numeric_limits<double>::lowest()) {
 				double deltaY2 = (maxy2 - miny2)*factorV;
 				miny2 -= deltaY2;
 				maxy2 += deltaY2;		
@@ -403,7 +403,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 			}
 		}
 		if (horizontal) {
-			if (minx != -DOUBLE_NULL && maxx != DOUBLE_NULL) {
+			if (minx != std::numeric_limits<double>::max() && maxx != std::numeric_limits<double>::lowest()) {
 				if (maxx == minx) {
 					if (maxx == 0) {
 						xRange = 2;
@@ -420,7 +420,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 			}
 		}
 		if (vertical) {
-			if (miny != -DOUBLE_NULL && maxy != DOUBLE_NULL) {
+			if (miny != std::numeric_limits<double>::max() && maxy != std::numeric_limits<double>::lowest()) {
 				if (maxy == miny) 
 					yRange = maxy > 0 ? 2*maxy : 1;
 				else	
@@ -431,7 +431,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				AdjustMajorUnitY();
 				AdjustMinUnitY();
 			}
-			if (miny2 != -DOUBLE_NULL && maxy2 != DOUBLE_NULL) {	
+			if (miny2 != std::numeric_limits<double>::max() && maxy2 != std::numeric_limits<double>::lowest()) {	
 				if (maxy2 == miny2) 
 					yRange2 = maxy2 > 0 ? 2*maxy2 : 1;
 				else	

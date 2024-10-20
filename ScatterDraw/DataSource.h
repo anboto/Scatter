@@ -1636,24 +1636,8 @@ typename Range::value_type CosWindow(Range &data, int numOver) {
 template <typename T>
 bool IsNum(const T* r, int sz) {
 	if (sz == 0)
-		return true;
+		return false;
 	for (int i = 0; i < sz; i++) {
-		if (!IsNum(r[i]))  
-			return false;
-	}
-	return true;
-}
-
-template <typename T>
-bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &r) {
-	return IsNum(r.data(), int(r.size()));
-}
-
-template <class Range>
-bool IsNum(const Range& r) {
-	if (r.size() == 0)
-		return true;
-	for (int i = 0; i < r.size(); i++) {
 		if (!IsNum(r[i]))  
 			return false;
 	}
