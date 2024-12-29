@@ -226,7 +226,7 @@ public:
 	ProcessingTab();
 	virtual ~ProcessingTab() noexcept {};
 	
-	void Init(ScatterCtrl& scatter) {pscatter = &scatter;}
+	void Init(ScatterCtrl& scatter, Array<ProcessingTab> &tabs) {pscatter = &scatter; ptabs = &tabs;}
 	void UpdateField(const String name, int id);
 	void OnFFT();
 	void OnOp();
@@ -237,12 +237,15 @@ public:
 	void OnOperation();
 	void OnSet();
 	void OnUpdateSensitivity();
+	void OnIntegral();
+	void OnSetToAll();
 	void OnFit();
 	void OnHist();
 	void OnPercentile();
 		
 private:
 	ScatterCtrl* pscatter;
+	Array<ProcessingTab> *ptabs;
 	int id;
 	
 	WithProcessingTabFitLeft<StaticRect> tabFitLeft;

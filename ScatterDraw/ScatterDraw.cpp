@@ -1980,10 +1980,13 @@ INITBLOCK {
 	MarkPlot::Register<SquareMarkPlot>("Square");
 	MarkPlot::Register<TriangleMarkPlot>("Triangle");
 	MarkPlot::Register<CrossMarkPlot>("Cross");
-	MarkPlot::Register<XMarkPlot>("X");
+	MarkPlot::Register<XMarkPlot>("X mark");
 	MarkPlot::Register<RhombMarkPlot>("Rhomb");
 	MarkPlot::Register<RangePlot>("Range");
 	MarkPlot::Register<BubblePlot>("Bubble");
+	MarkPlot::Register<InvTriangleMarkPlot>("Inv. Triangle");
+	MarkPlot::Register<AsteriskMarkPlot>("Asterisk");
+	MarkPlot::Register<DiamondMarkPlot>("Diamond");
 	
 	DashStyle::Register("LINE_SOLID", LINE_SOLID);
 	DashStyle::Register("LINE_DOTTED_FINER", LINE_DOTTED_FINER);

@@ -2,6 +2,7 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterCtrl.h"
 #include <Functions4U/Functions4U_Gui.h>
+#include <STEM4U/Integral.h>
 
 namespace Upp {
 	
@@ -72,7 +73,7 @@ void ProcessingDlg::Init(ScatterCtrl& scatter)
 		if (scatter.ScatterDraw::IsVisible(i)) {
 			list.list.Add(scatter.GetLegend(i), i);
 			ProcessingTab& tab = tabs.Add();
-			tab.Init(scatter);
+			tab.Init(scatter, tabs);
 			CtrlLayout(tab);
 			right.rect.Add(tab.SizePos());
 		}
@@ -171,6 +172,10 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.butAutoSensSector.WhenAction = [=] {OnAutoSensSector();}; 
 	tabFitRight.width.WhenLostFocus = [=] {OnUpdateSensitivity();};
 	tabFitRight.width.WhenAction = [=] {OnUpdateSensitivity();};
+	tabFitRight.fromX.WhenAction = [=] {OnIntegral();};
+	tabFitRight.toX.WhenAction = [=] {OnIntegral();};
+	
+	tabFitRight.butSetToAll.WhenAction = [=] {OnSetToAll();};
 	
 	tabFitRight.opDerivative.Tip(t_("Numerical derivative including derivative order and accuracy (related to window size)"));
 	tabFitRight.derOrder <<= 1;
@@ -192,6 +197,13 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.numDecimals <<= 3;
 	tabFitRight.numDecimals.WhenAction = [=] {UpdateEquations();};
 	tabFitRight.showEquation.WhenAction = [=] {OnShowEquation();};
+	
+	tabFitRight.dropIntegral.Add(TRAPEZOIDAL, t_("Trapezoidal")).
+							 Add(SIMPSON_1_3, t_("Simpson 1/3")).
+							 Add(SIMPSON_3_8, t_("Simpson 3/8")).
+							 Add(SPLINE, t_("Spline"));
+	tabFitRight.dropIntegral <<= SIMPSON_3_8;
+	tabFitRight.dropIntegral.WhenAction = [=]{OnIntegral();};
 	
 	tabFitRight.array.MultiSelect().SetLineCy(EditField::GetStdHeight());
 	tabFitRight.array.WhenBar = [&](Bar &menu) {ArrayCtrlWhenBar(menu, tabFitRight.array);};
@@ -539,6 +551,12 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		tabFitRight.width <<= pscatter->GetXRange()/15.;
 		tabFitRight.width.SetInc(pscatter->GetXRange()/15./2.);
 		
+		if (IsNull(tabFitRight.fromX))
+			tabFitRight.fromX = data.x(int64(0));
+		if (IsNull(tabFitRight.toX))
+			tabFitRight.toX = data.x(data.GetCount()-1);
+		OnIntegral();
+		
 		tabFitLeft.scatter.AddSeries(average).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(linear).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(cuadratic).NoMark().Stroke(1.5);
@@ -583,6 +601,90 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 	GetVisibleData();
 	
 	Show();	
+}
+
+void ProcessingTab::OnSetToAll() {
+	Array<ProcessingTab> &tabs = *ptabs;
+	for (int i = 0; i < tabs.size(); ++i) {
+		if (&(tabs[i]) != this) {
+			tabs[i].tabFitRight.dropIntegral = ~tabFitRight.dropIntegral;
+			tabs[i].tabFitRight.fromX = ~tabFitRight.fromX;
+			tabs[i].tabFitRight.toX = ~tabFitRight.toX;
+			tabs[i].tabFitRight.opSeries = ~tabFitRight.opSeries;
+			tabs[i].tabFitRight.opAverage = ~tabFitRight.opAverage;
+			tabs[i].tabFitRight.opLinear = ~tabFitRight.opLinear;
+			tabs[i].tabFitRight.opCuadratic = ~tabFitRight;
+			tabs[i].tabFitRight.opCubic = ~tabFitRight.opCubic;
+			tabs[i].tabFitRight.opSinus = ~tabFitRight.opSinus;
+			tabs[i].tabFitRight.opSinusTend = ~tabFitRight.opSinusTend;
+			tabs[i].tabFitRight.opFFT = ~tabFitRight.opFFT;
+			tabs[i].tabFitRight.fromT = ~tabFitRight.fromT;
+			tabs[i].tabFitRight.toT = ~tabFitRight.toT;
+			tabs[i].tabFitRight.opSG = ~tabFitRight.opSG;
+			tabs[i].tabFitRight.sgOrder <<= ~tabFitRight.sgOrder;
+			tabs[i].tabFitRight.sgDeg <<= ~tabFitRight.sgDeg;
+			tabs[i].tabFitRight.sgSize <<= ~tabFitRight.sgSize;
+			tabs[i].tabFitRight.opSpline = ~tabFitRight.opSpline;
+			tabs[i].tabFitRight.numDecimals <<= ~tabFitRight.numDecimals;
+			tabs[i].tabFitRight.showEquation = ~tabFitRight.showEquation;
+			tabs[i].tabFitRight.opMax = ~tabFitRight.opMax;
+			tabs[i].tabFitRight.opMin = ~tabFitRight.opMin;
+			tabs[i].tabFitRight.opMovAvg = ~tabFitRight.opMovAvg;
+			tabs[i].tabFitRight.opCumAvg = ~tabFitRight.opCumAvg;
+			tabs[i].tabFitRight.opSecAvg = ~tabFitRight.opSecAvg;
+			tabs[i].tabFitRight.opDerivative = ~tabFitRight.opDerivative;
+			tabs[i].tabFitRight.derAccuracy <<= ~tabFitRight.derAccuracy;
+			tabs[i].tabFitRight.derOrder <<= ~tabFitRight.derOrder;
+		}
+	}
+}
+
+void ProcessingTab::OnIntegral() {
+	double fromX = tabFitRight.fromX;
+	double toX = tabFitRight.toX;
+	
+	tabFitLeft.comments.SetText("");
+	
+	double integral, avg;
+	if (IsNull(fromX) || IsNull(toX)) 
+		;
+	else if (fromX == toX)
+		integral = 0;
+	else if (fromX > toX) {
+		integral = Null;
+		avg = Null;
+		tabFitLeft.comments.SetText(t_("'From x' has to be lower than 'To x'"));
+	} else {
+		DataSource &data = tabFitLeft.scatter.GetDataSource(0);
+		Vector<double> x, y;
+		data.CopyXY(x, y);
+		int sz = x.size();
+		int idFrom = 0, idTo = sz-1;
+		for (int i = 0; i < sz; ++i) {
+			if (x[i] <= fromX)
+				idFrom = i;
+			if (x[i] >= toX && idTo == sz-1)	
+				idTo = i;
+		}
+		if (idTo != sz-1) {
+			y[idTo] = y[idTo-1] + (toX - x[idTo-1])*(y[idTo]-y[idTo-1])/(x[idTo]-x[idTo-1]);			// Linear interpolation
+			x[idTo] = toX;
+			x.Remove(idTo+1, sz-idTo-1);
+			y.Remove(idTo+1, sz-idTo-1);
+		} else if (toX > x[idTo])
+			tabFitLeft.comments.SetText(t_("'To x' is higher than the maximum x"));
+		if (idFrom != 0) {
+			y[idFrom] = y[idFrom] + (fromX - x[idFrom])*(y[idFrom+1]-y[idFrom])/(x[idFrom+1]-x[idFrom]);// Linear interpolation
+			x[idFrom] = fromX;
+			x.Remove(0, idFrom);
+			y.Remove(0, idFrom);
+		} else if (fromX < x[0])
+			tabFitLeft.comments.SetText(t_("'From x' is lower than the minimum x"));
+		integral = Integral(x, y, (IntegralType)(int)(~tabFitRight.dropIntegral));
+		avg = integral /(toX - fromX);
+	}	
+	tabFitRight.integral <<= FormatF(integral, tabFitRight.numDecimals);
+	tabFitRight.integralAvg <<= FormatF(avg, tabFitRight.numDecimals);
 }
 
 void ProcessingTab::OnUpdateSensitivity() 

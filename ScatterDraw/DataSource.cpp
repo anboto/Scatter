@@ -619,13 +619,15 @@ void DataSource::GetSpectralMoments(Getdatafun getdataY, Getdatafun getdataX, bo
 	m2  /= 2;
 }
 			
-bool DataSource::SameX(DataSource &data) {
+bool DataSource::SameX(DataSource &data, bool testAll) {
 	int64 num = GetCount();
 	if (num == 0)
 		return false;
-	if (data.GetCount() != num)
+	if (testAll && data.GetCount() != num)
 		return false;
 	for (int64 i = 0; i < num; ++i) {
+		if (!testAll && i == data.GetCount())
+			return true;
 		if (data.x(i) != x(i))
 			return false;
 	}

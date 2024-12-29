@@ -45,11 +45,11 @@ void DataDlg::Init(ScatterCtrl& scatter) {
 		if (scatter.IsDeletedDataSource(0))
 			return;
 		bool addedAll = true;
-		DataSource &serie0 = scatter.GetDataSource(0);
 		for (int c = 1; c < scatter.GetCount(); c++) {
 			if (!IsNull(scatter.GetCount(c) && !scatter.IsDeletedDataSource(c))) {
-				DataSource &serie = scatter.GetDataSource(c);
-				if (!serie0.SameX(serie)) {
+				DataSource &serie0 = scatter.GetDataSource(c-1);
+				DataSource &serie  = scatter.GetDataSource(c);
+				if (!serie0.SameX(serie, false)) {
 					addedAll = false;
 					break;
 				}

@@ -232,7 +232,7 @@ public:
 						double &m_1, double &m0, double &m1, double &m2);
 	void GetSpectralMoments(Getdatafun getdataY, Getdatafun getdataX, bool frequency, 
 						double &m_1, double &m0, double &m1, double &m2);
-	bool SameX(DataSource &data);
+	bool SameX(DataSource &data, bool testAll = true);
 	Vector<double> SortData(Getdatafun getdata);
 	Vector<double> Percentile(Getdatafun getdata, double rate);
 	double PercentileVal(Getdatafun getdata, double rate, double mn = Null, double mx = Null);
