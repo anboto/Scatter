@@ -187,7 +187,7 @@ END_LAYOUT
 
 LAYOUT(ProcessingTab, 504, 320)
 	ITEM(Upp::TabCtrl, tab, HSizePosZ(0, 0).VSizePosZ(0, 0))
-	ITEM(Upp::Label, name, SetFrame(Upp::ThinInsetFrame()).RightPosZ(0, 232).TopPosZ(0, 19))
+	ITEM(Upp::Label, name, SetFrame(ThinInsetFrame()).RightPosZ(0, 232).TopPosZ(0, 19))
 END_LAYOUT
 
 LAYOUT(ProcessingTabFitLeft, 356, 324)
@@ -260,7 +260,7 @@ LAYOUT(ProcessingTabFitRight, 376, 568)
 	ITEM(Upp::EditString, integralAvg, SetEditable(false).LeftPosZ(292, 52).TopPosZ(392, 19))
 	ITEM(Upp::Label, dv___62, SetLabel(t_("Avg:")).LeftPosZ(268, 24).TopPosZ(392, 19))
 	ITEM(Upp::DropList, dropIntegral, LeftPosZ(76, 84).TopPosZ(368, 19))
-	ITEM(Upp::Button, butSetToAll, SetLabel(t_("Set to all")).LeftPosZ(316, 56).TopPosZ(344, 19))
+	ITEM(Upp::Button, butSetToAll, SetLabel(t_("Set to all")).RightPosZ(4, 56).TopPosZ(344, 19))
 END_LAYOUT
 
 LAYOUT(ProcessingTabOpLeft, 428, 328)
