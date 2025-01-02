@@ -19,6 +19,8 @@ CONSOLE_APP_MAIN
 	String fileName = GetExeDirFile("Scatter");
 	
 	ScatterDraw scatter;
+	scatter.cbModifFormatY = [](String& ret, int, double num) {ret = Format("%.1f", num);};
+	
 	Vector<Pointf> s1 = {{10,14}, {20,65}, {30,29}, {40,32}, {50,12}};
 	Vector<double> x = {20, 30, 40, 50, 60, 70};
 	Vector<double> y = {34, 85, 49, 72, 56, 34};
