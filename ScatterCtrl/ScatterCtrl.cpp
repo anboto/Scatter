@@ -72,8 +72,10 @@ String FixPathName(const String &path) {
 #endif
 
 	Vector<Vector<String>> replace = {{":", "_"}, {"..", "_"}, {".", "_"}, {"º", t_("deg")}, {"€", t_("Eur")}};
-	for (const Vector<String> &each : replace) 
+	for (const Vector<String> &each : replace) {
 		ret.Replace(each[0], each[1]);
+		ret = ToAscii(ret);
+	}
 	
 	return RemoveAccents(RemovePunctuation(RemoveGreek(ret)));
 }
