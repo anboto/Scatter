@@ -9,6 +9,13 @@ esES("Sin marca")
 euES("Marka gabe")
 frFR("Sans marque")
 
+T_("Impossible to save explicit data (data from a equation, not from a data "
+     "table)")
+caES("")
+esES("")
+euES("")
+frFR("")
+
 
 // Equation.cpp
 
