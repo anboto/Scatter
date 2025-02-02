@@ -210,19 +210,19 @@ class AsteriskMarkPlot : public MarkPlot {
 private:
 	template <class T>
 	void DoPaint(T& w, const double& scale, const Point& cp, const double& size, const Color& markColor) const {
-		int side2l = int((size * scale)/2.);
-		int side2r = int(size*scale - side2l);
+		double side2l = (size * scale)/2.;
+		double side2r = size*scale - side2l;
 		double angle = 2 * M_PI / 10;  // 36 degrees in radians
 		double x1 = sin(2 * angle);
 		double y1 = cos(2 * angle);
 		double x2 = sin(4 * angle);
 		double y2 = -cos(4 * angle);
 		
-		w.DrawLine(cp.x, cp.y, cp.x,               cp.y - side2l,      fround(scale), markColor);
-		w.DrawLine(cp.x, cp.y, cp.x + side2r * x1, cp.y - side2r * y1, fround(scale), markColor);
-		w.DrawLine(cp.x, cp.y, cp.x + side2r * x2, cp.y + side2r * y2, fround(scale), markColor);
-		w.DrawLine(cp.x, cp.y, cp.x - side2l * x2, cp.y + side2l * y2, fround(scale), markColor);
-		w.DrawLine(cp.x, cp.y, cp.x - side2l * x1, cp.y - side2l * y1, fround(scale), markColor);
+		w.DrawLine(cp.x, cp.y, cp.x,               		   fround(cp.y - side2l),      fround(scale), markColor);
+		w.DrawLine(cp.x, cp.y, fround(cp.x + side2r * x1), fround(cp.y - side2r * y1), fround(scale), markColor);
+		w.DrawLine(cp.x, cp.y, fround(cp.x + side2r * x2), fround(cp.y + side2r * y2), fround(scale), markColor);
+		w.DrawLine(cp.x, cp.y, fround(cp.x - side2l * x2), fround(cp.y + side2l * y2), fround(scale), markColor);
+		w.DrawLine(cp.x, cp.y, fround(cp.x - side2l * x1), fround(cp.y - side2l * y1), fround(scale), markColor);
 	} 
 
 public:

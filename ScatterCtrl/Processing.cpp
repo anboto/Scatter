@@ -647,12 +647,11 @@ void ProcessingTab::OnIntegral() {
 	
 	double integral, avg;
 	if (IsNull(fromX) || IsNull(toX)) 
-		;
+		integral = avg = Null;
 	else if (fromX == toX)
-		integral = 0;
+		integral = avg = 0;
 	else if (fromX > toX) {
-		integral = Null;
-		avg = Null;
+		integral = avg = Null;
 		tabFitLeft.comments.SetText(t_("'From x' has to be lower than 'To x'"));
 	} else {
 		DataSource &data = tabFitLeft.scatter.GetDataSource(0);
