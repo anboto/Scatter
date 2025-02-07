@@ -1026,9 +1026,9 @@ T LinearInterpolate(const T x, const Point_<T> *vec, int len) {
 	return vec[len-1].y;
 }
 
-template <class Range>
-typename Range::value_type LinearInterpolate(const typename Range::value_type x, const Range &vec) {
-	return LinearInterpolate(x, (const typename Range::value_type *)vec, vec.size());
+template <typename T, class Range>
+T LinearInterpolate(const T x, const Range &vec) {
+	return LinearInterpolate(x, vec.begin(), vec.size());
 }
 
 template <class T>
