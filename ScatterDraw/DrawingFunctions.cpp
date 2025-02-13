@@ -64,9 +64,7 @@ void ScatterDraw::ParseTextMultiline(const String &text, Upp::Font &fnt, UVector
 			t = text.Mid(pos, npos-pos);
 		else
 			t = text.Mid(pos);
-		Size &s = sizes.Add();
-		s.cx = GetTextSize(t, fnt).cx;
-		s.cy = GetTextSize(t, fnt).cy;
+		sizes << GetTextSize(t, fnt);
 	}
 }
 

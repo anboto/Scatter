@@ -49,6 +49,7 @@ void ScatterDraw::DrawLegend(Draw& w) const {
 		}
 	}
 	legendWidth += lineLen + 3*xWidth;
+	legendWidth = int(1.05*legendWidth);
 	
 	int rowIncSign;
 	int plotWLeg, plotHLeg;
@@ -93,7 +94,7 @@ void ScatterDraw::DrawLegend(Draw& w) const {
 	double right = plotWLeg + (hPlotLeft - hPlotRight)*plotScaleX - legendPos.x*plotScaleX - rectWidth;
 	double top = plotTop + legendPos.y*plotScaleY;
 	double bottom = size.cy - vPlotBottom*plotScaleY - legendPos.y*plotScaleY - rectHeight;
-	//plotHLeg - legendPos.y*plotScaleY - rectHeight;
+	
 	Rectf rect;
 	switch(legendAnchor) {
 	case TOP:			rect.Set(plotScaleX*hPlotLeft, 0, rectWidth, rectHeight);		break;
