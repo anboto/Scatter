@@ -143,7 +143,7 @@ private:
 	int dashCount;
 	
 	void Change();
-	void ChangeMark();
+	void ChangeMark(int index);
 	void UpdateFields();
 	void OnMoveUp(); 
 	void OnMoveDown();
@@ -274,14 +274,15 @@ private:
 	UserEquation *userEquation;
 	//GridCtrlSource ds;
 	
-	bool avgFirst, linearFirst, cuadraticFirst, cubicFirst, sinusFirst, sinusTendFirst, splineFirst;
-	double r2Linear, r2Cuadratic, r2Cubic, r2Sinus, r2SinusTend;
+	bool avgFirst, slopeFirst, linearFirst, quadraticFirst, cubicFirst, sinusFirst, sinusTendFirst, splineFirst;
+	double r2Slope, r2Linear, r2Quadratic, r2Cubic, r2Sinus, r2SinusTend;
 	bool tabFreqFirst, tabOpFirst, tabBestFitFirst, tabHistFirst;
 	
 	Vector<Pointf> fft;
 	AvgEquation average;
+	SlopeEquation slope;
 	LinearEquation linear;
-	PolynomialEquation2 cuadratic;
+	QuadraticEquation quadratic;
 	PolynomialEquation3 cubic;
 	SinEquation sinus, sinusTend;
 	SplineEquation spline;

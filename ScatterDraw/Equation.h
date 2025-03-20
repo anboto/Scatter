@@ -101,11 +101,23 @@ public:
 	double f(double ) 					{return coeff[0];}
 	virtual String GetName() 			{return t_("Average");}
 	virtual String GetEquation(int _numDigits = 3) {	
-		String ret = Format("%s", FormatCoeff(0, _numDigits));
-		return ret;
+		return Format("%s", FormatCoeff(0, _numDigits));
 	}
 	void SetDegree(int )				{NEVER();}
 	virtual void GuessCoeff(DataSource &series)	{coeff[0] = series.AvgY();}
+};
+
+class SlopeEquation : public ExplicitEquation {
+public:
+	SlopeEquation() 						{SetCoeff(0);}
+	SlopeEquation(double c0)				{SetCoeff(c0);}
+	double f(double x) 					{return x*coeff[0];}
+	virtual String GetName() 			{return t_("Slope");}
+	virtual String GetEquation(int _numDigits = 3) {	
+		return Format("%s*x", FormatCoeff(0, _numDigits));
+	}
+	void SetDegree(int )				{NEVER();}
+	virtual void GuessCoeff(DataSource &series)	{coeff[0] = series.Slope();}
 };
 
 class LinearEquation : public ExplicitEquation {
@@ -142,9 +154,11 @@ public:
 	}
 };	
 
-class PolynomialEquation2 : public PolynomialEquation {
+class QuadraticEquation : public PolynomialEquation {
 public:
-	PolynomialEquation2() {SetDegree(2);}
+	QuadraticEquation() {SetDegree(2);}
+	virtual String GetName() 			       	{return t_("Quadratic");}
+	virtual String GetFullName() 		       	{return t_("Quadratic");}
 };
 
 class PolynomialEquation3 : public PolynomialEquation {

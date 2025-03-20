@@ -866,6 +866,9 @@ double Spline::Integral(double from, double to) const {
 
 INITBLOCK {
 	ExplicitEquation::Register<LinearEquation>("LinearEquation");
+	ExplicitEquation::Register<QuadraticEquation>("Quadratic");
+	ExplicitEquation::Register<PolynomialEquation3>("PolynomialEquation3");
+	ExplicitEquation::Register<PolynomialEquation4>("PolynomialEquation4");
 	ExplicitEquation::Register<PolynomialEquation5>("PolynomialEquation5");
 	ExplicitEquation::Register<SinEquation>("SinEquation");
 	ExplicitEquation::Register<DampedSinEquation>("DampedSinusoidal");

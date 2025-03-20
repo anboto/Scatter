@@ -493,11 +493,7 @@ void SeriesTab::Init0() {
 	right.name.SetFocus();
 }
 
-void SeriesTab::ChangeMark() {
-	int index = left.list.GetCursor();
-	if (index < 0)
-		return;
-	
+void SeriesTab::ChangeMark(int index) {
 	ScatterCtrl &scatter = *pscatter;
 	
 	int id = MarkPlot::TypeIndex(~right.markstyle);
@@ -539,13 +535,13 @@ void SeriesTab::Change() {
 	scatter.SetMarkColor(index, Upp::Color(~right.markcolor));
 	scatter.SetMarkWidth(index, ~right.markwidth);
 	scatter.ShowSeriesLegend(index, ~right.showLegend);
-	ChangeMark();
+	ChangeMark(index);
 	
 	scatter.Units(index, ~right.unitsY, ~right.unitsX);
                          
 	scatter.SetDataPrimaryY(index, ~right.primary);
       
-	left.list.Set(index, ~right.name);
+	left.list.Set(index, 0, ~right.name);
 	scatter.Legend(index, ~right.name);
                    
 	scatter.SetModify();
@@ -579,7 +575,7 @@ void SeriesTab::UpdateFields() {
 	right.markstyle <<= scatter.GetMarkStyleName(index);
 	right.markcolor <<= scatter.GetMarkColor(index);
 	right.markwidth <<= scatter.GetMarkWidth(index);
-	ChangeMark();
+	ChangeMark(index);
 	
 	right.showLegend <<= scatter.GetShowSeriesLegend(index);
 	

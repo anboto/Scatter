@@ -1935,7 +1935,7 @@ void ScatterDraw::InitPlot() {
 			int count = 0;
 			for(int i = 0; xMinUnit + i*xMajorUnit <= xRange && count < 100; i++, count++) // 100 max just in case
 				gridX << xMinUnit + i*xMajorUnit;
-			ASSERT(count < 100);
+			ASSERT(count <= 100);
 		}
 	}
 

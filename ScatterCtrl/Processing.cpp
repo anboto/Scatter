@@ -148,8 +148,9 @@ ProcessingTab::ProcessingTab()
 	tabFitRight.opSeries = true;
 	tabFitRight.opSeries.WhenAction = [=] {OnOp();};
 	tabFitRight.opAverage.WhenAction = [=] {OnOp();};
+	tabFitRight.opSlope.WhenAction = [=] {OnOp();};
 	tabFitRight.opLinear.WhenAction = [=] {OnOp();};
-	tabFitRight.opCuadratic.WhenAction = [=] {OnOp();};
+	tabFitRight.opQuadratic.WhenAction = [=] {OnOp();};
 	tabFitRight.opCubic.WhenAction = [=] {OnOp();};
 	tabFitRight.opSinus.WhenAction = [=] {OnOp();};
 	tabFitRight.opSinusTend.WhenAction = [=] {OnOp();};
@@ -258,7 +259,7 @@ ProcessingTab::ProcessingTab()
 	tabHistRight.opNormalize.WhenAction();
 	
 	tabFreqFirst = tabOpFirst = tabBestFitFirst = tabHistFirst = true;
-	avgFirst = linearFirst = cuadraticFirst = cubicFirst = sinusFirst = sinusTendFirst = splineFirst = true;
+	avgFirst = slopeFirst = linearFirst = quadraticFirst = cubicFirst = sinusFirst = sinusTendFirst = splineFirst = true;
 
 	exclamationOpened = false;
 	
@@ -327,6 +328,13 @@ void ProcessingTab::OnOp()
 		average.Fit(data, r2);
 		avgFirst = false;
 	}
+	if (~tabFitRight.opSlope && slopeFirst) {	
+		if (slope.Fit(data, r2Slope) < 0) {
+			tabFitRight.opSlope <<= false;
+			tabFitRight.opSlope.Enable(false);
+		} else
+			slopeFirst = false;
+	}
 	if (~tabFitRight.opLinear && linearFirst) {	
 		if (linear.Fit(data, r2Linear) < 0) {
 			tabFitRight.opLinear <<= false;
@@ -334,13 +342,13 @@ void ProcessingTab::OnOp()
 		} else
 			linearFirst = false;
 	}
-	if (~tabFitRight.opCuadratic && cuadraticFirst) {		
-		cuadratic.GuessCoeff(data);
-		if (cuadratic.Fit(data, r2Cuadratic) < 0) {
-			tabFitRight.opCuadratic <<= false;
-			tabFitRight.opCuadratic.Enable(false);
+	if (~tabFitRight.opQuadratic && quadraticFirst) {		
+		quadratic.GuessCoeff(data);
+		if (quadratic.Fit(data, r2Quadratic) < 0) {
+			tabFitRight.opQuadratic <<= false;
+			tabFitRight.opQuadratic.Enable(false);
 		} else
-			cuadraticFirst = false;
+			quadraticFirst = false;
 	}
 	if (~tabFitRight.opCubic && cubicFirst) {		
 		cubic.GuessCoeff(data);
@@ -395,8 +403,9 @@ void ProcessingTab::OnOp()
 	int iid = 0;
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSeries);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opAverage);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSlope);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opLinear);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opCuadratic);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opQuadratic);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opCubic);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSinus);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSinusTend);
@@ -404,11 +413,11 @@ void ProcessingTab::OnOp()
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opDerivative);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSG);
 	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opFFT);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMax);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMin);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opMovAvg);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opSecAvg);
-	tabFitLeft.scatter.ScatterDraw::Show(iid++,tabFitRight.opCumAvg);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opMax);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opMin);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opMovAvg);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opSecAvg);
+	tabFitLeft.scatter.ScatterDraw::Show(iid++, tabFitRight.opCumAvg);
 	
 	UpdateEquations();
 	OnShowEquation();
@@ -558,8 +567,9 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		OnIntegral();
 		
 		tabFitLeft.scatter.AddSeries(average).NoMark().Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(slope).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(linear).NoMark().Stroke(1.5);
-		tabFitLeft.scatter.AddSeries(cuadratic).NoMark().Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(quadratic).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(cubic).NoMark().Stroke(1.5);		
 		tabFitLeft.scatter.AddSeries(sinus).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(sinusTend).NoMark().Stroke(1.5);
@@ -579,8 +589,9 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 	} else {
 		tabFitRight.opSeries.Enable(false);
 		tabFitRight.opAverage.Enable(false);
+		tabFitRight.opSlope.Enable(false);
 		tabFitRight.opLinear.Enable(false);
-		tabFitRight.opCuadratic.Enable(false);
+		tabFitRight.opQuadratic.Enable(false);
 		tabFitRight.opCubic.Enable(false);
 		tabFitRight.opSinus.Enable(false);
 		tabFitRight.opSinusTend.Enable(false);
@@ -612,8 +623,9 @@ void ProcessingTab::OnSetToAll() {
 			tabs[i].tabFitRight.toX = ~tabFitRight.toX;
 			tabs[i].tabFitRight.opSeries = ~tabFitRight.opSeries;
 			tabs[i].tabFitRight.opAverage = ~tabFitRight.opAverage;
+			tabs[i].tabFitRight.opSlope = ~tabFitRight.opSlope;
 			tabs[i].tabFitRight.opLinear = ~tabFitRight.opLinear;
-			tabs[i].tabFitRight.opCuadratic = ~tabFitRight;
+			tabs[i].tabFitRight.opQuadratic = ~tabFitRight;
 			tabs[i].tabFitRight.opCubic = ~tabFitRight.opCubic;
 			tabs[i].tabFitRight.opSinus = ~tabFitRight.opSinus;
 			tabs[i].tabFitRight.opSinusTend = ~tabFitRight.opSinusTend;
@@ -892,10 +904,12 @@ void ProcessingTab::OnSet()
 void ProcessingTab::UpdateEquations()
 {
 	tabFitRight.eqAverage = tabFitRight.opAverage ? average.GetEquation(tabFitRight.numDecimals) : "";
+	tabFitRight.eqSlope = tabFitRight.opSlope ? slope.GetEquation(tabFitRight.numDecimals) : "";
+	tabFitRight.r2Slope = tabFitRight.opSlope ? r2Slope : Null;
 	tabFitRight.eqLinear = tabFitRight.opLinear ? linear.GetEquation(tabFitRight.numDecimals) : "";
 	tabFitRight.r2Linear = tabFitRight.opLinear ? r2Linear : Null;
-	tabFitRight.eqCuadratic = tabFitRight.opCuadratic ? cuadratic.GetEquation(tabFitRight.numDecimals) : "";
-	tabFitRight.r2Cuadratic = tabFitRight.opCuadratic ? r2Cuadratic : Null;
+	tabFitRight.eqQuadratic = tabFitRight.opQuadratic ? quadratic.GetEquation(tabFitRight.numDecimals) : "";
+	tabFitRight.r2Quadratic = tabFitRight.opQuadratic ? r2Quadratic : Null;
 	tabFitRight.eqCubic = tabFitRight.opCubic ? cubic.GetEquation(tabFitRight.numDecimals) : "";
 	tabFitRight.r2Cubic = tabFitRight.opCubic ? r2Cubic : Null;
 	tabFitRight.eqSinus = tabFitRight.opSinus ? sinus.GetEquation(tabFitRight.numDecimals) : "";
@@ -911,9 +925,11 @@ void ProcessingTab::OnShowEquation()
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
 						(show && tabFitRight.opAverage ? average.GetEquation(tabFitRight.numDecimals) : String(t_("Average"))));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
+						(show && tabFitRight.opSlope ? slope.GetEquation(tabFitRight.numDecimals) : String(t_("Slope"))));
+	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
 						(show && tabFitRight.opLinear ? linear.GetEquation(tabFitRight.numDecimals) : String(t_("Linear"))));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
-						(show && tabFitRight.opCuadratic ? cuadratic.GetEquation(tabFitRight.numDecimals) : String(t_("Cuadratic"))));
+						(show && tabFitRight.opQuadratic ? quadratic.GetEquation(tabFitRight.numDecimals) : String(t_("Quadratic"))));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
 						(show && tabFitRight.opCubic ? cubic.GetEquation(tabFitRight.numDecimals) : String(t_("Cubic"))));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 

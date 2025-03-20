@@ -109,7 +109,7 @@ Pointf DataSource::MaxSubDataImp(Getdatafun getdataY, Getdatafun getdataX, int64
 		return Null;
 	
 	VectorPointf pf(p);
-	PolynomialEquation2 polyFit;
+	QuadraticEquation polyFit;
 	if (ExplicitEquation::NoError != polyFit.Fit(pf))
 		return Null;
 	const Vector<double> &coeff = polyFit.GetCoeff();
@@ -125,6 +125,16 @@ double DataSource::Avg(Getdatafun getdata) {
 	if (d.size() == 0)
 		return Null;
 	return d.mean();
+}
+
+double DataSource::Slope(Getdatafun getdataX, Getdatafun getdataY) {
+	VectorXd x = Copy<VectorXd>(getdataX);
+	if (x.size() == 0)
+		return Null;
+	VectorXd y = Copy<VectorXd>(getdataY);
+	if (y.size() == 0)
+		return Null;
+	return x.dot(y)/x.squaredNorm();
 }
 
 double DataSource::AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w) {

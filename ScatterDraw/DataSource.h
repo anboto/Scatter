@@ -154,7 +154,8 @@ public:
 	double AvgY()  					{return Avg(&DataSource::y);}		
 	double AvgX()  					{return Avg(&DataSource::x);}	
 	double AvgYWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::y, w);}		
-	double AvgXWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::x, w);}	
+	double AvgXWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::x, w);}
+	double Slope()					{return	Slope(&DataSource::x, &DataSource::y);}
 	double RMSY()  									{return RMS(&DataSource::y);}			
 	double StdDevY(double avg = Null)  				{return StdDev(&DataSource::y, avg);}
 	double StdDevX(double avg = Null)  				{return StdDev(&DataSource::x, avg);}
@@ -203,6 +204,7 @@ public:
 	double Min(Getdatafun getdata, int64& id);
 	double Max(Getdatafun getdata, int64& id);
 	double Avg(Getdatafun getdata);
+	double Slope(Getdatafun getdataX, Getdatafun getdataY);
 	double AvgWeighted(Getdatafun getdata, const Eigen::VectorXd &w);
 	int64 Closest(Getdatafun getdata, double d);
 	int64 Closest(Getdatafun getdataX, Getdatafun getdataY, double x, double y);
