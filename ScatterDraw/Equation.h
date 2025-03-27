@@ -553,8 +553,9 @@ public:
 		String lambda = FormatCoeff(1, nDig);
 		String sfactor = FormatCoeff(2, nDig);
 		String x0 = FormatCoeff(3, nDig);
-		String ret = Format("%s*(%s/%s)*((x-%s)/%s)^(%s-1)*e^(-(((x-%s)/%s)^%s))", sfactor, k, lambda, x0, lambda, x0, k, lambda, k);
-		ret.Replace("+ -", "- ");
+		String ret = Format("%s*(%s/%s)*(((x-%s)/%s)^(%s-1))*e^(-(((x-%s)/%s)^%s))", sfactor, k, lambda, x0, lambda, k, x0, lambda, k);
+		ret.Replace("+-", "-");
+		ret.Replace("--", "+");
 		return ret;
 	}	
 	virtual void GuessCoeff(DataSource &series) {
