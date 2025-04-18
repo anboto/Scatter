@@ -6,6 +6,8 @@
 #define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml.h>
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 	
 PieCtrl::PieCtrl() : copyRatio(1) {

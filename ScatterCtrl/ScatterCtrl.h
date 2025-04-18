@@ -194,16 +194,16 @@ public:
 	Function<void(Point, dword, MouseAction)> WhenMouseClick;
 	
 	struct KeyBehavior {		
-		KeyBehavior(bool _ctrl, bool _alt, bool _shift, int _key, bool _isVirtualKey, ScatterAction _action) : 
+		KeyBehavior(bool _ctrl, bool _alt, bool _shift, dword _key, bool _isVirtualKey, ScatterAction _action) : 
 			ctrl(_ctrl), alt(_alt), shift(_shift), key(_key), isVirtualKey(_isVirtualKey), action(_action) {}
 		bool ctrl;
 		bool alt;
 		bool shift;
-		int key;
+		dword key;
 		bool isVirtualKey;
 		ScatterAction action;
 	};
-	void AddKeyBehavior(bool ctrl, bool alt, bool shift, int key, bool isVirtualKey, ScatterAction action); 
+	void AddKeyBehavior(bool ctrl, bool alt, bool shift, dword key, bool isVirtualKey, ScatterAction action); 
 	void RemoveKeyBehavior(ScatterAction action);	
 	void ClearKeyBehavior();
 	
@@ -428,7 +428,7 @@ private:
 	void DoMouseAction(bool down, Point pt, ScatterAction action, int wheel);
 	void DoKeyAction(ScatterAction action);
 	void ProcessMouse(bool down, Point &pt, bool ctrl, bool alt, bool shift, bool left, bool middle, int middleWheel, bool right); 
-	bool ProcessKey(int key); 
+	bool ProcessKey(dword key); 
 	void LabelPopUp(bool down, Point &pt); 
 	void Scrolling(bool down, Point &pt, bool isOut = false);
 	void MouseZoom(int zdelta, bool hor, bool ver);

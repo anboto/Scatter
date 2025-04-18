@@ -3,6 +3,8 @@
 #include "ScatterDraw.h"
 #include <Eigen/Eigen.h>
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 using namespace Eigen;
 
@@ -754,15 +756,15 @@ ExplicitEquation::FitError SplineEquation::Fit(DataSource &data, double &r2) {
 	return NoError;
 }
 
-void Spline::Init(const double *x, const double *y, int num) {
+void Spline::Init(const double *x, const double *y, size_t num) {
     nscoeff = num - 1;
     
     Buffer<double> h(nscoeff);
-    for(int i = 0; i < nscoeff; ++i)
+    for(size_t i = 0; i < nscoeff; ++i)
         h[i] = x[i+1] - x[i];
 
     Buffer<double> alpha(nscoeff);
-    for(int i = 1; i < nscoeff; ++i)
+    for(size_t i = 1; i < nscoeff; ++i)
         alpha[i] = 3*(y[i+1] - y[i])/h[i] - 3*(y[i] - y[i-1])/h[i-1];
 
     Buffer<double> c(nscoeff+1), l(nscoeff+1), mu(nscoeff+1), z(nscoeff+1);
@@ -770,7 +772,7 @@ void Spline::Init(const double *x, const double *y, int num) {
     mu[0] = 0;
     z[0] = 0;
 
-    for(int i = 1; i < nscoeff; ++i) {
+    for(size_t i = 1; i < nscoeff; ++i) {
         l[i] = 2*(x[i+1] - x[i-1]) - h[i-1]*mu[i-1];
         mu[i] = h[i]/l[i];
         z[i] = (alpha[i] - h[i-1]*z[i-1])/l[i];
@@ -781,13 +783,13 @@ void Spline::Init(const double *x, const double *y, int num) {
     c[nscoeff] = 0;
 
 	scoeff.Alloc(nscoeff);
-    for(int i = nscoeff-1; i >= 0; --i) {
+    for(int i = (int)nscoeff-1; i >= 0; --i) {
         c[i] = z[i] - mu[i] * c[i+1];
         scoeff[i].b = (y[i+1] - y[i])/h[i] - h[i]*(c[i+1] + 2*c[i])/3;
         scoeff[i].d = (c[i+1] - c[i])/3/h[i];
     }
 
-    for(int i = 0; i < nscoeff; ++i) {
+    for(size_t i = 0; i < nscoeff; ++i) {
         scoeff[i].x = x[i];
         scoeff[i].a = y[i];
         scoeff[i].c = c[i];
@@ -797,7 +799,7 @@ void Spline::Init(const double *x, const double *y, int num) {
 
 int Spline::GetPieceIndex(double x) const {
 	ASSERT(nscoeff > 0);
-    int j;
+    size_t j;
     for (j = 0; j < nscoeff; j++) {
         if (scoeff[j].x > x) {
             if (j == 0)
@@ -805,7 +807,7 @@ int Spline::GetPieceIndex(double x) const {
             break;
         }
     }
-    return --j;
+    return (int)--j;
 }
 
 double Spline::f(double x) const {
@@ -844,7 +846,7 @@ double Spline::Integral(double from, double to) const {
 		ifrom = GetPieceIndex(from);
 	int ito;
 	if (!IsNum(to)) {
-		ito = nscoeff-1;
+		ito = (int)nscoeff-1;
 		to = xlast;
 	} else
 		ito = GetPieceIndex(to);

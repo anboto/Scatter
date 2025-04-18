@@ -5,6 +5,8 @@
 #include <Eigen/Eigen.h>
 #include <ScatterDraw/Histogram.h>
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 
 Histogram::Histogram() {

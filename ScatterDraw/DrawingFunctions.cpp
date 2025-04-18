@@ -2,6 +2,8 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterDraw.h"
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 	
 Vector <double> GetLineDash(String dash) {
@@ -214,7 +216,7 @@ void DrawLineOpa(Painter& w, double x0, double y0, double x1, double y1, double 
 	w.Line(Pointf(x1, y1));
 	DashScaled(w, dash, scale);
 	w.Opacity(opacity);				// Before Stroke()
-	w.Stroke(thick*scale, color);
+	w.Stroke(max(1., thick*scale), color);
 }
 
 void DrawCircleOpa(Painter& w, double x, double y, double r, double scale, 
@@ -223,7 +225,7 @@ void DrawCircleOpa(Painter& w, double x, double y, double r, double scale,
 	w.Circle(x, y, r);
 	DashScaled(w, dash, scale);
 	w.Opacity(opacity);				// Before Stroke()
-	w.Stroke(thick*scale, color);
+	w.Stroke(max(1., thick*scale), color);
 }
 
 void FillRectangleOpa(Draw &w, double x0, double y0, double x1, double y1,  

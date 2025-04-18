@@ -2,7 +2,6 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterCtrl.h"
 
-	
 #define IMAGECLASS ScatterImg
 #define IMAGEFILE <ScatterCtrl/ScatterCtrl.iml>
 #include <Draw/iml.h>
@@ -10,9 +9,10 @@
 #define TFILE <ScatterCtrl/ScatterCtrl.t>
 #include <Core/t.h>
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {	
-	
-	
+		
 Vector<ScatterCtrl *> ScatterCtrl::instances;	
 Array<ScatterWindow> ScatterWindowPool::pool;
 	
@@ -598,12 +598,12 @@ void ScatterCtrl::ClearMouseBehavior()
 	mouseBehavior.Clear();
 }	
 
-void ScatterCtrl::AddKeyBehavior(bool ctrl, bool alt, bool shift, int key, bool isVirtualKey, ScatterAction action) 
+void ScatterCtrl::AddKeyBehavior(bool ctrl, bool alt, bool shift, dword key, bool isVirtualKey, ScatterAction action) 
 {
 	if (!isVirtualKey) {
 #if defined(PLATFORM_WIN32) || defined (PLATFORM_WIN64)
 		HKL hKeyboardLayout = ::GetKeyboardLayout(0);
-		key = VkKeyScanExW(WCHAR(key), hKeyboardLayout) + K_DELTA;
+		key = (dword)VkKeyScanExW(WCHAR(key), hKeyboardLayout) + K_DELTA;
 	}
 #else
 		key = key + K_DELTA;
@@ -637,7 +637,7 @@ void ScatterCtrl::ProcessMouse(bool down, Point &pt, bool ctrl, bool alt, bool s
 	}	
 }
 
-bool ScatterCtrl::ProcessKey(int key) 
+bool ScatterCtrl::ProcessKey(dword key) 
 {
 	if (key & K_KEYUP)
 		return true;

@@ -4,6 +4,8 @@
 
 #include "PopUpText.h"
 	
+#include <Functions4U/EnableWarnings.h>
+	
 namespace Upp {
 		
 static Size GetEditSize(const String &_str, const Font &font) {

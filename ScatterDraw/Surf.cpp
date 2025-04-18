@@ -253,7 +253,7 @@ double TableData::z_point(Getdatafun getdataX, Getdatafun getdataY, Getdatafun g
 		return Null;
 }
 
-double TableData::z_data(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdataZ, 
+double TableData::z_data(Getdatafun /*getdataX*/, Getdatafun /*getdataY*/, Getdatafun getdataZ, 
 						int ix, int iy) {
 	int width = rowMajor ? lenxAxis : lenyAxis;
 	if (areas) 

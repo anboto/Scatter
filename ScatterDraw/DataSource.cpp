@@ -3,6 +3,8 @@
 #include "ScatterDraw.h"
 #include "Histogram.h"
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 using namespace Eigen;
 
@@ -888,7 +890,7 @@ Vector<Pointf> DataSource::SavitzkyGolay(Getdatafun getdataY, Getdatafun getdata
 
 double LinearInterpolate(double x, const VectorXd &vecx, const VectorXd &vecy) {
 	ASSERT(vecx.size() == vecy.size());
-	return LinearInterpolate(x, vecx.data(), vecy.data(), vecx.size());
+	return LinearInterpolate(x, vecx.data(), vecy.data(), (size_t)vecx.size());
 }
 
 void Resample(const VectorXd &x, const VectorXd &y, VectorXd &rrx, VectorXd &rry, double srate) {
@@ -932,7 +934,7 @@ void ResampleY(const VectorXd &x, const VectorXd &y, const VectorXd &xmaster, Ve
 void FilterFFT(VectorXd &data, double T, double fromT, double toT) {
 	double samplingFrecuency = 1/T;
 	
-	size_t numData = data.size();
+	size_t numData = (size_t)data.size();
     VectorXcd freqbuf;
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);

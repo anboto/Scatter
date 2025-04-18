@@ -2,6 +2,8 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterDraw.h"
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 
 String ScatterDraw::defaultCSVseparator = ";";
@@ -13,8 +15,8 @@ ScatterDraw::ScatterDraw() {
 /*
 void debug_h() {
 	int dummy = 0;		// It does nothing. It just serves as a place to set a breakpoint for templated functions
-}*/
-
+}
+*/
 ScatterDraw& ScatterDraw::SetColor(const Color& _color) {
 	graphColor = _color;
 	return *this;
@@ -506,7 +508,7 @@ Color ScatterDraw::GetNewColor(int index, int version) {
 				return dark[index];
 		}
 	} else
-		return Color(Random(), Random(), Random());
+		return Color((int)Random(), (int)Random(), (int)Random());
 }
 	
 String ScatterDraw::GetNewDash(int index) {
@@ -527,7 +529,7 @@ String ScatterDraw::GetNewDash(int index) {
 	dword r = Random();
 	if (r < 8000)
 		r += 2000;
-	String ret = FormatInt(r).Right(4);
+	String ret = FormatInt((int)r).Right(4);
 	String space = " ";
 	return ret.Mid(0, 1) + space + ret.Mid(1, 1) + space + ret.Mid(2, 1) + space + ret.Mid(3, 1);
 }
@@ -1383,7 +1385,7 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	if (scale > 1) {
 		if (maxXRange > 0) {
 			if (xRange*scale > maxXRange) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				if (xRange == maxXRange) {
 					Refresh();
 					return;
@@ -1393,7 +1395,7 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 		}
 		if (maxYRange > 0) {
 			if (yRange*scale > maxYRange) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				if (yRange == maxYRange) {
 					Refresh();
 					return;
@@ -1404,7 +1406,7 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	} else {
 		if (maxXRange > 0) {
 			if (xRange*scale < minXRange) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				if (xRange == minXRange) {
 					Refresh();
 					return;
@@ -1414,7 +1416,7 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 		}
 		if (maxYRange > 0) {
 			if (yRange*scale < minYRange) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				if (yRange == minYRange) {
 					Refresh();
 					return;
@@ -1427,12 +1429,12 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	if (mouseX) {
 		if (zoomStyleX == TO_CENTER) {
 			if (IsNum(minXmin) && xMin + xRange*(1-scale)/2. <= minXmin) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				Refresh();
 				return;
 			}
 			if (IsNum(maxXmax) && xMin + xRange*scale + xRange*(1-scale)/2. >= maxXmax) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				Refresh();
 				return;
 			}
@@ -1450,12 +1452,12 @@ void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
 	if (mouseY) {
 		if (zoomStyleY == TO_CENTER) {
 			if (IsNum(minYmin) && yMin + yRange*(1-scale)/2. <= minYmin) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				Refresh();
 				return;
 			}
 			if (IsNum(maxYmax) && yMin + yRange*scale + yRange*(1-scale)/2. >= maxYmax) {
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 				Refresh();
 				return;
 			}
@@ -1504,23 +1506,23 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 		if (IsNum(minXmin) && factorX > 0) {
 			if (xMin > minXmin) {
 				if (xMin - deltaX < minXmin) {
-					highlight_0 = GetTickCount();
+					highlight_0 = (int)GetTickCount();
 					deltaX = xMin - minXmin;
 				}
 			} else {
 				factorX = Null;
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 			}
 		}
 		if (IsNum(maxXmax) && factorX < 0) {
 			if (xMin + xRange < maxXmax) {
 				if (xMin + xRange - deltaX > maxXmax) {
-					highlight_0 = GetTickCount();
+					highlight_0 = (int)GetTickCount();
 					deltaX = xMin + xRange - maxXmax;
 				}
 			} else {
 				factorX = Null;
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 			}
 		}
 		if (factorX != 0 && !IsNull(factorX)) {	
@@ -1534,23 +1536,23 @@ void ScatterDraw::ScrollNonLinked(double factorX, double factorY) {
 		if (IsNum(minYmin) && factorY > 0) {
 			if (yMin > minYmin) {
 				if (yMin - deltaY < minYmin) {
-					highlight_0 = GetTickCount();
+					highlight_0 = (int)GetTickCount();
 					deltaY = yMin - minYmin;
 				}
 			} else {
 				factorY = Null;
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 			}
 		}
 		if (IsNum(maxYmax) && factorY < 0) {
 			if (yMin + yRange < maxYmax) {
 				if (yMin + yRange - deltaY > maxYmax) {
-					highlight_0 = GetTickCount();
+					highlight_0 = (int)GetTickCount();
 					deltaY = yMin + yRange - maxYmax;
 				}
 			} else {
 				factorY = Null;
-				highlight_0 = GetTickCount();
+				highlight_0 = (int)GetTickCount();
 			}
 		}	
 		if (factorY != 0 && IsNum(factorY)) {	

@@ -3,6 +3,8 @@
 #include "PieDraw.h"
 #include "DrawingFunctions.h"
 
+#include <Functions4U/EnableWarnings.h>
+
 namespace Upp {
 	
 static void DrawPie(Draw& w, double c_x, double c_y, double r, int start, int alpha, int width = 0, 

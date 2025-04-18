@@ -723,10 +723,10 @@ public:
 	Spline()													  {}
 	Spline(const Vector<double> &x, const Vector<double> &y)	  {Init(x, y);}
 	Spline(const Eigen::VectorXd &x, const Eigen::VectorXd &y) 	  {Init(x, y);}
-	Spline(const double *x, const double *y, int n)				  {Init(x, y, n);}	
+	Spline(const double *x, const double *y, size_t n)			  {Init(x, y, n);}	
 	void Init(const Vector<double> &x, const Vector<double> &y)	  {Init(x.begin(), y.begin(), x.GetCount());}
-	void Init(const Eigen::VectorXd &x, const Eigen::VectorXd &y) {Init(x.data(), y.data(), int(x.size()));}
-	void Init(const double *x, const double *y, int n);
+	void Init(const Eigen::VectorXd &x, const Eigen::VectorXd &y) {Init(x.data(), y.data(), x.size());}
+	void Init(const double *x, const double *y, size_t n);
 	double f(double x) const;
 	double df(double x) const;
 	double d2f(double x) const;
@@ -735,7 +735,7 @@ public:
 private:
 	struct Coeff {double a, b, c, d, x;};
     Buffer<Coeff> scoeff;
-    int nscoeff = 0;
+    size_t nscoeff = 0;
     double xlast;
     
     int GetPieceIndex(double x) const;
