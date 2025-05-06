@@ -575,14 +575,14 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		tabFitLeft.scatter.AddSeries(cubic).NoMark().Stroke(1.5);		
 		tabFitLeft.scatter.AddSeries(sinus).NoMark().Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(sinusTend).NoMark().Stroke(1.5);
-		tabFitLeft.scatter.AddSeries(spline).NoMark().Dash(LINE_SOLID).Stroke(1.5);
-		tabFitLeft.scatter.AddSeries(derivative).NoMark().Dash(LINE_SOLID).Stroke(1.5);
-		tabFitLeft.scatter.AddSeries(sg).NoMark().Dash(LINE_SOLID).Stroke(1.5);
-		tabFitLeft.scatter.AddSeries(fftFilter).NoMark().Dash(LINE_SOLID).Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(spline).NoMark().Dash(ScatterDraw::LINE_SOLID).Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(derivative).NoMark().Dash(ScatterDraw::LINE_SOLID).Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(sg).NoMark().Dash(ScatterDraw::LINE_SOLID).Stroke(1.5);
+		tabFitLeft.scatter.AddSeries(fftFilter).NoMark().Dash(ScatterDraw::LINE_SOLID).Stroke(1.5);
 		tabFitLeft.scatter.AddSeries(upperEnvelope).Legend(pscatter->GetLegend(id) + String("-") + t_("Max"))
-						.NoMark().Dash(LINE_DASHED).Stroke(1.5).SetSequentialX(true);
+						.NoMark().Dash(ScatterDraw::LINE_DASHED).Stroke(1.5).SetSequentialX(true);
 		tabFitLeft.scatter.AddSeries(lowerEnvelope).Legend(pscatter->GetLegend(id) + String("-") + t_("Min"))
-						.NoMark().Dash(LINE_DASHED).SetSequentialX(true);
+						.NoMark().Dash(ScatterDraw::LINE_DASHED).SetSequentialX(true);
 		tabFitLeft.scatter.AddSeries(movAvg).Stroke(1.5).Legend(pscatter->GetLegend(id) + String("-") + t_("MovAvg")).NoMark();		
 		tabFitLeft.scatter.AddSeries(secAvg).Stroke(1.5).Legend(pscatter->GetLegend(id) + String("-") + t_("SecAvg")).NoMark();		
 		tabFitLeft.scatter.AddSeries(cumAvg).Stroke(1.5).Legend(pscatter->GetLegend(id) + String("-") + t_("CumAvg")).NoMark();		

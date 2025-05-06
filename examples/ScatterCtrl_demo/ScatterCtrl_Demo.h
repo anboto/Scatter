@@ -136,14 +136,12 @@ public:
 	typedef Tab8_Secondary CLASSNAME;
 
 	void Init();
-	void MyFormat(String& s, int , double d)
-	{
+	void MyFormat(String& s, int , double d) {
 		s = Format("%Mon", fround(d)); 
 		if (!s.IsEmpty())
 			s << "\n2011";
 	}
-	void MyFormatDelta(String& s, int , double d)
-	{
+	void MyFormatDelta(String& s, int , double d) {
 		s = FormatDouble(d) + " " + t_("months");
 	}
 	virtual ScatterCtrl &Scatter()	{return scatter;};

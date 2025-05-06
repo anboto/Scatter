@@ -193,7 +193,7 @@ void DrawCircleOpa(Draw& w, double x, double y, double r, double scale, double o
 }
 
 void DashScaled(Painter& w, const String dash, double scale) {
-	if (!dash.IsEmpty() && dash != LINE_NONE) {		
+	if (!dash.IsEmpty() && dash != ScatterDraw::LINE_NONE) {		
 		Vector<double> d;
 		double start = 0;
 		CParser p(dash);
@@ -300,13 +300,13 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 				double thick, const Color &_color, String dash, const Color &background) {
 	ASSERT(!p.IsEmpty());
 	Color color = GetOpaqueColor(_color, background, opacity) ;
-	if (dash == LINE_SOLID) {
+	if (dash == ScatterDraw::LINE_SOLID) {
 		//w.DrawPolyline(p, int(thick*scale), color);
-		for (int i = 1; i < p.GetCount(); ++i) {
+		for (int i = 1; i < p.size(); ++i) {
 			if (!(!IsNum(p[i-1]) || !IsNum(p[i])))
 				w.DrawLine(p[i-1], p[i], int(thick*scale), color);
 		}
-	} else if (dash == LINE_NONE) 
+	} else if (dash == ScatterDraw::LINE_NONE) 
 		;
 	else {
 		Vector <double> &pat = GetDashedArray(dash);
@@ -317,10 +317,11 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 		double len = pat[0]*scale;			// Pixels per bar
 		Pointf begin, end;
 		begin = p[0];
-		for (int i = 1; i < p.GetCount();) {
-			if (!IsNum(begin) || !IsNum(p[i])) 
+		for (int i = 1; i < p.size();) {
+			if (!IsNum(begin) || !IsNum(p[i])) {
+				begin = p[i];	
 				i++;
-			else {
+			} else {
 				double d = Distance(begin, p[i]);
 				if (d >= len) 
 					end = PointAtLen(begin, p[i], len);
@@ -333,7 +334,7 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 					w.DrawLine(begin, end, int(thick*scale), color);
 				if (d >= len) {
 					iPat++;
-					if (iPat == pat.GetCount())
+					if (iPat == pat.size())
 						iPat = 0;				 
 					len = pat[iPat]*scale;
 				}
@@ -347,7 +348,7 @@ void DrawPolylineOpa(Painter& w, const Vector<Pointf> &p, double scale, double o
 				double thick, const Color &color, String dash, const Color &) {	
 	ASSERT(!p.IsEmpty());
 	
-	if (dash == LINE_NONE)
+	if (dash == ScatterDraw::LINE_NONE)
 		return;
 	
 	bool any_at_all = false;

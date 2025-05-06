@@ -634,37 +634,36 @@ public:
 		this->idsy = clone(_idsy);
 		this->idsFixed = clone(_idsFixed);
 		this->beginData = _beginData;
-		this->numData = _numData;
-		if (IsNull(_numData)) {
-			if (!_useRows) {
-				if (_data.IsEmpty())
-					this->numData = 0;
-				else	
-					this->numData = _data[0].GetCount() - _beginData;
-			} else
-				this->numData = _data.GetCount() - _beginData;
-		} else {
-			if (!_useRows) {
-				if (_data.IsEmpty())
-					this->numData = 0;
-				else	
-					this->numData = min(_data[0].GetCount() - _beginData, _numData);
-			} else
-				this->numData = min(_data.GetCount() - _beginData, _numData);
-		}
+		
+		if (!_useRows) {
+			if (data->IsEmpty())
+				this->numData = 0;
+			else {	
+				this->numData = _data[0].size();
+				for (int i = 1; i < _data.size(); ++i)
+					this->numData = min(this->numData, _data[i].size());
+				this->numData -= _beginData;
+			}
+		} else
+			this->numData = max(_data.size() - _beginData, 0);
+		
+		if (!IsNull(_numData))
+			this->numData = min(this->numData, _numData);
 	}
 	void Init(const Vector<Vector<T> > &_data, int _idx, int _idy, bool _useRows = true, int _beginData = 0, int _numData = Null) {
 		static Vector<int> idsVoid;
 		Init(_data, _idx, _idy, idsVoid, idsVoid, idsVoid, _useRows, _beginData, _numData);
 	}
 	virtual inline double y(int64 id)  {
+		if (data->IsEmpty())
+			return Null;
 		if (!IsNull(idy) && idy >= 0) {
 			if (useRows) {
-				if ((*data)[beginData + int(id)].GetCount() <= idy)
+				if ((*data)[beginData + int(id)].size() <= idy)
 					return Null;
 				return (*data)[beginData + int(id)][idy];
 			} else {
-				if ((*data)[idy].GetCount() <= beginData + int(id))
+				if ((*data)[idy].size() <= beginData + int(id))
 					return Null;
 				return (*data)[idy][beginData + int(id)];
 			}
@@ -677,7 +676,19 @@ public:
 			return ret/GetznyCount(id);
 		}
 	}
-	virtual inline double x(int64 id)  {return useRows ? (*data)[beginData + int(id)][idx] : (*data)[idx][beginData + int(id)];}
+	virtual inline double x(int64 id)  {
+		if (data->IsEmpty())
+			return Null;
+		if (useRows) {
+			if ((*data)[beginData + int(id)].size() <= idx)
+				return Null;
+			return (*data)[beginData + int(id)][idx];
+		} else {
+			if ((*data)[idx].size() <= beginData + int(id))
+				return Null;
+			return (*data)[idx][beginData + int(id)];
+		}	
+	}
 	virtual inline int64 GetCount() const	{return numData;};
 	virtual double znx(int n, int64 id)	const {
 		return useRows ? (*data)[beginData + int(id)][idsx[n]] : (*data)[idsx[n]][beginData + int(id)];}
@@ -1323,7 +1334,7 @@ public:
 	double MaxY()	{return maxY;}
 	double MinZ()	{return minZ;}
 	double MaxZ()	{return maxZ;}
-	virtual double z_data(int ix, int iy) 	{NEVER();	return Null;}
+	virtual double z_data(int /*ix*/, int /*iy*/) 	{NEVER();	return Null;}
 	virtual int rows() 						{NEVER();	return Null;}
 	virtual int cols() 						{NEVER();	return Null;}
 	virtual bool IsAreas()					{NEVER();	return Null;}
@@ -1623,12 +1634,12 @@ typename Range::value_type CosWindow(Range &data, int numOver) {
         numDataFact += windowFact;
     	data[i] *= windowFact;	
     }
-    for (size_t i = numOver; i < numData - numOver; ++i) {
+    for (size_t i = (size_t)numOver; i < numData - (size_t)numOver; ++i) {
         typename Range::value_type windowFact = 1;		// 1.004
         numDataFact += windowFact;
     }
-    for (size_t i = numData - numOver; i < numData; ++i) {
-  		typename Range::value_type windowFact = 0.5*(1 + cos(M_PI*(numData - i - numOver)/numOver));
+    for (size_t i = numData - (size_t)numOver; i < numData; ++i) {
+  		typename Range::value_type windowFact = 0.5*(1 + cos(M_PI*(numData - i - (size_t)numOver)/numOver));
         numDataFact += windowFact;
     	data[i] *= windowFact;	
     }

@@ -32,10 +32,10 @@ CONSOLE_APP_MAIN
 	SplineEquation spline;
 	VectorPointf s1data(s1);
 	spline.Fit(s1data);
-	scatter.AddSeries(spline).Legend("Series 1 Softened").NoMark().Dash(LINE_SOLID).Stroke(1.5);
+	scatter.AddSeries(spline).Legend("Series 1 Softened").NoMark().Dash(ScatterDraw::LINE_SOLID).Stroke(1.5);
 	
 	scatter.AddSeries(x, y).Units("ºC", "seg").Legend("Series 2").Stroke(5, Null)
-		   .Dash(LINE_DASHED).MarkStyle<SquareMarkPlot>().MarkWidth(12);
+		   .Dash(ScatterDraw::LINE_DASHED).MarkStyle<SquareMarkPlot>().MarkWidth(12);
 		   
 	scatter.SetXYMin(10, 0).SetRange(50, 100).SetMajorUnits(10, 20).SetMinUnits(20, 0);		// Done by hand
 	

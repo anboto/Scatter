@@ -6,8 +6,6 @@
 
 namespace Upp {
 
-String ScatterDraw::defaultCSVseparator = ";";
-
 ScatterDraw::ScatterDraw() {
 	lastxRange = xRange;
 	lastyRange = yRange;
@@ -510,31 +508,23 @@ Color ScatterDraw::GetNewColor(int index, int version) {
 	} else
 		return Color((int)Random(), (int)Random(), (int)Random());
 }
-	
+		
 String ScatterDraw::GetNewDash(int index) {
+	index %= 7;
 	switch(index) {
 	case 0:		return LINE_SOLID;
 	case 1:		return LINE_DOTTED;
-	case 2:		return LINE_DASHED;
-	case 3:		return LINE_DASH_DOT;
-	case 4:		return LINE_SOLID;
-	case 5:		return LINE_DOTTED;
-	case 6:		return LINE_DASHED;
-	case 7:		return LINE_DASH_DOT;
-	case 8:		return LINE_SOLID;
-	case 9:		return LINE_DOTTED;
-	case 10:	return LINE_DASHED;
-	case 11:	return LINE_DASH_DOT;
+	case 2:		return LINE_DOTTED_FINE;
+	case 3:		return LINE_DOTTED_FINER;
+	case 4:		return LINE_DASHED;
+	case 5:		return LINE_DASHED_LONG;
+	case 6:		return LINE_DASH_DOT;
 	}
-	dword r = Random();
-	if (r < 8000)
-		r += 2000;
-	String ret = FormatInt((int)r).Right(4);
-	String space = " ";
-	return ret.Mid(0, 1) + space + ret.Mid(1, 1) + space + ret.Mid(2, 1) + space + ret.Mid(3, 1);
+	return LINE_SOLID;
 }
 
 MarkPlot *ScatterDraw::GetNewMarkPlot(int index) {
+	index %= 9;
 	switch(index) {
 	case 0:	return new CircleMarkPlot();
 	case 1:	return new SquareMarkPlot();
@@ -542,6 +532,9 @@ MarkPlot *ScatterDraw::GetNewMarkPlot(int index) {
 	case 3:	return new CrossMarkPlot();
 	case 4:	return new XMarkPlot();
 	case 5:	return new RhombMarkPlot();
+	case 6:	return new InvTriangleMarkPlot();
+	case 7:	return new DiamondMarkPlot();
+	case 8:	return new AsteriskMarkPlot();
 	}
 	return new CircleMarkPlot();
 }
@@ -1785,16 +1778,20 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 						if (xx >= xMin) 
 							imin = i;
 					}
-					if (IsNull(imax)) {
-						if (xx >= xMin + xRange) 
-							imax = i;
+					imax = i;
+					if (xx >= xMin + xRange) {
+						imax = i;
+						break;
 					}
 				}
 			}
+			if (IsNull(imin) || IsNull(imax))
+				return points;
+			/*
 			if (IsNull(imin))
 			    imin = 0;
 			if (IsNull(imax))
-			    imax = data.GetCount() - 1;
+			    imax = data.GetCount() - 1;*/
 		} else {
 			imin = 0;
 			imax = data.GetCount() - 1;
@@ -1990,15 +1987,15 @@ INITBLOCK {
 	MarkPlot::Register<AsteriskMarkPlot>("Asterisk");
 	MarkPlot::Register<DiamondMarkPlot>("Diamond");
 	
-	DashStyle::Register("LINE_SOLID", LINE_SOLID);
-	DashStyle::Register("LINE_DOTTED_FINER", LINE_DOTTED_FINER);
-	DashStyle::Register("LINE_DOTTED_FINE", LINE_DOTTED_FINE);
-	DashStyle::Register("LINE_DOTTED", LINE_DOTTED);
-	DashStyle::Register("LINE_DOTTED_SEP", LINE_DOTTED_SEP);
-	DashStyle::Register("LINE_DASHED", LINE_DASHED);
-	DashStyle::Register("LINE_DASH_DOT", LINE_DASH_DOT);
-	DashStyle::Register("LINE_BEGIN_END", LINE_BEGIN_END);
-	DashStyle::Register("LINE_NONE", LINE_NONE);
+	DashStyle::Register("LINE_SOLID", ScatterDraw::LINE_SOLID);
+	DashStyle::Register("LINE_DOTTED_FINER", ScatterDraw::LINE_DOTTED_FINER);
+	DashStyle::Register("LINE_DOTTED_FINE", ScatterDraw::LINE_DOTTED_FINE);
+	DashStyle::Register("LINE_DOTTED", ScatterDraw::LINE_DOTTED);
+	DashStyle::Register("LINE_DOTTED_SEP", ScatterDraw::LINE_DOTTED_SEP);
+	DashStyle::Register("LINE_DASHED", ScatterDraw::LINE_DASHED);
+	DashStyle::Register("LINE_DASH_DOT", ScatterDraw::LINE_DASH_DOT);
+	DashStyle::Register("LINE_BEGIN_END", ScatterDraw::LINE_BEGIN_END);
+	DashStyle::Register("LINE_NONE", ScatterDraw::LINE_NONE);
 }
 
 }

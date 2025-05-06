@@ -187,7 +187,7 @@ END_LAYOUT
 
 LAYOUT(ProcessingTab, 504, 320)
 	ITEM(Upp::TabCtrl, tab, HSizePosZ(0, 0).VSizePosZ(0, 0))
-	ITEM(Upp::Label, name, SetFrame(Upp::ThinInsetFrame()).RightPosZ(0, 232).TopPosZ(0, 19))
+	ITEM(Upp::Label, name, SetFrame(ThinInsetFrame()).RightPosZ(0, 232).TopPosZ(0, 19))
 END_LAYOUT
 
 LAYOUT(ProcessingTabFitLeft, 356, 324)

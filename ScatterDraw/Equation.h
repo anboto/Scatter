@@ -204,7 +204,7 @@ public:
 class DampedSinEquation : public ExplicitEquation {
 public:
 	DampedSinEquation() 					{coeff.Clear();	coeff << 0. << 0.1 << 1. << 0.1 << 0.; numcoeff = 5;}
-	DampedSinEquation(double offset, double A, double lambda, double w, double phi,double dt) {Init(offset, A, lambda, w, dt);}
+	DampedSinEquation(double offset, double A, double lambda, double w, double dt) {Init(offset, A, lambda, w, dt);}
 	void Init(double offset, double A, double lambda, double w,  double dt) {
 		coeff.Clear();	coeff << offset << A << lambda << w << dt; numcoeff = 5;
 	}
@@ -724,8 +724,8 @@ public:
 	Spline(const Vector<double> &x, const Vector<double> &y)	  {Init(x, y);}
 	Spline(const Eigen::VectorXd &x, const Eigen::VectorXd &y) 	  {Init(x, y);}
 	Spline(const double *x, const double *y, size_t n)			  {Init(x, y, n);}	
-	void Init(const Vector<double> &x, const Vector<double> &y)	  {Init(x.begin(), y.begin(), x.GetCount());}
-	void Init(const Eigen::VectorXd &x, const Eigen::VectorXd &y) {Init(x.data(), y.data(), x.size());}
+	void Init(const Vector<double> &x, const Vector<double> &y)	  {Init(x.begin(), y.begin(), (size_t)x.size());}
+	void Init(const Eigen::VectorXd &x, const Eigen::VectorXd &y) {Init(x.data(),  y.data(),  (size_t)x.size());}
 	void Init(const double *x, const double *y, size_t n);
 	double f(double x) const;
 	double df(double x) const;

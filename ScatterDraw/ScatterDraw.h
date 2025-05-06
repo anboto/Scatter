@@ -74,16 +74,16 @@ public:
 		MD_SUBPIXEL    = MODE_SUBPIXEL
 	};
 	
-	#define LINE_SOLID 		  ""
-	#define LINE_NONE 		  "0"
-	#define LINE_DOTTED_FINER "2 10"
-	#define LINE_DOTTED_FINE  "2 6"
-	#define LINE_DOTTED 	  "4 10"
-	#define LINE_DOTTED_SEP	  "4 20"
-	#define LINE_DASHED 	  "12 12"
-	#define LINE_DASHED_LONG  "12 4"
-	#define LINE_DASH_DOT 	  "12 8 3 8"	// Reduced. Previous was too long
-	#define LINE_BEGIN_END	  "2"
+	static inline const String LINE_SOLID 	     = "";
+	static inline const String LINE_NONE 		 = "0";
+	static inline const String LINE_DOTTED_FINER = "2 10";
+	static inline const String LINE_DOTTED_FINE  = "2 6";
+	static inline const String LINE_DOTTED 	     = "4 10";
+	static inline const String LINE_DOTTED_SEP   = "4 20";
+	static inline const String LINE_DASHED 	     = "12 12";
+	static inline const String LINE_DASHED_LONG  = "12 4";
+	static inline const String LINE_DASH_DOT 	 = "12 8 3 8";	// Reduced. Previous was too long
+	static inline const String LINE_BEGIN_END	 = "2";
 	
 protected:
 	class ScatterBasicSeries {
@@ -436,6 +436,7 @@ public:
 	
 	ScatterDraw& ShowLegend(bool show = true) 		{showLegend = show;		return *this;}
 	bool GetShowLegend()							{return showLegend;}
+	ScatterDraw& NoShowLegend()						{return ShowLegend(false);}
 	ScatterDraw& SetLegendPos(const Point &pos) 	{legendPos = pos;		return *this;}
 	ScatterDraw& SetLegendPosX(int x) 				{legendPos.x = x;		return *this;}
 	ScatterDraw& SetLegendPosY(int y) 				{legendPos.y = y;		return *this;}
@@ -738,12 +739,18 @@ public:
 	ScatterDraw &SetDrawXReticle(bool set = true)  	{drawXReticle = set;	return *this;}
 	ScatterDraw &SetDrawYReticle(bool set = true)  	{drawYReticle = set;	return *this;}
 	ScatterDraw &SetDrawY2Reticle(bool set = true) 	{drawY2Reticle = set;	return *this;}
+	ScatterDraw &NoDrawXReticle()  					{return SetDrawXReticle(false);}
+	ScatterDraw &NoDrawYReticle()  					{return SetDrawYReticle(false);}
+	ScatterDraw &NoDrawY2Reticle() 					{return SetDrawY2Reticle(false);}
 	bool GetDrawXReticle()							{return drawXReticle;}
 	bool GetDrawYReticle()							{return drawYReticle;}
 	bool GetDrawY2Reticle()							{return drawY2Reticle;}
 	ScatterDraw &SetDrawXReticleNumbers(bool set = true) {drawXReticleNumbers = set;	return *this;}
 	ScatterDraw &SetDrawYReticleNumbers(bool set = true) {drawYReticleNumbers = set;	return *this;}
 	ScatterDraw &SetDrawY2ReticleNumbers(bool set = true){drawY2ReticleNumbers = set;	return *this;}
+	ScatterDraw &NoDrawXReticleNumbers() 			{return SetDrawXReticleNumbers(false);}
+	ScatterDraw &NoDrawYReticleNumbers() 			{return SetDrawYReticleNumbers(false);}
+	ScatterDraw &NoDrawY2ReticleNumbers() 			{return SetDrawY2ReticleNumbers(false);}
 	bool GetDrawXReticleNumbers()					{return drawXReticleNumbers;}
 	bool GetDrawYReticleNumbers()					{return drawYReticleNumbers;}
 	bool GetDrawY2ReticleNumbers()					{return drawY2ReticleNumbers;}
@@ -1376,7 +1383,7 @@ private:
 	bool labelsChanged = false;
 	bool stacked = false;
 	bool serializeFormat = true;
-	static String defaultCSVseparator;
+	static inline String defaultCSVseparator = ";";
 	
 	Vector<double> gridX, gridXLog, gridY, gridYLog;
 };
@@ -1563,11 +1570,11 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	if (drawYReticle || drawYReticleNumbers || drawY2ReticleNumbers) {
 		double factorY = plotH/yRange;
 		Vector<double> gY, gY2;
-		if (drawYReticleNumbers) {
+		//if (drawYReticleNumbers) {
 			gY.SetCount(gridY.size());
 			for(int i = 0; i < gridY.size(); ++i) 
 				gY[i] = yMin + gridY[i];
-		}
+		//}
 		if (drawY2ReticleNumbers) {
 			gY2.SetCount(gridY.size());
 			for(int i = 0; i < gridY.size(); ++i) 
@@ -1662,7 +1669,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	
 template <class T>
 void ScatterDraw::Plot(T& w) {
-	if (plotW < 0 || plotH < 0 || xRange <= 0 || yRange <= 0)
+	if (plotW <= 0 || plotH <= 0 || xRange <= 0 || yRange <= 0)
 		return;
 		
 	double factorX = plotW/xRange;
@@ -1761,7 +1768,6 @@ void ScatterDraw::Plot(T& w) {
 			}
 		}*/
 	}
-
 	try {
 		for (int j = 0; j < series.size(); j++) {
 			ScatterSeries &serie = series[j];
