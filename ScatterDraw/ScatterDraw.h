@@ -852,14 +852,15 @@ public:
 	double GetMaxY()			{return yMin+yRange;}
 	int GetPlotWidth()			{return plotW;}
 	int GetPlotHeight()			{return plotH;}
+
 	double GetPosX(double x) {
-		return plotW*(FixLog10(x, logX) - xMin)/xRange;
+		return SafeDoubleToInt(plotW*(FixLog10(x, logX) - xMin)/xRange);
 	}
 	double GetPosY(double y, bool primaryY = true) {
 		if (primaryY)
-			return plotH*(1 - (FixLog10(y, logY) - yMin)/yRange);
+			return SafeDoubleToInt(plotH*(1 - (FixLog10(y, logY) - yMin)/yRange));
 		else
-			return plotH*(1 - (FixLog10(y, logY) - yMin2)/yRange2);
+			return SafeDoubleToInt(plotH*(1 - (FixLog10(y, logY) - yMin2)/yRange2));
 	}
 	double GetSizeX(double cx) 	{return plotW*cx/xRange;}
 	double GetSizeY(double cy) 	{return plotH*cy/yRange;}		
@@ -1350,6 +1351,12 @@ protected:
 	void DrawRainbowPalette(Draw& w) const;
 	
 private:
+	static inline double SafeDoubleToInt(double value) {	// Return a double between the limits of signed int
+		constexpr double minInt = std::numeric_limits<int>::min();
+    	constexpr double maxInt = std::numeric_limits<int>::max();
+    	return max(minInt, min(value, maxInt));
+	}
+	
 	Size size{Size(800, 400)};		// Size to be used for all but screen painting
 	double plotScaleX = 1, plotScaleY = 1, plotScaleAvg = 1;
 	bool responsive = false;
@@ -1780,6 +1787,7 @@ void ScatterDraw::Plot(T& w) {
 				continue;
 			if (data.IsExplicit() && IsNull(data.GetCount()))
 				continue;
+			
 			Vector<Pointf> points = DataAddPoints(serie.Data(), serie.primaryY, serie.sequential);
 			if (!points.IsEmpty() && serie.seriesPlot && (serie.thickness > 0 || !IsNull(serie.fillColor)))
 				serie.seriesPlot->Paint(w, points, plotScaleAvg, serie.opacity, 

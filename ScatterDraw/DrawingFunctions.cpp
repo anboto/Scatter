@@ -301,9 +301,8 @@ void DrawPolylineOpa(Draw& w, const Vector<Pointf> &p, double scale, double opac
 	ASSERT(!p.IsEmpty());
 	Color color = GetOpaqueColor(_color, background, opacity) ;
 	if (dash == ScatterDraw::LINE_SOLID) {
-		//w.DrawPolyline(p, int(thick*scale), color);
 		for (int i = 1; i < p.size(); ++i) {
-			if (!(!IsNum(p[i-1]) || !IsNum(p[i])))
+			if (IsNum(p[i-1]) && IsNum(p[i]))
 				w.DrawLine(p[i-1], p[i], int(thick*scale), color);
 		}
 	} else if (dash == ScatterDraw::LINE_NONE) 
