@@ -11,6 +11,7 @@
 #include "SeriesPlot.h"
 #include "MarkPlot.h"
 #include <Functions4U/Functions4U.h>
+#include <immintrin.h>		// For _mm_cvttsd_si32() and _mm_set_sd()
 
 namespace Upp {
 
@@ -546,8 +547,8 @@ public:
 	ScatterDraw &AddSeries(Array<Pointf> &points)		{return AddSeries<ArrayPointf>(points);}
 	template <class Y>
 	ScatterDraw &AddSeries(Vector<Vector <Y> > &data, int idx, int idy, 
-		Vector<int> &idsx, Vector<int> &idsy, Vector<int> &idsFixed, bool useCols = true, int beginData = 0, int numData = Null) {
-		return AddSeries<VectorVectorY<Y> >(data, idx, idy, idsx, idsy, idsFixed, useCols, beginData, numData);
+		Vector<int> &idsx, Vector<int> &idsy, Vector<int> &idsFixed, bool useCols = true, int beginData = 0, int numData = Null, double gainX = 1) {
+		return AddSeries<VectorVectorY<Y> >(data, idx, idy, idsx, idsy, idsFixed, useCols, beginData, numData, gainX);
 	}
 	ScatterDraw &AddSeries(Function <double(double)> function)	{return AddSeries<FuncSource>(function);}
 	ScatterDraw &AddSeries(double (*function)(double))			{return AddSeries<FuncSource>(function);}
@@ -590,7 +591,10 @@ public:
 	template <class C, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 	ScatterDraw &AddSeries(T1 &arg1, T2 &arg2, T3 &arg3, T4 &arg4, T5 &arg5, T6 &arg6, T7 &arg7, T8 &arg8, T9 &arg9)	
 								{return _AddSeries(new C(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));}	
-																
+	template <class C, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
+	ScatterDraw &AddSeries(T1 &arg1, T2 &arg2, T3 &arg3, T4 &arg4, T5 &arg5, T6 &arg6, T7 &arg7, T8 &arg8, T9 &arg9, T10 &arg10)	
+								{return _AddSeries(new C(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10));}
+																							
 	template <class Y>
 	ScatterDraw &AddSeries(Vector<Y> &yData, double x0, double deltaX)		{return _AddSeries(new VectorY<Y>(yData, x0, deltaX));}
 	template <class Y>
@@ -1352,9 +1356,12 @@ protected:
 	
 private:
 	static inline double SafeDoubleToInt(double value) {	// Return a double between the limits of signed int
-		constexpr double minInt = std::numeric_limits<int>::min();
-    	constexpr double maxInt = std::numeric_limits<int>::max();
-    	return max(minInt, min(value, maxInt));
+		//constexpr double minInt = std::numeric_limits<int>::min();
+    	//constexpr double maxInt = std::numeric_limits<int>::max();
+    	//return max(minInt, min(value, maxInt));
+    	if (IsNull(value))
+    		return Null;
+    	return (double)_mm_cvttsd_si32(_mm_set_sd(value)); 	// Fast SSE4.1 truncation
 	}
 	
 	Size size{Size(800, 400)};		// Size to be used for all but screen painting
@@ -1806,14 +1813,14 @@ void ScatterDraw::Plot(T& w) {
 					}
 				} else {
 					for (int64 i = 0; i < data.GetCount(); ++i) {
-						int ix = (int)GetPosX(data.x(i));
-						int iy = (int)GetPosY(data.y(i), serie.primaryY);
-						Vector<int> dataX, dataY;
+						double ix = GetPosX(data.x(i));
+						double iy = GetPosY(data.y(i), serie.primaryY);
+						Vector<double> dataX, dataY;
 						Vector<double> dataFixed;
 						for (int ii = 0; ii < data.GetznxCount(i); ++ii) 
-							dataX << (int)GetPosX(data.znx(ii, i));
+							dataX << GetPosX(data.znx(ii, i));
 						for (int ii = 0; ii < data.GetznyCount(i); ++ii) 
-							dataY << (int)GetPosY(data.zny(ii, i), serie.primaryY);
+							dataY << GetPosY(data.zny(ii, i), serie.primaryY);
 						for (int ii = 0; ii < data.GetznFixedCount(); ++ii) 
 							dataFixed << data.znFixed(ii, i);
 						serie.markPlot->Paint(w, plotScaleAvg, ix, iy, dataX, dataY, dataFixed, 

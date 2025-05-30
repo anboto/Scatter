@@ -11,8 +11,8 @@ public:
 	virtual ~MarkPlot() noexcept {};	
 	virtual void Paint(Draw &p, const double& , const Point& cp, const double& size, 
 		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const = 0;
-	virtual void Paint(Draw &, const double& , int , int , const Vector<int>& , 
-		const Vector<int>& , const Vector<double>& , const double& , 
+	virtual void Paint(Draw &, const double& , int , int , const Vector<double>& , 
+		const Vector<double>& , const Vector<double>& , const double& , 
 		const Color& , const double& , const Color& ) const {NEVER();};
 	virtual void Paint(Painter &p, const double& , const Point& cp, const double& size, 
 		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const = 0;

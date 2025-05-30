@@ -615,16 +615,17 @@ private:
 	Vector<int> idsx, idsy, idsFixed;
 	int beginData = 0;
 	int numData = Null;
+	double gainX = 1;
 	
 public:
 	VectorVectorY() {}
 	VectorVectorY(const Vector<Vector<T> > &_data, int _idx, int _idy, 
 				  const Vector<int> &_idsx, const Vector<int> &_idsy, const Vector<int> &_idsFixed, 
-				  bool _useRows = true, int _beginData = 0, int _numData = Null) {
-		Init(_data, _idx, _idy, _idsx, _idsy, _idsFixed, _useRows, _beginData, _numData);
+				  bool _useRows = true, int _beginData = 0, int _numData = Null, double _gainX = 1) {
+		Init(_data, _idx, _idy, _idsx, _idsy, _idsFixed, _useRows, _beginData, _numData, _gainX);
 	}
 	void Init(const Vector<Vector<T> > &_data, int _idx, int _idy, const Vector<int> &_idsx, const Vector<int> &_idsy, 
-			  const Vector<int> &_idsFixed, bool _useRows = true, int _beginData = 0, int _numData = Null) {
+			  const Vector<int> &_idsFixed, bool _useRows = true, int _beginData = 0, int _numData = Null, double _gainX = 1) {
 		this->data = &_data;
 		this->useRows = _useRows;
 		
@@ -634,6 +635,7 @@ public:
 		this->idsy = clone(_idsy);
 		this->idsFixed = clone(_idsFixed);
 		this->beginData = _beginData;
+		this->gainX = _gainX;
 		
 		if (!_useRows) {
 			if (data->IsEmpty())
@@ -682,11 +684,11 @@ public:
 		if (useRows) {
 			if ((*data)[beginData + int(id)].size() <= idx)
 				return Null;
-			return (*data)[beginData + int(id)][idx];
+			return (*data)[beginData + int(id)][idx] * gainX;
 		} else {
 			if ((*data)[idx].size() <= beginData + int(id))
 				return Null;
-			return (*data)[idx][beginData + int(id)];
+			return (*data)[idx][beginData + int(id)] * gainX;
 		}	
 	}
 	virtual inline int64 GetCount() const	{return numData;};
@@ -1730,15 +1732,6 @@ void CleanNAN_safe(Range &x, Range &y, Range &z) {
 	x = pick(retx);
 	y = pick(rety);
 	z = pick(retz);	
-}
-
-template <class Range1, class Range2>
-Range1 ApplyIndex(const Range1 &x, const Range2 &indices) {
-	ASSERT(x.size() == indices.size());
-	Range1 ret(x.size());
-	for (int i = 0; i < x.size(); ++i)
-		ret[i] = x[indices[i]];
-	return ret;
 }
 
 template <class Range1, class Range2>
