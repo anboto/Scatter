@@ -1970,33 +1970,48 @@ bool IsQTF(const String &str) {
 	return str[0] == '\1' || str[0] == '[';
 }
 
+const String ScatterDraw::LINE_SOLID 	     = "";
+const String ScatterDraw::LINE_NONE 		 = "0";
+const String ScatterDraw::LINE_DOTTED_FINER = "2 10";
+const String ScatterDraw::LINE_DOTTED_FINE  = "2 6";
+const String ScatterDraw::LINE_DOTTED 	     = "4 10";
+const String ScatterDraw::LINE_DOTTED_SEP   = "4 20";
+const String ScatterDraw::LINE_DASHED 	     = "12 12";
+const String ScatterDraw::LINE_DASHED_LONG  = "12 4";
+const String ScatterDraw::LINE_DASH_DOT 	 = "12 8 3 8";	// Reduced. Previous was too long
+const String ScatterDraw::LINE_BEGIN_END	 = "2";
 	
-INITBLOCK {
-	SeriesPlot::Register<LineSeriesPlot>("Line");
-	SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");
-	SeriesPlot::Register<BarSeriesPlot>("Bar");
+struct ScatterDraw::StaticConstructor {
+	StaticConstructor() {
+		ONCELOCK {
+			SeriesPlot::Register<LineSeriesPlot>("Line");
+			SeriesPlot::Register<StaggeredSeriesPlot>("Staggered");
+			SeriesPlot::Register<BarSeriesPlot>("Bar");
+			
+			MarkPlot::Register<CircleMarkPlot>("Circle");
+			MarkPlot::Register<SquareMarkPlot>("Square");
+			MarkPlot::Register<TriangleMarkPlot>("Triangle");
+			MarkPlot::Register<CrossMarkPlot>("Cross");
+			MarkPlot::Register<XMarkPlot>("X mark");
+			MarkPlot::Register<RhombMarkPlot>("Rhomb");
+			MarkPlot::Register<RangePlot>("Range");
+			MarkPlot::Register<BubblePlot>("Bubble");
+			MarkPlot::Register<InvTriangleMarkPlot>("Inv. Triangle");
+			MarkPlot::Register<AsteriskMarkPlot>("Asterisk");
+			MarkPlot::Register<DiamondMarkPlot>("Diamond");
 	
-	MarkPlot::Register<CircleMarkPlot>("Circle");
-	MarkPlot::Register<SquareMarkPlot>("Square");
-	MarkPlot::Register<TriangleMarkPlot>("Triangle");
-	MarkPlot::Register<CrossMarkPlot>("Cross");
-	MarkPlot::Register<XMarkPlot>("X mark");
-	MarkPlot::Register<RhombMarkPlot>("Rhomb");
-	MarkPlot::Register<RangePlot>("Range");
-	MarkPlot::Register<BubblePlot>("Bubble");
-	MarkPlot::Register<InvTriangleMarkPlot>("Inv. Triangle");
-	MarkPlot::Register<AsteriskMarkPlot>("Asterisk");
-	MarkPlot::Register<DiamondMarkPlot>("Diamond");
-	
-	DashStyle::Register("LINE_SOLID", ScatterDraw::LINE_SOLID);
-	DashStyle::Register("LINE_DOTTED_FINER", ScatterDraw::LINE_DOTTED_FINER);
-	DashStyle::Register("LINE_DOTTED_FINE", ScatterDraw::LINE_DOTTED_FINE);
-	DashStyle::Register("LINE_DOTTED", ScatterDraw::LINE_DOTTED);
-	DashStyle::Register("LINE_DOTTED_SEP", ScatterDraw::LINE_DOTTED_SEP);
-	DashStyle::Register("LINE_DASHED", ScatterDraw::LINE_DASHED);
-	DashStyle::Register("LINE_DASH_DOT", ScatterDraw::LINE_DASH_DOT);
-	DashStyle::Register("LINE_BEGIN_END", ScatterDraw::LINE_BEGIN_END);
-	DashStyle::Register("LINE_NONE", ScatterDraw::LINE_NONE);
-}
+			DashStyle::Register("LINE_SOLID", ScatterDraw::LINE_SOLID);
+			DashStyle::Register("LINE_DOTTED_FINER", ScatterDraw::LINE_DOTTED_FINER);
+			DashStyle::Register("LINE_DOTTED_FINE", ScatterDraw::LINE_DOTTED_FINE);
+			DashStyle::Register("LINE_DOTTED", ScatterDraw::LINE_DOTTED);
+			DashStyle::Register("LINE_DOTTED_SEP", ScatterDraw::LINE_DOTTED_SEP);
+			DashStyle::Register("LINE_DASHED", ScatterDraw::LINE_DASHED);
+			DashStyle::Register("LINE_DASH_DOT", ScatterDraw::LINE_DASH_DOT);
+			DashStyle::Register("LINE_BEGIN_END", ScatterDraw::LINE_BEGIN_END);
+			DashStyle::Register("LINE_NONE", ScatterDraw::LINE_NONE);
+		}
+	}
+};
+ScatterDraw::StaticConstructor ScatterDraw::staticConstructorInstance;
 
 }

@@ -21,8 +21,7 @@ void debug_h();			// Dummy function used to debug .h files
 
 class DashStyle {
 public:
-	static int Register(const String& name, const String& style) {
-		return map().FindAdd(name, style);
+	static int Register(const String& name, String style) {
 		return map().FindAdd(name, style);
 	}
 	static void Unregister(const String& name) {
@@ -75,16 +74,16 @@ public:
 		MD_SUBPIXEL    = MODE_SUBPIXEL
 	};
 	
-	static inline const String LINE_SOLID 	     = "";
-	static inline const String LINE_NONE 		 = "0";
-	static inline const String LINE_DOTTED_FINER = "2 10";
-	static inline const String LINE_DOTTED_FINE  = "2 6";
-	static inline const String LINE_DOTTED 	     = "4 10";
-	static inline const String LINE_DOTTED_SEP   = "4 20";
-	static inline const String LINE_DASHED 	     = "12 12";
-	static inline const String LINE_DASHED_LONG  = "12 4";
-	static inline const String LINE_DASH_DOT 	 = "12 8 3 8";	// Reduced. Previous was too long
-	static inline const String LINE_BEGIN_END	 = "2";
+	static const String LINE_SOLID;
+	static const String LINE_NONE;
+	static const String LINE_DOTTED_FINER;
+	static const String LINE_DOTTED_FINE;
+	static const String LINE_DOTTED;
+	static const String LINE_DOTTED_SEP;
+	static const String LINE_DASHED;
+	static const String LINE_DASHED_LONG;
+	static const String LINE_DASH_DOT;
+	static const String LINE_BEGIN_END;
 	
 protected:
 	class ScatterBasicSeries {
@@ -1355,6 +1354,9 @@ protected:
 	void DrawRainbowPalette(Draw& w) const;
 	
 private:
+	struct StaticConstructor;
+	static StaticConstructor staticConstructorInstance;
+            
 	static inline double SafeDoubleToInt(double value) {	// Return a double between the limits of signed int
 		//constexpr double minInt = std::numeric_limits<int>::min();
     	//constexpr double maxInt = std::numeric_limits<int>::max();
@@ -1823,7 +1825,7 @@ void ScatterDraw::Plot(T& w) {
 							dataY << GetPosY(data.zny(ii, i), serie.primaryY);
 						for (int ii = 0; ii < data.GetznFixedCount(); ++ii) 
 							dataFixed << data.znFixed(ii, i);
-						serie.markPlot->Paint(w, plotScaleAvg, ix, iy, dataX, dataY, dataFixed, 
+						serie.markPlot->Paint(w, plotScaleAvg, (int)ix, (int)iy, dataX, dataY, dataFixed, 
 							serie.markWidth, serie.markColor, 
 							serie.markBorderWidth, serie.markBorderColor);   
 					}

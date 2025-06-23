@@ -174,7 +174,7 @@ void TextsTab::Init(ScatterCtrl& scatter) {
 	bottomMargin <<= scatter.GetPlotAreaBottomMargin();
 	bottomMargin.WhenAction = [=]{Change();};
 	butFontTitle.SetImage(ScatterImgP::ColorA);
-	butFontTitle.WhenAction = [=]{Change();};
+	butFontTitle.WhenAction = [=]{OnFontTitle();};
 	colorTitle <<= scatter.GetTitleColor();
 	colorTitle.WhenAction = [=]{Change();};
 	butFontLabel.SetImage(ScatterImgP::ColorA);
