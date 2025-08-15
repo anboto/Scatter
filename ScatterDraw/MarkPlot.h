@@ -16,8 +16,8 @@ public:
 		const Color& , const double& , const Color& ) const {NEVER();};
 	virtual void Paint(Painter &p, const double& , const Point& cp, const double& size, 
 		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const = 0;
-	virtual void Paint(Painter &, const double& , int , int , const Vector<int>& , 
-		const Vector<int>& , const Vector<double>& , const double& , 
+	virtual void Paint(Painter &, const double& , int , int , const Vector<double>& , 
+		const Vector<double>& , const Vector<double>& , const double& , 
 		const Color& , const double& , const Color& ) const {NEVER();};
 	template<class T>
 	static void Register(const String& name) {
@@ -78,11 +78,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };
@@ -103,11 +103,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };
@@ -129,11 +129,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };
@@ -155,11 +155,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };
@@ -176,11 +176,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 };	
@@ -197,11 +197,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 };	
@@ -227,11 +227,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& , const Color& ) const {
+		const double& , const Color& ) const override {
 		DoPaint(p, scale, cp, size, markColor);
 	}
 };
@@ -252,11 +252,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };	
@@ -277,11 +277,11 @@ private:
 
 public:
 	void Paint(Draw &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Painter &p, const double& scale, const Point& cp, const double& size, const Color& markColor,
-		const double& markBorderWidth, const Color& markBorderColor) const {
+		const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, cp, size, markColor, markBorderWidth, markBorderColor);
 	}
 };	
@@ -295,19 +295,19 @@ public:
 		type = rangeType;
 		multiPlot = true;
 	}
-	virtual int GetTypeCount()			{return 3;}
-	virtual const char **TypeString()	{
+	virtual int GetTypeCount() const 			{return 3;}
+	virtual const char **TypeString() override {
 		static const char *names[] = {"ALL", "MIN_MAX", "MIN_AVG_MAX"};
 		return names;
 	}
 	
 private:
 	template <class T>
-	void DoPaint(T& w, const double& scale, int x, int y, const Vector<int>& dataX, 
-		const Vector<int>& dataY, const double& size, const Color& markColor) const {
+	void DoPaint(T& w, const double& scale, int x, int y, const Vector<double>& dataX, 
+		const Vector<double>& dataY, const double& size, const Color& markColor) const {
 		int side2l = int((size*scale)/2.);
 		int side2r = int(size*scale - side2l);
-		const Vector<int> *pdata;
+		const Vector<double> *pdata;
 		if (!dataY.IsEmpty()) 
 			pdata = &dataY;
 		else
@@ -354,21 +354,21 @@ private:
 	}
 	
 public:
-	virtual void Paint(Draw &p, const double& scale, int x, int y, const Vector<int>& dataX, 
-		const Vector<int>& dataY, const Vector<double>& , const double& size, 
-		const Color& markColor, const double& , const Color& ) const {
+	virtual void Paint(Draw &p, const double& scale, int x, int y, const Vector<double>& dataX, 
+		const Vector<double>& dataY, const Vector<double>& , const double& size, 
+		const Color& markColor, const double& , const Color& ) const override {
 		DoPaint(p, scale, x, y, dataX, dataY, size, markColor);
 	}
-	virtual void Paint(Painter &p, const double& scale, int x, int y, const Vector<int>& dataX, 
-		const Vector<int>& dataY, const Vector<double>& , const double& size, 
-		const Color& markColor, const double& , const Color& ) const {
+	virtual void Paint(Painter &p, const double& scale, int x, int y, const Vector<double>& dataX, 
+		const Vector<double>& dataY, const Vector<double>& , const double& size, 
+		const Color& markColor, const double& , const Color& ) const override {
 		DoPaint(p, scale, x, y, dataX, dataY, size, markColor);
 	}
 	void Paint(Draw &, const double& , const Point& , const double& , const Color& ,
-		const double& , const Color& ) const 
+		const double& , const Color& ) const override 
 	{}
 	void Paint(Painter &, const double& , const Point& , const double& , const Color& ,
-		const double& , const Color& ) const  
+		const double& , const Color& ) const override  
 	{}
 };	
 
@@ -386,21 +386,21 @@ private:
 	
 public:
 	BubblePlot() {multiPlot = true;}
-	virtual void Paint(Draw &p, const double& scale, int x, int y, const Vector<int>& , 
-		const Vector<int>& , const Vector<double>& dataFixed, const double& size, 
-		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const {
+	virtual void Paint(Draw &p, const double& scale, int x, int y, const Vector<double>& , 
+		const Vector<double>& , const Vector<double>& dataFixed, const double& size, 
+		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, x, y, dataFixed, size, markColor, markBorderWidth, markBorderColor);
 	}
-	virtual void Paint(Painter &p, const double& scale, int x, int y, const Vector<int>& , 
-		const Vector<int>& , const Vector<double>& dataFixed, const double& size, 
-		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const {
+	virtual void Paint(Painter &p, const double& scale, int x, int y, const Vector<double>& , 
+		const Vector<double>& , const Vector<double>& dataFixed, const double& size, 
+		const Color& markColor, const double& markBorderWidth, const Color& markBorderColor) const override {
 		DoPaint(p, scale, x, y, dataFixed, size, markColor, markBorderWidth, markBorderColor);
 	}
 	void Paint(Draw &, const double& , const Point& , const double& , const Color& ,
-		const double& , const Color& ) const 
+		const double& , const Color& ) const override 
 	{}
 	void Paint(Painter &, const double& , const Point& , const double& , const Color& ,
-		const double& , const Color& ) const  
+		const double& , const Color& ) const override 
 	{}
 };	
 					

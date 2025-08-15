@@ -285,19 +285,19 @@ public:
 			return false;
 		return true;
 	}
-	virtual inline double y(int64 id) {
+	virtual inline double y(int64 id) override {
 		if (isExplicit)
 			return f(xLow + id*(xHigh - xLow)/double(count - 1));
 		else
 			return Check(id) ? data->y(id) : Null;
 	}
-	virtual inline double x(int64 id) {
+	virtual inline double x(int64 id) override {
 		if (isExplicit)
 			return xLow + id*(xHigh - xLow)/double(count - 1);
 		else
 			return Check(id) ? data->x(id) : Null;
 	}
-	virtual inline double x(double t) {
+	virtual inline double x(double t) override {
 		double x = data->x(t);
 		if (IsNum(xHigh) && xHigh < x)
 			return Null;
@@ -305,7 +305,7 @@ public:
 			return Null;
 		return x;
 	}
-	virtual double f(double x) {
+	virtual double f(double x) override {
 		if (IsNum(xHigh) && xHigh < x)
 			return Null;
 		if (IsNum(xLow) && xLow > x)
@@ -314,7 +314,7 @@ public:
 	}
 	virtual double MinX() 				{return xLow;}
 	virtual double MaxX() 				{return xHigh;}
-	virtual inline int64 GetCount() const {
+	virtual inline int64 GetCount() const override {
 		if (isExplicit)
 			return count;
 		return data->GetCount();
@@ -527,11 +527,11 @@ public:
 	CArray(const double *_yData, int _numData, double _x0, double _deltaX) : yData(_yData), numData(_numData), x0(_x0), deltaX(_deltaX) {xData = NULL;}
 	CArray(const double *_xData, const double *_yData, int _numData) : xData(_xData), yData(_yData), numData(_numData) {zData = nullptr; x0 = deltaX = 0;}
 	CArray(const double *_xData, const double *_yData, const double *_zData, int _numData) : xData(_xData), yData(_yData), zData(_zData), numData(_numData) {x0 = deltaX = 0;}
-	virtual inline double y(int64 id)  	{return yData[ptrdiff_t(id)];}
-	virtual inline double x(int64 id)  	{return xData ? xData[ptrdiff_t(id)] : id*deltaX + x0;}
-	virtual double znFixed(int n, int64 id); 
-	virtual int GetznFixedCount() const			{return 1;}
-	virtual inline int64 GetCount() const		{return numData;}
+	virtual inline double y(int64 id) override {return yData[ptrdiff_t(id)];}
+	virtual inline double x(int64 id) override {return xData ? xData[ptrdiff_t(id)] : id*deltaX + x0;}
+	virtual double znFixed(int n, int64 id) override ; 
+	virtual int GetznFixedCount()   const override {return 1;}
+	virtual inline int64 GetCount() const override {return numData;}
 };
 
 class EigenVector : public DataSource {
@@ -550,16 +550,16 @@ public:
 		ASSERT(_xData.size() == _yData.size() && _xData.size() == _zData.size());
 		x0 = deltaX = 0;
 	}
-	virtual inline double x(int64 id)  	{return xData ? (*xData)(Eigen::Index(id)) : id*deltaX + x0;}
-	virtual inline double y(int64 id)  	{return (*yData)(Eigen::Index(id));}
-	virtual double znFixed(int n, int64 id) {
+	virtual inline double x(int64 id) override {return xData ? (*xData)(Eigen::Index(id)) : id*deltaX + x0;}
+	virtual inline double y(int64 id) override {return (*yData)(Eigen::Index(id));}
+	virtual double znFixed(int n, int64 id) override {
 		if (n == 0)
 			return (*zData)(Eigen::Index(id));
 		NEVER();
 		return Null;
 	}
-	virtual int GetznFixedCount() const			{return 1;}
-	virtual inline int64 GetCount() const		{return yData->size();}
+	virtual int GetznFixedCount()   const override {return 1;}
+	virtual inline int64 GetCount() const override {return yData->size();}
 };
 
 template <class T>
@@ -656,7 +656,7 @@ public:
 		static Vector<int> idsVoid;
 		Init(_data, _idx, _idy, idsVoid, idsVoid, idsVoid, _useRows, _beginData, _numData);
 	}
-	virtual inline double y(int64 id)  {
+	virtual inline double y(int64 id) override {
 		if (data->IsEmpty())
 			return Null;
 		if (!IsNull(idy) && idy >= 0) {
@@ -678,7 +678,7 @@ public:
 			return ret/GetznyCount(id);
 		}
 	}
-	virtual inline double x(int64 id)  {
+	virtual inline double x(int64 id) override {
 		if (data->IsEmpty())
 			return Null;
 		if (useRows) {
@@ -691,23 +691,23 @@ public:
 			return (*data)[idx][beginData + int(id)] * gainX;
 		}	
 	}
-	virtual inline int64 GetCount() const	{return numData;};
-	virtual double znx(int n, int64 id)	const {
+	virtual inline int64 GetCount() const override {return numData;};
+	virtual double znx(int n, int64 id)	const override {
 		return useRows ? (*data)[beginData + int(id)][idsx[n]] : (*data)[idsx[n]][beginData + int(id)];}
-	virtual double zny(int n, int64 id)	const {
+	virtual double zny(int n, int64 id)	const override {
 		if (!IsNull(idy) && idy < 0) 
 			return useRows ? (*data)[beginData + int(id)][n - idy] : (*data)[n - idy][beginData + int(id)];	
 		return useRows ? (*data)[beginData + int(id)][idsy[n]] : (*data)[idsy[n]][beginData + int(id)];
 	}
-	virtual double znFixed(int n, int64 id)	{return useRows ? (*data)[beginData + int(id)][idsFixed[n]] : (*data)[idsFixed[n]][beginData + int(id)];}
-	virtual int GetznxCount(int64) const	{
+	virtual double znFixed(int n, int64 id)	override {return useRows ? (*data)[beginData + int(id)][idsFixed[n]] : (*data)[idsFixed[n]][beginData + int(id)];}
+	virtual int GetznxCount(int64) const override {
 		return idsx.GetCount();}
-	virtual int GetznyCount(int64 id) const {
+	virtual int GetznyCount(int64 id) const override {
 		if (!IsNull(idy) && idy < 0) 
 			return (useRows ? (*data)[beginData + int(id)].GetCount() : (*data).GetCount()) + idy;
 		return idsy.GetCount();
 	}
-	virtual int GetznFixedCount() const		{return idsFixed.GetCount();}
+	virtual int GetznFixedCount() const	override {return idsFixed.GetCount();}
 };
 
 class VectorXY : public DataSource {
@@ -721,9 +721,9 @@ public:
 		xData = &_xData;
 		yData = &_yData;
 	}
-	virtual inline double x(int64 id) 		{return (*xData)[int(id)];}
-	virtual inline double y(int64 id) 		{return (*yData)[int(id)];}
-	virtual inline int64 GetCount()	 const	{return min(xData->GetCount(), yData->GetCount());}
+	virtual inline double x(int64 id) override {return (*xData)[int(id)];}
+	virtual inline double y(int64 id) override {return (*yData)[int(id)];}
+	virtual inline int64 GetCount()	const override {return min(xData->GetCount(), yData->GetCount());}
 };
 
 class ArrayXY : public DataSource {
@@ -732,9 +732,9 @@ private:
 
 public:
 	ArrayXY(const Array<double> &_xData, const Array<double> &_yData) : xData(&_xData), yData(&_yData) {}
-	virtual inline double x(int64 id) 		{return (*xData)[int(id)];}
-	virtual inline double y(int64 id) 		{return (*yData)[int(id)];}
-	virtual inline int64 GetCount() const	{return min(xData->GetCount(), yData->GetCount());}
+	virtual inline double x(int64 id) override {return (*xData)[int(id)];}
+	virtual inline double y(int64 id) override {return (*yData)[int(id)];}
+	virtual inline int64 GetCount() const override {return min(xData->GetCount(), yData->GetCount());}
 };
 
 class VectorPointf : public DataSource {
@@ -747,9 +747,9 @@ public:
 	VectorPointf(Vector<Pointf> *_data) 		{Init(_data);}
 	void Init(const Vector<Pointf> *_data) 		{data = _data;}
 	void Init(const Vector<Pointf> &_data) 		{data = &_data;}
-	virtual inline double y(int64 id) 			{return (*data)[int(id)].y;}
-	virtual inline double x(int64 id) 	 		{return (*data)[int(id)].x;}
-	virtual inline int64 GetCount() const		{return data->GetCount();}
+	virtual inline double y(int64 id) override 	{return (*data)[int(id)].y;}
+	virtual inline double x(int64 id) override 	{return (*data)[int(id)].x;}
+	virtual inline int64 GetCount() const override {return data->GetCount();}
 };	
 
 class ArrayPointf : public DataSource {
@@ -758,9 +758,9 @@ private:
 
 public:
 	ArrayPointf(const Array<Pointf> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) 		{return (*data)[int(id)].y;}
-	virtual inline double x(int64 id) 	 {return (*data)[int(id)].x;}
-	virtual inline int64 GetCount() const	{return data->GetCount();}
+	virtual inline double y(int64 id) override {return (*data)[int(id)].y;}
+	virtual inline double x(int64 id) override {return (*data)[int(id)].x;}
+	virtual inline int64 GetCount() const override {return data->GetCount();}
 };	
 
 template <class TX, class TY>
@@ -770,9 +770,9 @@ private:
 
 public:
 	VectorMapXY(const VectorMap<TX, TY> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) 			{return (*data)[int(id)];}
-	virtual inline double x(int64 id) 	 		{return (*data).GetKey(int(id));}
-	virtual inline int64 GetCount() const		{return data->GetCount();}
+	virtual inline double y(int64 id) override 	{return (*data)[int(id)];}
+	virtual inline double x(int64 id) override 	{return (*data).GetKey(int(id));}
+	virtual inline int64 GetCount() const override {return data->GetCount();}
 };	
 
 template <class TX, class TY>
@@ -782,7 +782,7 @@ private:
 
 public:
 	ArrayMapXY(const ArrayMap<TX, TY> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) 			{return (*data)[int(id)];}
+	virtual inline double y(int64 id) override 	{return (*data)[int(id)];}
 	virtual inline double x(int64 id) 		 	{return (*data).GetKey(int(id));}
 	virtual inline int64 GetCount() const		{return data->GetCount();}
 };		
@@ -794,10 +794,10 @@ protected:
 public:
 	FuncSource() {isExplicit = true;}
 	FuncSource(Function <double(double)> _function) : function(_function) {isExplicit = true;}
-	virtual inline double f(double x)		{return function(x);}
-	virtual double x(int64 ) 				{NEVER(); return Null;}
-	virtual double y(int64 ) 				{NEVER(); return Null;}
-	virtual inline int64 GetCount() const	{return 0;}
+	virtual inline double f(double x) override {return function(x);}
+	virtual double x(int64 ) override 		{NEVER(); return Null;}
+	virtual double y(int64 ) override 		{NEVER(); return Null;}
+	virtual inline int64 GetCount() const override {return 0;}
 };
 
 class FuncSourceV : public DataSource {
@@ -806,10 +806,10 @@ private:
 
 public:
 	FuncSourceV(Event<double&, double> _function) : function(_function) {isExplicit = true;}
-	virtual inline double f(double x)		{double y; function(y, x); return y;}
-	virtual double x(int64 ) 				{NEVER(); return Null;}
-	virtual double y(int64 ) 				{NEVER(); return Null;}
-	virtual inline int64 GetCount() const	{return 0;}
+	virtual inline double f(double x) override 		{double y; function(y, x); return y;}
+	virtual double x(int64 ) override 		{NEVER(); return Null;}
+	virtual double y(int64 ) override 		{NEVER(); return Null;}
+	virtual inline int64 GetCount() const override {return 0;}
 };
 
 class FuncSourcePara : public DataSource {
@@ -826,23 +826,23 @@ public:
 		isParam = true; 
 		lastT = Null;
 	}
-	virtual inline double y(double t) {
+	virtual inline double y(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			lastPointf = function(minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.y;
 	}
-	virtual inline double x(double t) {
+	virtual inline double x(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			lastPointf = function(minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.x;
 	}
-	virtual double x(int64 ) 				{NEVER(); return Null;}
-	virtual double y(int64 ) 				{NEVER(); return Null;}
-	virtual inline int64 GetCount() const	{return numPoints;}
+	virtual double x(int64 ) override 		{NEVER(); return Null;}
+	virtual double y(int64 ) override 		{NEVER(); return Null;}
+	virtual inline int64 GetCount() const override {return numPoints;}
 };	
 
 typedef Event<double&, double> PlotExplicFunc; 
@@ -875,23 +875,23 @@ public:
 		isParam = true; 
 		lastT = Null;
 	}
-	inline double y(double t) {
+	inline double y(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			function(lastPointf, minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.y;
 	}
-	inline double x(double t) {
+	inline double x(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			function(lastPointf, minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.x;
 	}
-	virtual double x(int64 ) 				{NEVER(); return Null;}
-	virtual double y(int64 ) 				{NEVER(); return Null;}
-	virtual inline int64 GetCount() const	{return numPoints;}
+	virtual double x(int64 ) override {NEVER(); return Null;}
+	virtual double y(int64 ) override {NEVER(); return Null;}
+	virtual inline int64 GetCount() const override {return numPoints;}
 };	
 	
 struct PointfLess {

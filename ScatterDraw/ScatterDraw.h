@@ -1792,10 +1792,13 @@ void ScatterDraw::Plot(T& w) {
 			DataSource &data = serie.Data();
 			if (serie.opacity == 0 || (!serie.seriesPlot && !serie.markPlot))
 				continue;
-			if (!data.IsExplicit() && data.GetCount() == 0)
-				continue;
-			if (data.IsExplicit() && IsNull(data.GetCount()))
-				continue;
+			if (data.IsExplicit()) {
+				if (IsNull(data.GetCount()))
+					continue;
+			} else {
+				if (data.IsEmpty())
+					continue;
+			}
 			
 			Vector<Pointf> points = DataAddPoints(serie.Data(), serie.primaryY, serie.sequential);
 			if (!points.IsEmpty() && serie.seriesPlot && (serie.thickness > 0 || !IsNull(serie.fillColor)))
