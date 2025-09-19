@@ -319,19 +319,19 @@ private:
 		int max = INT_MIN;
 		for (int i = 0; i < pdata->GetCount(); ++i) {
 			if (min > (*pdata)[i])
-				min = (*pdata)[i];
+				min = (int)(*pdata)[i];
 			if (max < (*pdata)[i])
-				max = (*pdata)[i];
+				max = (int)(*pdata)[i];
 		}
 		if (type == MIN_AVG_MAX) {
 			for (int i = 0; i < pdata->GetCount(); ++i) 
-				avg += (*pdata)[i];
+				avg += (int)(*pdata)[i];
 			avg /= pdata->GetCount();
 		}
 		if (!dataY.IsEmpty()) {	
 			if (type == ALL) {
 				for (int i = 0; i < dataY.GetCount(); ++i) 
-					w.DrawLine(x - side2l, dataY[i], x + side2r, dataY[i], fround(scale), markColor);
+					w.DrawLine(x - side2l, (int)dataY[i], x + side2r, (int)dataY[i], fround(scale), markColor);
 			} else {
 				w.DrawLine(x - side2l, min, x + side2r, min, fround(scale), markColor);			
 				w.DrawLine(x - side2l, max, x + side2r, max, fround(scale), markColor);			
@@ -342,7 +342,7 @@ private:
 		} else {
 			if (type == ALL) {
 				for (int i = 0; i < dataX.GetCount(); ++i) 
-					w.DrawLine(dataX[i], y - side2l, dataX[i], y + side2r, fround(scale), markColor);
+					w.DrawLine((int)dataX[i], y - side2l, (int)dataX[i], y + side2r, fround(scale), markColor);
 			} else {
 				w.DrawLine(min, y - side2l, min, y + side2r, fround(scale), markColor);
 				w.DrawLine(max, y - side2l, max, y + side2r, fround(scale), markColor);

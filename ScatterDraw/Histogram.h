@@ -31,7 +31,7 @@ public:
 	Histogram &Create2D(const Vector<Vector<double> > &_ranges, const Vector<double> &data, double total);
 
 	Histogram &Normalize(double val = 1);
-	Histogram &Accumulative(bool _accum = true)	{accumulative = _accum;	return *this;}
+	Histogram &Cumulative(bool _accum = true)	{cumulative = _accum;	return *this;}
 	
 	double Compare(const Histogram &hist);
 	
@@ -43,7 +43,7 @@ public:
 	
 	inline double y(int64 id) {
 		ASSERT(values.size());
-		if (!accumulative)	
+		if (!cumulative)	
 			return values(ptrdiff_t(id));
 		else {
 			double ret = 0;
@@ -77,7 +77,7 @@ public:
 	}
 protected:
 	double totalVals;
-	bool accumulative = false;
+	bool cumulative = false;
 	
 	MultiDimMatrixIndex valuesIdx;
 	Eigen::VectorXd values; 

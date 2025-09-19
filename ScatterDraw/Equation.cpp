@@ -882,6 +882,8 @@ INITBLOCK {
 	ExplicitEquation::Register<WeibullCumulativeEquation>("WeibullCumulativeEquation");
 	ExplicitEquation::Register<WeibullEquation3>("WeibullEquation3");
 	ExplicitEquation::Register<WeibullCumulativeEquation3>("WeibullCumulativeEquation3");
+	ExplicitEquation::Register<GumbelEquation>("GumbelEquation");
+	ExplicitEquation::Register<GumbelCumulativeEquation>("GumbelCumulativeEquation");
 	ExplicitEquation::Register<NormalEquation>("NormalEquation");
 	ExplicitEquation::Register<AsymptoticEquation4>("Asymptotic4");
 }

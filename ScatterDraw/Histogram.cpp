@@ -110,12 +110,15 @@ Histogram &Histogram::Create(DataSource &data, double min, double max, int numVa
 		else
 			max = data.MaxX();
 	}
-	
+	if (max == min)
+		return *this;
+		
 	values.resize(numVals);
 	values.setZero();
 	ranges.SetCount(1);
 	ranges[0].SetCount(numVals);
 	double delta = (max - min)/numVals;
+	
 	for (int ii = 0; ii < numVals; ++ii) 
 		ranges[0][ii] = min + (ii + 0.5)*delta;
 	

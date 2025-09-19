@@ -17,7 +17,7 @@ namespace Upp {
 
 Color GetOpaqueColor(const Color &color, const Color &background, double opacity);
 
-void debug_h();			// Dummy function used to debug .h files
+//void debug_h();			// Dummy function used to debug .h files
 
 class DashStyle {
 public:

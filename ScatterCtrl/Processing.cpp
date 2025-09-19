@@ -374,7 +374,7 @@ void ProcessingTab::OnOp()
 		double r2SinusTendBest = Null;
 		SinEquation sinusTendBest;
 		for (int iLow = 9; iLow >= 0; iLow--) {
-			double xLow = data.x(int64(data.GetCount()*iLow/10.));
+			double xLow = data.x(data.GetCount()*iLow/10);
 			dataXRange2.SetXLow(xLow);
 			sinusTend.GuessCoeff(dataXRange2);
 			if (sinusTend.Fit(dataXRange2, r2SinusTend) < 0)
@@ -436,7 +436,7 @@ void ProcessingTab::OnAutoSensSector()
 	baseWidth = 0;
 	for (int64 i = 1; i < data.GetCount(); ++i)
 		baseWidth += (data.x(i) - data.x(i-1));
-	baseWidth /= (data.GetCount() - 1);
+	baseWidth /= double(data.GetCount() - 1);
 	
 	double rangeX = data.x(data.GetCount() - 1) - data.x(int64(0));
 	
@@ -754,7 +754,7 @@ void ProcessingTab::OnUpdateSensitivity()
 	tabFitRight.numMax.Enable(tabFitRight.opMax);
 	tabFitRight.numMax <<= (tabFitRight.opMax ? upperEnvelope.GetCount() : Null);
 	if (tabFitRight.opMax) {
-		tabFitRight.array.Add(5, 0, t_("MPM"));
+		tabFitRight.array.Set(5, 0, t_("MPM"));
 		tabFitRight.array.Set(5, 1, mpm);
 	}
 	if (tabFitRight.opMin && newWidthMin != tabFitRight.width) {
@@ -1037,7 +1037,7 @@ void ProcessingTab::OnHist() {
 	double valNormalize = ~tabHistRight.valNormalize;
 	bool isY = ~tabHistRight.axis == t_("Y");
 	
-	histogram.Create(data, minVal, maxVal, numVals, isY).Accumulative(~tabHistRight.opAccumulative);
+	histogram.Create(data, minVal, maxVal, numVals, isY).Cumulative(~tabHistRight.opCumulative);
 	
 	if (normalize)
 		histogram.Normalize(valNormalize);

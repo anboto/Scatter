@@ -606,6 +606,8 @@ public:
 	virtual double AvgX() 					{return (x0 + yData->GetCount()*deltaX)/2.;}
 };
 
+void debug_h();
+
 template <class T>
 class VectorVectorY : public DataSource {
 private:
@@ -641,9 +643,11 @@ public:
 			if (data->IsEmpty())
 				this->numData = 0;
 			else {	
-				this->numData = _data[0].size();
-				for (int i = 1; i < _data.size(); ++i)
-					this->numData = min(this->numData, _data[i].size());
+				this->numData = min(_data[this->idx].size(), _data[this->idy].size());
+				for (int i = 0; i < this->idsx.size(); ++i)
+					this->numData = min(this->numData, _data[this->idsx[i]].size());
+				for (int i = 0; i < this->idsy.size(); ++i)
+					this->numData = min(this->numData, _data[this->idsy[i]].size());
 				this->numData -= _beginData;
 			}
 		} else

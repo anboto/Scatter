@@ -695,7 +695,10 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 
 double DataSource::PercentileWeibullVal(bool isY, double rate, double mn, double mx) {
 	Histogram hist;
-	hist.Create(*this, mn, mx, 2000, isY).Accumulative(true);
+	hist.Create(*this, mn, mx, 2000, isY).Cumulative(true);
+	if (IsNull(hist))
+		return Null;
+	
 	hist.Normalize(1);
 	
 	Eigen::VectorXd x, y;

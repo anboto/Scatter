@@ -574,6 +574,85 @@ public:
 	void SetDegree(int )					{NEVER();}
 };
 
+class GumbelCumulativeEquation : public ExplicitEquation {
+public:
+	GumbelCumulativeEquation()	{SetCoeff(1, 1, 1);}
+	GumbelCumulativeEquation(double mu, double beta, double factor) {
+		ASSERT(beta > 0);	SetCoeff(mu, beta, factor);}
+	double f(double x) {
+		double mu =  coeff[0];
+		double beta = coeff[1]; 
+		double factor = coeff[2];
+		if (beta == 0)
+			return 0;
+		double z = (x - mu)/beta;
+		if (z > 705)		// Too close to double limits
+			return 0;
+		return factor*::exp(-::exp(-z));
+	}
+	virtual String GetName() 					{return t_("Gumbel cumulative");}
+	virtual String GetEquation(int nDig = 3) {
+		String mu =  FormatCoeff(0, nDig);
+		String beta = FormatCoeff(1, nDig);
+		String factor = FormatCoeff(2, nDig);
+		String ret = Format("%s*e^-(e^-((x-%s)/%s))", factor, mu, beta);
+		ret.Replace("+-", "-");
+		ret.Replace("--", "+");
+		return ret;
+	}	
+	virtual void GuessCoeff(DataSource &series) {
+		double mean = series.AvgY();
+		double stdd = series.StdDevY(mean);
+		double beta = stdd*sqrt(6.)/M_PI;
+		double mu = mean - 0.5772156649*beta;		// Euler-Mascheroni constant
+		coeff[0] = mu;
+		coeff[1] = beta;
+		coeff[2] = series.y(series.size()-1);
+	}
+	void SetDegree(int )				{NEVER();}
+};
+
+class GumbelEquation : public ExplicitEquation {
+public:
+	GumbelEquation() 							{SetCoeff(1, 1, 1);}
+	GumbelEquation(double mu, double beta, double factor) {
+		ASSERT(beta > 0);	SetCoeff(mu, beta, factor);}
+	double f(double x) {
+		double mu =  coeff[0];
+		double beta = coeff[1]; 
+		double factor = coeff[2];
+		if (beta == 0)
+			return 0;
+		double z = (x - mu)/beta;
+		if (z > 705)		// Too close to double limits
+			return 0;
+		return factor*(1/beta)*::exp(-(z + ::exp(-z)));
+	}
+	virtual String GetName() 					{return t_("Gumbel");}
+	virtual String GetEquation(int nDig = 3) {
+		String mu =  FormatCoeff(0, nDig);
+		String beta = FormatCoeff(1, nDig);
+		String sfactor = FormatCoeff(2, nDig);
+		String ret = Format("%s*(1/%s)*e^-((x-%s)/%s + e^-(x-%s)/%s)", sfactor, beta, mu, beta, mu, beta);
+		ret.Replace("+-", "-");
+		ret.Replace("--", "+");
+		return ret;
+	}	
+	virtual void GuessCoeff(DataSource &series) {
+		Vector<Pointf> cumulative = series.CumulativeY();
+		VectorPointf data(cumulative);
+		GumbelCumulativeEquation gumbelCumulative;
+		ExplicitEquation::FitError error = gumbelCumulative.Fit(data);
+		if (error == ExplicitEquation::NoError) {
+			double k = gumbelCumulative.GetCoeff()[0];
+			double lambda = gumbelCumulative.GetCoeff()[1];
+			double factor = gumbelCumulative.GetCoeff()[2];
+			SetCoeff(k, lambda, factor);
+		}
+	}
+	void SetDegree(int )					{NEVER();}
+};
+
 class NormalEquation : public ExplicitEquation {
 public:
 	NormalEquation() 						{SetCoeff(1, 1, 1);}
