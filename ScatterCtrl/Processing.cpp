@@ -271,10 +271,12 @@ ProcessingTab::ProcessingTab()
 }
 
 void ProcessingTab::ArrayCopy() {
+	WaitCursor waitcursor;
 	tabBestFitRight.gridTrend.SetClipboard(true, true);
 }
 
 void ProcessingTab::ArraySelect() {
+	WaitCursor waitcursor;
 	tabBestFitRight.gridTrend.Select(0, tabBestFitRight.gridTrend.GetCount(), true);
 }
 
