@@ -1757,9 +1757,9 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				points << Pointf(GetPosX(xx), GetPosY(yy, primaryY));
 		}
 	} else if (data.IsExplicit()) {
-		double xmax = xMin + xRange;
 		double dx = xRange/plotW;
-		for (double xx = xMin - dx; xx < xmax + dx; xx += dx) {
+		for (int i = -1; i <= plotW; i++) {
+			double xx = xMin + dx * i;
 			double yy = data.f(xx);
 			if (!IsNum(yy))
 				points << Null;
