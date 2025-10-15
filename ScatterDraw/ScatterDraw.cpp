@@ -1775,7 +1775,7 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 				if (IsNum(xx)) {
 					if (IsNull(imin)) {
 						if (xx >= xMin) 
-							imin = i;
+							imin = i > 0 ? i-1 : 0;
 					}
 					imax = i;
 					if (xx >= xMin + xRange) {
@@ -1786,11 +1786,6 @@ Vector<Pointf> ScatterDraw::DataAddPoints(DataSource& data, bool primaryY, bool 
 			}
 			if (IsNull(imin) || IsNull(imax))
 				return points;
-			/*
-			if (IsNull(imin))
-			    imin = 0;
-			if (IsNull(imax))
-			    imax = data.GetCount() - 1;*/
 		} else {
 			imin = 0;
 			imax = data.GetCount() - 1;

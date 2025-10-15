@@ -11,7 +11,9 @@
 #include "SeriesPlot.h"
 #include "MarkPlot.h"
 #include <Functions4U/Functions4U.h>
+#ifdef CPU_X86
 #include <immintrin.h>		// For _mm_cvttsd_si32() and _mm_set_sd()
+#endif
 
 namespace Upp {
 
@@ -1358,12 +1360,15 @@ private:
 	static StaticConstructor staticConstructorInstance;
             
 	static inline double SafeDoubleToInt(double value) {	// Return a double between the limits of signed int
-		//constexpr double minInt = std::numeric_limits<int>::min();
-    	//constexpr double maxInt = std::numeric_limits<int>::max();
-    	//return max(minInt, min(value, maxInt));
     	if (IsNull(value))
     		return Null;
+#ifdef CPU_X86
     	return (double)_mm_cvttsd_si32(_mm_set_sd(value)); 	// Fast SSE4.1 truncation
+#else
+		constexpr double minInt = std::numeric_limits<int>::min();
+    	constexpr double maxInt = std::numeric_limits<int>::max();
+    	return max(minInt, min(value, maxInt));
+#endif
 	}
 	
 	Size size{Size(800, 400)};		// Size to be used for all but screen painting
