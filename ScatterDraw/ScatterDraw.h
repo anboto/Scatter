@@ -1673,7 +1673,7 @@ bool ScatterDraw::PlotTexts(T& w, bool boldX, bool boldY) {
 	double borderWidth = 1.5*gridWidth;//fround(gridWidth*plotScaleAvg);
 #ifdef flagGUI		// Control highlight
 	if (!IsNull(highlight_0)) {
-		double delayFactor = 4*(1000. - (GetTickCount() - highlight_0))/1000.;
+		double delayFactor = 4*(1000. - (int64(GetTickCount()) - highlight_0))/1000.;
 		if (delayFactor < 1) {
 			delayFactor = 1;
 			highlight_0 = Null;
@@ -1705,14 +1705,14 @@ void ScatterDraw::Plot(T& w) {
 			w.DrawRect(0, 0, plotW, plotH, plotAreaColor);
 		else {
 			ImageBuffer out_image(plotW, plotH);
-			Upp::Fill(~out_image, plotAreaColor, int(out_image.GetLength()));
+			Upp::Fill(~out_image, plotAreaColor, size_t(out_image.GetLength()));
 
 			if (!IsNum(surfMaxZ) || !IsNum(surfMinZ))
 				return;
 			
 			double deltaz = surfMaxZ - surfMinZ;
 			if (deltaz == 0) 
-				Upp::Fill(~out_image, GetRainbowColor(0, surfRainbow, 0), int(out_image.GetLength()));	
+				Upp::Fill(~out_image, GetRainbowColor(0, surfRainbow, 0), size_t(out_image.GetLength()));	
 			else {
 				CoWork co;
 				for (int ix = 0; ix < plotW; ++ix) {
