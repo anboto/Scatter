@@ -3,7 +3,6 @@
 #include "ScatterDraw.h"
 #include <Eigen/Eigen.h>
 
-#include <Functions4U/EnableWarnings.h>
 
 namespace Upp {
 using namespace Eigen;

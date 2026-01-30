@@ -9,7 +9,6 @@
 #define TFILE <ScatterCtrl/ScatterCtrl.t>
 #include <Core/t.h>
 
-#include <Functions4U/EnableWarnings.h>
 
 namespace Upp {	
 		

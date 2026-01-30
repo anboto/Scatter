@@ -3,7 +3,6 @@
 #include "PieDraw.h"
 #include "DrawingFunctions.h"
 
-#include <Functions4U/EnableWarnings.h>
 
 namespace Upp {
 	

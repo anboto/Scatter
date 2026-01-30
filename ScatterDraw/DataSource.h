@@ -136,14 +136,14 @@ public:
 	Vector<double> X()				{return Data(&DataSource::x);}
 	Vector<double> Y()				{return Data(&DataSource::y);}
 	double MinY(int64& id)  		{return Min(&DataSource::y, id);}
-	double MinY()  					{int64 dummy;	return Min(&DataSource::y, dummy);}
+	virtual double MinY()  			{int64 dummy;	return Min(&DataSource::y, dummy);}
 	double MinX(int64& id)  		{return Min(&DataSource::x, id);}	
-	double MinX() 					{int64 dummy;	return Min(&DataSource::x, dummy);}
+	virtual double MinX() 			{int64 dummy;	return Min(&DataSource::x, dummy);}
 
 	double MaxY(int64& id)  		{return Max(&DataSource::y, id);}
-	double MaxY()  					{int64 dummy;	return Max(&DataSource::y, dummy);}
+	virtual double MaxY()  			{int64 dummy;	return Max(&DataSource::y, dummy);}
 	double MaxX(int64& id)  		{return Max(&DataSource::x, id);}	
-	double MaxX() 					{int64 dummy;	return Max(&DataSource::x, dummy);}	
+	virtual double MaxX() 			{int64 dummy;	return Max(&DataSource::x, dummy);}	
 	
 	bool IsSortedY()  				{return IsSorted(&DataSource::y);}		
 	bool IsSortedX()  				{return IsSorted(&DataSource::x);}	
@@ -151,8 +151,8 @@ public:
 	int64 Closest(double x,double y){return Closest(&DataSource::x, &DataSource::y, x, y);}	
 	int64 ClosestY(double d)  		{return Closest(&DataSource::y, d);}		
 	int64 ClosestX(double d)  		{return Closest(&DataSource::x, d);}
-	double AvgY()  					{return Avg(&DataSource::y);}		
-	double AvgX()  					{return Avg(&DataSource::x);}	
+	virtual double AvgY()  			{return Avg(&DataSource::y);}		
+	virtual double AvgX()  			{return Avg(&DataSource::x);}	
 	double AvgYWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::y, w);}		
 	double AvgXWeighted(const Eigen::VectorXd &w)	{return AvgWeighted(&DataSource::x, w);}
 	double Slope()					{return	Slope(&DataSource::x, &DataSource::y);}
@@ -285,19 +285,19 @@ public:
 			return false;
 		return true;
 	}
-	virtual inline double y(int64 id) override {
+	inline double y(int64 id) override {
 		if (isExplicit)
 			return f(xLow + id*(xHigh - xLow)/double(count - 1));
 		else
 			return Check(id) ? data->y(id) : Null;
 	}
-	virtual inline double x(int64 id) override {
+	inline double x(int64 id) override {
 		if (isExplicit)
 			return xLow + id*(xHigh - xLow)/double(count - 1);
 		else
 			return Check(id) ? data->x(id) : Null;
 	}
-	virtual inline double x(double t) override {
+	inline double x(double t) override {
 		double x = data->x(t);
 		if (IsNum(xHigh) && xHigh < x)
 			return Null;
@@ -305,16 +305,16 @@ public:
 			return Null;
 		return x;
 	}
-	virtual double f(double x) override {
+	double f(double x) override {
 		if (IsNum(xHigh) && xHigh < x)
 			return Null;
 		if (IsNum(xLow) && xLow > x)
 			return Null;
 		return data->f(x);
 	}
-	virtual double MinX() 				{return xLow;}
-	virtual double MaxX() 				{return xHigh;}
-	virtual inline int64 GetCount() const override {
+	double MinX() override {return xLow;}
+	double MaxX() override {return xHigh;}
+	inline int64 GetCount() const override {
 		if (isExplicit)
 			return count;
 		return data->GetCount();
@@ -357,13 +357,13 @@ public:
 		else
 			return data->y(id)*multY + shiftY;
 	}*/
-	virtual inline double x(double t) {
+	inline double x(double t) override {
 		return data->x(t)*multX + shiftX;
 	}
-	virtual double f(double x) {
+	double f(double x) override {
 		return data->f(x)*multY + shiftY;
 	}
-	virtual inline int64 GetCount() const {
+	inline int64 GetCount() const override {
 		if (isExplicit)
 			return count;
 		return data->GetCount();
@@ -394,9 +394,9 @@ public:
 		DataWrapper::Init(_data);
 		isReverse = true;
 	}
-	virtual inline double y(int64 id) {return data->y(GetCount() - id - 1);}
-	virtual inline double x(int64 id) {return data->x(GetCount() - id - 1);}
-	virtual int64 GetCount() const	  {return data->GetCount();}
+	inline double y(int64 id) override {return data->y(GetCount() - id - 1);}
+	inline double x(int64 id) override {return data->x(GetCount() - id - 1);}
+	int64 GetCount() const override	  {return data->GetCount();}
 };
 
 class DataReverseX : public DataWrapper {
@@ -407,9 +407,9 @@ public:
 		ASSERT(!_data.IsExplicit() && !_data.IsParam());
 		DataWrapper::Init(_data);
 	}
-	virtual inline double y(int64 id) {return data->y(id);}
-	virtual inline double x(int64 id) {return data->x(GetCount() - id - 1);}
-	virtual int64 GetCount() const	  {return data->GetCount();}
+	inline double y(int64 id) override {return data->y(id);}
+	inline double x(int64 id) override {return data->x(GetCount() - id - 1);}
+	int64 GetCount() const override	  {return data->GetCount();}
 };
 
 class DataAppend : public DataSource {
@@ -425,19 +425,19 @@ public:
 		isExplicit = data[0]->IsExplicit() && data[1]->IsExplicit();
 		isAppend = true;
 	}
-	virtual inline double y(int64 id) {
+	inline double y(int64 id) override {
 		int64 count1 = data[0]->GetCount();
 		if (id < count1)
 			return data[0]->y(id);
 		return data[1]->y(id - count1);
 	}
-	virtual inline double x(int64 id) {
+	inline double x(int64 id) override {
 		int64 count1 = data[0]->GetCount();
 		if (id < count1)
 			return data[0]->x(id);
 		return data[1]->x(id - count1);
 	}
-	virtual int64 GetCount() const		{return data[0]->GetCount() + data[1]->GetCount();}
+	int64 GetCount() const override		{return data[0]->GetCount() + data[1]->GetCount();}
 	DataSource& DataAt(int i)           {return *data[i];}
 };
 
@@ -492,18 +492,10 @@ public:
 			this->index = _index;
 			this->parent = _parent;
 		}
-		virtual inline double y(int64 id) {
-			return parent->GetY(index, id);	
-		}
-		double RealY(int64 id) {
-			return data->y(id);	
-		}
-		virtual inline double x(int64 id) {
-			return data->x(id);	
-		}
-		virtual int64 GetCount() const {
-			return data->GetCount();
-		}
+		inline double y(int64 id) override 	{return parent->GetY(index, id);}
+		double RealY(int64 id) 				{return data->y(id);}
+		inline double x(int64 id) override 	{return data->x(id);}
+		int64 GetCount() const override 	{return data->GetCount();}
 	private:
 		DataSource *data = 0;
 		int index = -1;
@@ -527,11 +519,11 @@ public:
 	CArray(const double *_yData, int _numData, double _x0, double _deltaX) : yData(_yData), numData(_numData), x0(_x0), deltaX(_deltaX) {xData = NULL;}
 	CArray(const double *_xData, const double *_yData, int _numData) : xData(_xData), yData(_yData), numData(_numData) {zData = nullptr; x0 = deltaX = 0;}
 	CArray(const double *_xData, const double *_yData, const double *_zData, int _numData) : xData(_xData), yData(_yData), zData(_zData), numData(_numData) {x0 = deltaX = 0;}
-	virtual inline double y(int64 id) override {return yData[ptrdiff_t(id)];}
-	virtual inline double x(int64 id) override {return xData ? xData[ptrdiff_t(id)] : id*deltaX + x0;}
-	virtual double znFixed(int n, int64 id) override ; 
-	virtual int GetznFixedCount()   const override {return 1;}
-	virtual inline int64 GetCount() const override {return numData;}
+	inline double y(int64 id) override {return yData[ptrdiff_t(id)];}
+	inline double x(int64 id) override {return xData ? xData[ptrdiff_t(id)] : id*deltaX + x0;}
+	double znFixed(int n, int64 id) override ; 
+	int GetznFixedCount()   const override {return 1;}
+	inline int64 GetCount() const override {return numData;}
 };
 
 class EigenVector : public DataSource {
@@ -550,16 +542,16 @@ public:
 		ASSERT(_xData.size() == _yData.size() && _xData.size() == _zData.size());
 		x0 = deltaX = 0;
 	}
-	virtual inline double x(int64 id) override {return xData ? (*xData)(Eigen::Index(id)) : id*deltaX + x0;}
-	virtual inline double y(int64 id) override {return (*yData)(Eigen::Index(id));}
-	virtual double znFixed(int n, int64 id) override {
+	inline double x(int64 id) override {return xData ? (*xData)(Eigen::Index(id)) : id*deltaX + x0;}
+	inline double y(int64 id) override {return (*yData)(Eigen::Index(id));}
+	double znFixed(int n, int64 id) override {
 		if (n == 0)
 			return (*zData)(Eigen::Index(id));
 		NEVER();
 		return Null;
 	}
-	virtual int GetznFixedCount()   const override {return 1;}
-	virtual inline int64 GetCount() const override {return yData->size();}
+	int GetznFixedCount()   const override {return 1;}
+	inline int64 GetCount() const override {return yData->size();}
 };
 
 template <class T>
@@ -576,12 +568,12 @@ public:
 		this->x0 = _x0;
 		this->deltaX = _deltaX;
 	}	
-	virtual inline double y(int64 id) 		{return (*yData)[int(id)];}
-	virtual inline double x(int64 id) 		{return id*deltaX + x0;}
-	virtual inline int64 GetCount() const	{return yData->GetCount();}
-	virtual double MinX() 					{return x0;}	
-	virtual double MaxX() 					{return x0 + (yData->GetCount() - 1)*deltaX;}	
-	virtual double AvgX() 					{return x0 + ((yData->GetCount() - 1)*deltaX)/2.;}
+	inline double y(int64 id) override 		{return (*yData)[int(id)];}
+	inline double x(int64 id) override 		{return id*deltaX + x0;}
+	inline int64 GetCount() const override	{return yData->GetCount();}
+	double MinX() override 					{return x0;}	
+	double MaxX() override 					{return x0 + (yData->GetCount() - 1)*deltaX;}	
+	double AvgX() override 					{return x0 + ((yData->GetCount() - 1)*deltaX)/2.;}
 };	
 
 template <class T>
@@ -598,12 +590,12 @@ public:
 		this->x0 = _x0;
 		this->deltaX = _deltaX;
 	}	
-	virtual inline double y(int64 id) 		{return (*yData)[ptrdiff_t(id)];}
-	virtual inline double x(int64 id) 		{return id*deltaX + x0;}
-	virtual inline int64 GetCount() const	{return yData->GetCount();}
-	virtual double MinX() 					{return x0;}	
-	virtual double MaxX() 					{return x0 + yData->GetCount()*deltaX;}	
-	virtual double AvgX() 					{return (x0 + yData->GetCount()*deltaX)/2.;}
+	inline double y(int64 id) override 		{return (*yData)[ptrdiff_t(id)];}
+	inline double x(int64 id) override 		{return id*deltaX + x0;}
+	inline int64 GetCount() const override	{return yData->GetCount();}
+	double MinX() override 					{return x0;}	
+	double MaxX() override 					{return x0 + yData->GetCount()*deltaX;}	
+	double AvgX() override 					{return (x0 + yData->GetCount()*deltaX)/2.;}
 };
 
 void debug_h();
@@ -660,7 +652,7 @@ public:
 		static Vector<int> idsVoid;
 		Init(_data, _idx, _idy, idsVoid, idsVoid, idsVoid, _useRows, _beginData, _numData);
 	}
-	virtual inline double y(int64 id) override {
+	inline double y(int64 id) override {
 		if (data->IsEmpty())
 			return Null;
 		if (!IsNull(idy) && idy >= 0) {
@@ -682,7 +674,7 @@ public:
 			return ret/GetznyCount(id);
 		}
 	}
-	virtual inline double x(int64 id) override {
+	inline double x(int64 id) override {
 		if (data->IsEmpty())
 			return Null;
 		if (useRows) {
@@ -695,23 +687,23 @@ public:
 			return (*data)[idx][beginData + int(id)] * gainX;
 		}	
 	}
-	virtual inline int64 GetCount() const override {return numData;};
-	virtual double znx(int n, int64 id)	const override {
+	inline int64 GetCount() const override {return numData;};
+	double znx(int n, int64 id)	const override {
 		return useRows ? (*data)[beginData + int(id)][idsx[n]] : (*data)[idsx[n]][beginData + int(id)];}
-	virtual double zny(int n, int64 id)	const override {
+	double zny(int n, int64 id)	const override {
 		if (!IsNull(idy) && idy < 0) 
 			return useRows ? (*data)[beginData + int(id)][n - idy] : (*data)[n - idy][beginData + int(id)];	
 		return useRows ? (*data)[beginData + int(id)][idsy[n]] : (*data)[idsy[n]][beginData + int(id)];
 	}
-	virtual double znFixed(int n, int64 id)	override {return useRows ? (*data)[beginData + int(id)][idsFixed[n]] : (*data)[idsFixed[n]][beginData + int(id)];}
-	virtual int GetznxCount(int64) const override {
+	double znFixed(int n, int64 id)	override {return useRows ? (*data)[beginData + int(id)][idsFixed[n]] : (*data)[idsFixed[n]][beginData + int(id)];}
+	int GetznxCount(int64) const override {
 		return idsx.GetCount();}
-	virtual int GetznyCount(int64 id) const override {
+	int GetznyCount(int64 id) const override {
 		if (!IsNull(idy) && idy < 0) 
 			return (useRows ? (*data)[beginData + int(id)].GetCount() : (*data).GetCount()) + idy;
 		return idsy.GetCount();
 	}
-	virtual int GetznFixedCount() const	override {return idsFixed.GetCount();}
+	int GetznFixedCount() const	override {return idsFixed.GetCount();}
 };
 
 class VectorXY : public DataSource {
@@ -725,9 +717,9 @@ public:
 		xData = &_xData;
 		yData = &_yData;
 	}
-	virtual inline double x(int64 id) override {return (*xData)[int(id)];}
-	virtual inline double y(int64 id) override {return (*yData)[int(id)];}
-	virtual inline int64 GetCount()	const override {return min(xData->GetCount(), yData->GetCount());}
+	inline double x(int64 id) override {return (*xData)[int(id)];}
+	inline double y(int64 id) override {return (*yData)[int(id)];}
+	inline int64 GetCount()	const override {return min(xData->GetCount(), yData->GetCount());}
 };
 
 class ArrayXY : public DataSource {
@@ -736,9 +728,9 @@ private:
 
 public:
 	ArrayXY(const Array<double> &_xData, const Array<double> &_yData) : xData(&_xData), yData(&_yData) {}
-	virtual inline double x(int64 id) override {return (*xData)[int(id)];}
-	virtual inline double y(int64 id) override {return (*yData)[int(id)];}
-	virtual inline int64 GetCount() const override {return min(xData->GetCount(), yData->GetCount());}
+	inline double x(int64 id) override 		{return (*xData)[int(id)];}
+	inline double y(int64 id) override 		{return (*yData)[int(id)];}
+	inline int64 GetCount() const override 	{return min(xData->GetCount(), yData->GetCount());}
 };
 
 class VectorPointf : public DataSource {
@@ -751,9 +743,9 @@ public:
 	VectorPointf(Vector<Pointf> *_data) 		{Init(_data);}
 	void Init(const Vector<Pointf> *_data) 		{data = _data;}
 	void Init(const Vector<Pointf> &_data) 		{data = &_data;}
-	virtual inline double y(int64 id) override 	{return (*data)[int(id)].y;}
-	virtual inline double x(int64 id) override 	{return (*data)[int(id)].x;}
-	virtual inline int64 GetCount() const override {return data->GetCount();}
+	inline double y(int64 id) override 			{return (*data)[int(id)].y;}
+	inline double x(int64 id) override 			{return (*data)[int(id)].x;}
+	inline int64 GetCount() const override 		{return data->GetCount();}
 };	
 
 class ArrayPointf : public DataSource {
@@ -762,9 +754,9 @@ private:
 
 public:
 	ArrayPointf(const Array<Pointf> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) override {return (*data)[int(id)].y;}
-	virtual inline double x(int64 id) override {return (*data)[int(id)].x;}
-	virtual inline int64 GetCount() const override {return data->GetCount();}
+	inline double y(int64 id) override 		{return (*data)[int(id)].y;}
+	inline double x(int64 id) override 		{return (*data)[int(id)].x;}
+	inline int64 GetCount() const override 	{return data->GetCount();}
 };	
 
 template <class TX, class TY>
@@ -774,9 +766,9 @@ private:
 
 public:
 	VectorMapXY(const VectorMap<TX, TY> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) override 	{return (*data)[int(id)];}
-	virtual inline double x(int64 id) override 	{return (*data).GetKey(int(id));}
-	virtual inline int64 GetCount() const override {return data->GetCount();}
+	inline double y(int64 id) override 		{return (*data)[int(id)];}
+	inline double x(int64 id) override 		{return (*data).GetKey(int(id));}
+	inline int64 GetCount() const override 	{return data->GetCount();}
 };	
 
 template <class TX, class TY>
@@ -786,9 +778,9 @@ private:
 
 public:
 	ArrayMapXY(const ArrayMap<TX, TY> &_data) : data(&_data) {}
-	virtual inline double y(int64 id) override 	{return (*data)[int(id)];}
-	virtual inline double x(int64 id) 		 	{return (*data).GetKey(int(id));}
-	virtual inline int64 GetCount() const		{return data->GetCount();}
+	inline double y(int64 id) override 			{return (*data)[int(id)];}
+	inline double x(int64 id) override 		 	{return (*data).GetKey(int(id));}
+	inline int64 GetCount() const override		{return data->GetCount();}
 };		
 
 class FuncSource : public DataSource {
@@ -798,10 +790,10 @@ protected:
 public:
 	FuncSource() {isExplicit = true;}
 	FuncSource(Function <double(double)> _function) : function(_function) {isExplicit = true;}
-	virtual inline double f(double x) override {return function(x);}
-	virtual double x(int64 ) override 		{NEVER(); return Null;}
-	virtual double y(int64 ) override 		{NEVER(); return Null;}
-	virtual inline int64 GetCount() const override {return 0;}
+	inline double f(double x) override 		{return function(x);}
+	double x(int64 ) override 				{NEVER(); return Null;}
+	double y(int64 ) override 				{NEVER(); return Null;}
+	inline int64 GetCount() const override 	{return 0;}
 };
 
 class FuncSourceV : public DataSource {
@@ -810,10 +802,10 @@ private:
 
 public:
 	FuncSourceV(Event<double&, double> _function) : function(_function) {isExplicit = true;}
-	virtual inline double f(double x) override 		{double y; function(y, x); return y;}
-	virtual double x(int64 ) override 		{NEVER(); return Null;}
-	virtual double y(int64 ) override 		{NEVER(); return Null;}
-	virtual inline int64 GetCount() const override {return 0;}
+	inline double f(double x) override 		{double y; function(y, x); return y;}
+	double x(int64 ) override 				{NEVER(); return Null;}
+	double y(int64 ) override 				{NEVER(); return Null;}
+	inline int64 GetCount() const override 	{return 0;}
 };
 
 class FuncSourcePara : public DataSource {
@@ -830,23 +822,23 @@ public:
 		isParam = true; 
 		lastT = Null;
 	}
-	virtual inline double y(double t) override {
+	inline double y(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			lastPointf = function(minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.y;
 	}
-	virtual inline double x(double t) override {
+	inline double x(double t) override {
 		if (!IsNum(lastT) || t != lastT) {
 			lastPointf = function(minT + t*(maxT-minT)/numPoints);
 			lastT = t;
 		}
 		return lastPointf.x;
 	}
-	virtual double x(int64 ) override 		{NEVER(); return Null;}
-	virtual double y(int64 ) override 		{NEVER(); return Null;}
-	virtual inline int64 GetCount() const override {return numPoints;}
+	double x(int64 ) override 				{NEVER(); return Null;}
+	double y(int64 ) override 				{NEVER(); return Null;}
+	inline int64 GetCount() const override 	{return numPoints;}
 };	
 
 typedef Event<double&, double> PlotExplicFunc; 
@@ -859,10 +851,10 @@ private:
 
 public:
 	PlotExplicFuncSource(PlotExplicFunc &_function) : function(_function) {isExplicit = true;}
-	virtual inline double f(double t)	{double y; function(y, t); return y;}
-	virtual double x(int64 ) 				{NEVER(); return Null;}
-	virtual double y(int64 ) 				{NEVER(); return Null;}
-	virtual inline int64 GetCount() const	{NEVER(); return Null;}
+	inline double f(double t) override		{double y; function(y, t); return y;}
+	double x(int64 ) override 				{NEVER(); return Null;}
+	double y(int64 ) override 				{NEVER(); return Null;}
+	inline int64 GetCount() const override	{NEVER(); return Null;}
 };	
 
 class PlotParamFuncSource : public DataSource {
@@ -893,9 +885,9 @@ public:
 		}
 		return lastPointf.x;
 	}
-	virtual double x(int64 ) override {NEVER(); return Null;}
-	virtual double y(int64 ) override {NEVER(); return Null;}
-	virtual inline int64 GetCount() const override {return numPoints;}
+	double x(int64 ) override 				{NEVER(); return Null;}
+	double y(int64 ) override 				{NEVER(); return Null;}
+	inline int64 GetCount() const override 	{return numPoints;}
 };	
 	
 struct PointfLess {
@@ -906,11 +898,11 @@ class DataSourceSurf {
 public:
 	DataSourceSurf() : isExplicit(false), key(1212121) {}
 	virtual ~DataSourceSurf() noexcept	{key = 1231231;}	
-	virtual double z(double x, double y)= 0;
+	virtual double z(double x, double y) = 0;
 	
 	virtual bool IsEmpty() = 0;
-	bool IsDeleted()	   {return key != 1212121;}
-	bool IsExplicit()	   {return isExplicit;}
+	bool IsDeleted()	   				{return key != 1212121;}
+	bool IsExplicit()	   				{return isExplicit;}
  
 	virtual inline double x(int )		{NEVER();	return Null;}
 	virtual inline double y(int )		{NEVER();	return Null;}
@@ -1187,7 +1179,7 @@ public:
 	double z_data(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, 
 					int x, int y);
 
-	double z(double x, double y) {
+	double z(double x, double y) override {
 		return z(&TableData::x, &TableData::y, &TableData::zdata, x, y);
 	}
 	double z(Getdatafun getdataX, Getdatafun getdataY, Getdatafun getdata, double x, double y) {
@@ -1196,30 +1188,30 @@ public:
 		else
 			return z_point(getdataX, getdataY, getdata, x, y);
 	}
-	double z_data(int ix, int iy) {
+	double z_data(int ix, int iy) override {
 		return z_data(&TableData::x, &TableData::y, &TableData::zdata, ix, iy);
 	}
 	
-	bool IsEmpty() {
+	bool IsEmpty() override {
 		return lendata == 0 || lenxAxis == 0 || lenyAxis == 0;
 	}
 	
 	double MinX(Getdatafun getdata);
-	virtual double MinX() 				{return MinX(&TableData::x);}
+	double MinX() override 				{return MinX(&TableData::x);}
 	double MaxX(Getdatafun getdata);
-	virtual double MaxX() 				{return MaxX(&TableData::x);}
+	double MaxX() override 				{return MaxX(&TableData::x);}
 	double MinY(Getdatafun getdata);
-	virtual double MinY() 				{return MinY(&TableData::y);}
+	double MinY() override 				{return MinY(&TableData::y);}
 	double MaxY(Getdatafun getdata);
-	virtual double MaxY() 				{return MaxY(&TableData::y);}
+	double MaxY() override 				{return MaxY(&TableData::y);}
 	double MinZ(Getdatafun getdata);
-	virtual double MinZ() 				{return MinZ(&TableData::zdata);}
+	double MinZ() override 				{return MinZ(&TableData::zdata);}
 	double MaxZ(Getdatafun getdata);
-	virtual double MaxZ() 				{return MaxZ(&TableData::zdata);}
+	double MaxZ() override 				{return MaxZ(&TableData::zdata);}
 
-	virtual int rows() 					{return lenyAxis;}
-	virtual int cols() 					{return lenxAxis;}
-	virtual bool IsAreas()				{return areas;}
+	int rows() override 				{return lenyAxis;}
+	int cols() override 				{return lenxAxis;}
+	bool IsAreas() override				{return areas;}
 	
 	int lendata;
 	int lenxAxis;
@@ -1252,9 +1244,9 @@ public:
 		this->rowMajor = true;
 	}
 	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
-	virtual inline double x(int id) 		{return (*pxAxis)[id];}
-	virtual inline double y(int id) 		{return (*pyAxis)[id];}
-	virtual inline double zdata(int id) 	{return (*pdata)[id];}
+	inline double x(int id) override 		{return (*pxAxis)[id];}
+	inline double y(int id) override 		{return (*pyAxis)[id];}
+	inline double zdata(int id) override 	{return (*pdata)[id];}
 	
 private:
 	Vector<double> *pdata;
@@ -1282,9 +1274,9 @@ public:
 		this->rowMajor = false;
 	}
 	void SetInterpolate(Interpolate _inter)	{this->inter = _inter;}
-	virtual inline double x(int id) 		{return (*pxAxis)(id);}
-	virtual inline double y(int id) 		{return (*pyAxis)(id);}
-	virtual inline double zdata(int id) 	{return (*pdata).array()(id);}
+	inline double x(int id) override 		{return (*pxAxis)(id);}
+	inline double y(int id) override 		{return (*pyAxis)(id);}
+	inline double zdata(int id) override 	{return (*pdata).array()(id);}
 	
 private:
 	Eigen::MatrixXd *pdata;
@@ -1311,9 +1303,9 @@ public:
 		this->areas = _areas;
 		this->rowMajor = true;
 	}
-	virtual inline double x(int id) 	{return pxAxis[id];}
-	virtual inline double y(int id) 	{return pyAxis[id];}
-	virtual inline double zdata(int id) {return pdata[id];}
+	inline double x(int id) override 	{return pxAxis[id];}
+	inline double y(int id) override 	{return pyAxis[id];}
+	inline double zdata(int id) override {return pdata[id];}
 	
 private:
 	double *pdata;
@@ -1330,20 +1322,20 @@ public:
 	}
 	void Init(Function<double (double x, double y)> funz, double minX, double maxX, double minY, double maxY);
 		
-	double z(double x, double y)	{return funz ? funz(x, y) : Null;}
+	double z(double x, double y) override	{return funz ? funz(x, y) : Null;}
 	
-	bool IsEmpty() 	{return funz;}
+	bool IsEmpty() override {return funz;}
 	
-	double MinX()	{return minX;}
-	double MaxX()	{return maxX;}
-	double MinY()	{return minY;}
-	double MaxY()	{return maxY;}
-	double MinZ()	{return minZ;}
-	double MaxZ()	{return maxZ;}
-	virtual double z_data(int /*ix*/, int /*iy*/) 	{NEVER();	return Null;}
-	virtual int rows() 						{NEVER();	return Null;}
-	virtual int cols() 						{NEVER();	return Null;}
-	virtual bool IsAreas()					{NEVER();	return Null;}
+	double MinX() override	{return minX;}
+	double MaxX() override	{return maxX;}
+	double MinY() override	{return minY;}
+	double MaxY() override	{return maxY;}
+	double MinZ() override	{return minZ;}
+	double MaxZ() override	{return maxZ;}
+	double z_data(int /*ix*/, int /*iy*/) override 	{NEVER();	return Null;}
+	int rows() override 							{NEVER();	return Null;}
+	int cols() override 							{NEVER();	return Null;}
+	bool IsAreas() override							{NEVER();	return Null;}
 		
 private:
 	double minX, maxX, minY, maxY, minZ, maxZ;

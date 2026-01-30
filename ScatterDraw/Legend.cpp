@@ -2,7 +2,6 @@
 // Copyright 2021 - 2022, the Anboto author and contributors
 #include "ScatterDraw.h"
 
-#include <Functions4U/EnableWarnings.h>
 
 namespace Upp {
 

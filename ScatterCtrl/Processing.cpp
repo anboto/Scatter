@@ -4,7 +4,6 @@
 #include <Functions4U/Functions4U_Gui.h>
 #include <STEM4U/Integral.h>
 
-#include <Functions4U/EnableWarnings.h>
 
 namespace Upp {
 	
