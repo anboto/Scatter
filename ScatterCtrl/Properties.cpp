@@ -66,7 +66,7 @@ void MeasuresTab::Init(ScatterCtrl& scatter) {
 	
 	int id = DashStyle::StyleIndex(scatter.GetGridDash());
 	if (id < 0) {
-		id = DashStyle::Register(Format(t_("Dash \"%s\""), scatter.GetGridDash()), scatter.GetGridDash());
+		id = DashStyle::Register(F(t_("Dash \"%s\""), scatter.GetGridDash()), scatter.GetGridDash());
 		dashStyle.Add(DashStyle::TypeName(id));
 	}
 	dashStyle <<= DashStyle::TypeName(id);
@@ -562,7 +562,7 @@ void SeriesTab::UpdateFields() {
 	right.visible <<= scatter.ScatterDraw::IsVisible(index);
 	int id = DashStyle::StyleIndex(scatter.GetDash(index));
 	if (id < 0) {
-		id = DashStyle::Register(Format(t_("Dash \"%s\""), scatter.GetDash(index)), scatter.GetDash(index));
+		id = DashStyle::Register(F(t_("Dash \"%s\""), scatter.GetDash(index)), scatter.GetDash(index));
 		right.dashStyle.Add(DashStyle::TypeName(id));
 	}
 	right.dashStyle <<= DashStyle::TypeName(id);
@@ -624,7 +624,7 @@ void SeriesTab::OnDelete() {
 	if (index < 0)
 		return;
 	
-	if (!PromptOKCancel(Format(t_("You are going to delete '%s' series.&Do you agree?"), DeQtf(String(left.list.Get(0))))))
+	if (!PromptOKCancel(F(t_("You are going to delete '%s' series.&Do you agree?"), DeQtf(String(left.list.Get(0))))))
 		return;
 	
 	ScatterCtrl &scatter = *pscatter;

@@ -68,7 +68,7 @@ void DataDlg::Init(ScatterCtrl& scatter) {
 	}
 }
 
-Value DataDlg::DataSourceX::Format(const Value& q) const {
+Value DataDlg::DataSourceX::F(const Value& q) const {
 	if (pscatter->IsDeletedDataSource(index))
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
@@ -79,7 +79,7 @@ Value DataDlg::DataSourceX::Format(const Value& q) const {
 	return ret;
 }
 
-Value DataDlg::DataSourceY::Format(const Value& q) const {
+Value DataDlg::DataSourceY::F(const Value& q) const {
 	if (pscatter->IsDeletedDataSource(index))
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
@@ -205,7 +205,7 @@ void DataDlg::ArraySaveToFile(String fileName) {
 			name = t_("Scatter plot data");
 		fileToSave.PreSelect(ForceExt(name, ".csv"));
 		fileToSave.ClearTypes();
-		fileToSave.Type(Format(t_("%s file"), t_("Comma separated values (.csv)")), "*.csv");
+		fileToSave.Type(F(t_("%s file"), t_("Comma separated values (.csv)")), "*.csv");
 	    if(!fileToSave.ExecuteSaveAs(t_("Saving plot data"))) {
 	        Exclamation(t_("Plot data has not been saved"));
 	        return;
@@ -239,7 +239,7 @@ void DataDlg::OnArrayBar(Bar &menu) {
 	if (count == 0)
 		menu.Add(t_("No row selected"), Null, Null).Enable(false).Bold(true);
 	else {
-		menu.Add(Format(t_("Selected %d rows"), count), Null, Null).Enable(false).Bold(true);
+		menu.Add(F(t_("Selected %d rows"), count), Null, Null).Enable(false).Bold(true);
 		menu.Add(t_("Copy"), ScatterImgP::Copy(), [=] {ArrayCopy();}).Key(K_CTRL_C)
 									.Help(t_("Copy selected rows to clipboard"));
 		menu.Add(t_("Save to file"), ScatterImgP::Save(), [=] {ArraySaveToFile(Null);}).Key(K_CTRL_S)

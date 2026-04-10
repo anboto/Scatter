@@ -491,10 +491,10 @@ void ProcessingTab::GetVisibleData() {
 		double val;
 		val = data.MaxY(idmx);
 		if (!IsNull(val)) {
-			tabFitRight.array.Set(0, 2, Format("%f,%f", data.x(idmx), val));
+			tabFitRight.array.Set(0, 2, F("%f,%f", data.x(idmx), val));
 			val = data.MinY(idmx);
 			if (!IsNull(val))
-				tabFitRight.array.Set(1, 2, Format("%f,%f", data.x(idmx), val));
+				tabFitRight.array.Set(1, 2, F("%f,%f", data.x(idmx), val));
 		}
 	}
 }
@@ -553,10 +553,10 @@ void ProcessingTab::UpdateField(const String _name, int _id)
 		double val;
 		val = data.MaxY(idmx);
 		if (!IsNull(val)) {
-			tabFitRight.array.Set(0, 1, Format("%f,%f", data.x(idmx), val));
+			tabFitRight.array.Set(0, 1, F("%f,%f", data.x(idmx), val));
 			val = data.MinY(idmx);
 			if (!IsNull(val))
-				tabFitRight.array.Set(1, 1, Format("%f,%f", data.x(idmx), val));
+				tabFitRight.array.Set(1, 1, F("%f,%f", data.x(idmx), val));
 		}
 	}
 	if (!data.IsParam() && !data.IsExplicit()) {	
@@ -820,7 +820,7 @@ void ProcessingTab::OnSet()
 				}
 			}
 			if ((maxdT - mindT)/maxdT > 0.00001) 
-				tabFreqLeft.comments.SetText(Format(t_("Sampling time changes from %f to %f"), mindT, maxdT));
+				tabFreqLeft.comments.SetText(F(t_("Sampling time changes from %f to %f"), mindT, maxdT));
 			else 
 				tabFreqLeft.comments.SetText("");
 			tabFreqRight.samplingTime = (maxdT + mindT)/2.;
@@ -940,8 +940,8 @@ void ProcessingTab::OnShowEquation()
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + 
 						(show && tabFitRight.opSinusTend ? sinusTend.GetEquation(tabFitRight.numDecimals) : String(t_("Sinusoidal tend"))));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(t_("Spline")));
-	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(Format(t_("Der_%d"), ~tabFitRight.derOrder)));
-	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(Format(t_("S_G_%d"), ~tabFitRight.sgOrder)));
+	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(F(t_("Der_%d"), ~tabFitRight.derOrder)));
+	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(F(t_("S_G_%d"), ~tabFitRight.sgOrder)));
 	tabFitLeft.scatter.Legend(i++, pscatter->GetLegend(id) + String("-") + String(t_("FFT_filter")));
 	tabFitLeft.scatter.Refresh();
 }
@@ -975,7 +975,7 @@ void ProcessingTab::OnFFT()
 		VectorPointf fftData(fft);
 		double mxy = fftData.MaxY(idMaxFFT);
 		if (!IsNull(mxy))
-			tabFreqRight.eMax <<= Format("(%f,%f)", fftData.x(idMaxFFT), mxy);
+			tabFreqRight.eMax <<= F("(%f,%f)", fftData.x(idMaxFFT), mxy);
 		
 		if (tabFreqRight.type == FFT_TYPE::T_PSD) {
 			double m_1, m0, m1, m2;

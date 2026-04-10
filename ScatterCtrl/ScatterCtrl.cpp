@@ -146,9 +146,9 @@ void ScatterCtrl::LoadControl() {
 	FileSel fs;
 	
 	fs.NoExeIcons();
-	fs.Type(Format(t_("%s data file"), "json"), "*.json");
-	fs.Type(Format(t_("%s data file"), "xml"), "*.xml");
-	fs.Type(Format(t_("%s data file"), "bin"), "*.bin");
+	fs.Type(F(t_("%s data file"), "json"), "*.json");
+	fs.Type(F(t_("%s data file"), "xml"), "*.xml");
+	fs.Type(F(t_("%s data file"), "bin"), "*.bin");
 	fs.AllFilesType();
 	if (!defaultDataFile.IsEmpty())
 		fs = defaultDataFile;
@@ -188,7 +188,7 @@ void ScatterCtrl::LoadControl() {
 		if (!LoadFromFile(*this, fileName))
 			Exclamation(t_("Plot has not been loaded"));
 	} else
-		Exclamation(Format(t_("File format \"%s\" not found"), GetFileExt(fileName)));
+		Exclamation(F(t_("File format \"%s\" not found"), GetFileExt(fileName)));
 }
 
 void ScatterCtrl::OnTypeDataFile(FileSel *_fs) 
@@ -211,16 +211,16 @@ void ScatterCtrl::SaveControl() {
 	FileSel fs;
 	
 	fs.NoExeIcons();
-	fs.Type(Format(t_("%s data file"), "json"), "*.json");
-	fs.Type(Format(t_("%s data file"), "xml"), "*.xml");
-	fs.Type(Format(t_("%s data file"), "bin"), "*.bin");
+	fs.Type(F(t_("%s data file"), "json"), "*.json");
+	fs.Type(F(t_("%s data file"), "xml"), "*.xml");
+	fs.Type(F(t_("%s data file"), "bin"), "*.bin");
 	fs.AllFilesType();
 	if (!GetTitle().IsEmpty())
 		fs = FixPathName(GetTitle()) + ".json";
 	else if (!defaultDataFile.IsEmpty())
 		fs = defaultDataFile;
 	else
-		fs = S(t_("Scatter plot data")) + ".json";
+		fs = F(t_("Scatter plot data")) + ".json";
 	
 	String ext = GetFileExt(~fs);
 	fs.DefaultExt(ext);
@@ -251,7 +251,7 @@ void ScatterCtrl::SaveControl() {
 		if (!StoreToFile(*this, fileName))
 			Exclamation(t_("Plot has not been saved"));
 	} else
-		Exclamation(Format(t_("File format \"%s\" not found"), GetFileExt(fileName)));
+		Exclamation(F(t_("File format \"%s\" not found"), GetFileExt(fileName)));
 }
 
 void ScatterCtrl::Paint0(Draw& w, const Size &sz) {
@@ -1029,16 +1029,16 @@ bool ScatterCtrl::SaveToFile(String fileName) {
 		FileSel fs;
 		
 		fs.NoExeIcons();
-		fs.Type(Format(t_("%s bitmap file"), "jpeg"), "*.jpg");
-		fs.Type(Format(t_("%s bitmap file"), "png"), "*.png");
-		fs.Type(Format(t_("%s vector file"), "pdf"), "*.pdf");
+		fs.Type(F(t_("%s bitmap file"), "jpeg"), "*.jpg");
+		fs.Type(F(t_("%s bitmap file"), "png"), "*.png");
+		fs.Type(F(t_("%s vector file"), "pdf"), "*.pdf");
 		fs.AllFilesType();
 		if (!GetTitle().IsEmpty())
 			fs = FixPathName(GetTitle()) + ".jpg";
 		else if (!defaultFileNamePlot.IsEmpty())
 			fs = defaultFileNamePlot;
 		else
-			fs = S(t_("Scatter plot")) + ".jpg";
+			fs = F(t_("Scatter plot")) + ".jpg";
 		
 		String ext = GetFileExt(~fs);
 		fs.DefaultExt(ext);
@@ -1076,7 +1076,7 @@ bool ScatterCtrl::SaveToFile(String fileName) {
 		ScatterDraw::SetDrawing(pdf, false);
 		return SaveFile(fileName, pdf.Finish());		
 	} else {
-		Exclamation(Format(t_("File format \"%s\" not found"), GetFileExt(fileName)));
+		Exclamation(F(t_("File format \"%s\" not found"), GetFileExt(fileName)));
 		return false;
 	}
 }
@@ -1088,7 +1088,7 @@ bool ScatterCtrl::SaveToFileData(String fileName) {
 		FileSel fs;
 		
 		fs.NoExeIcons();
-		fs.Type(Format(t_("%s comma separated file"), "csv"), "*.csv");
+		fs.Type(F(t_("%s comma separated file"), "csv"), "*.csv");
 		fs.AllFilesType();
 		if (!GetTitle().IsEmpty())
 			fs = FixPathName(GetTitle()) + ".csv";
@@ -1116,7 +1116,7 @@ bool ScatterCtrl::SaveToFileData(String fileName) {
 		WaitCursor waitcursor;
 		return SaveFileBOMUtf8(fileName, GetCSV());
 	} else {
-		Exclamation(Format(t_("File format \"%s\" not found"), GetFileExt(fileName)));
+		Exclamation(F(t_("File format \"%s\" not found"), GetFileExt(fileName)));
 		return false;
 	}
 }

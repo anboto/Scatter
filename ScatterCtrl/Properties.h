@@ -179,14 +179,14 @@ public:
 	
 	class DataSourceX : public Convert {
 	public:
-		Value Format(const Value& q) const;
+		Value F(const Value& q) const;
 		ScatterDraw *pscatter;
 		int index;
 	} dataSourceX;
 	
 	class DataSourceY : public Convert {
 	public:
-		Value Format(const Value& q) const;
+		Value F(const Value& q) const;
 		ScatterDraw *pscatter;
 		int index;
 	};

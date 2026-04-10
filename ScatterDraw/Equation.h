@@ -101,7 +101,7 @@ public:
 	double f(double ) 					{return coeff[0];}
 	virtual String GetName() 			{return t_("Average");}
 	virtual String GetEquation(int _numDigits = 3) {	
-		return Format("%s", FormatCoeff(0, _numDigits));
+		return F("%s", FormatCoeff(0, _numDigits));
 	}
 	void SetDegree(int )				{NEVER();}
 	virtual void GuessCoeff(DataSource &series)	{coeff[0] = series.AvgY();}
@@ -114,7 +114,7 @@ public:
 	double f(double x) 					{return x*coeff[0];}
 	virtual String GetName() 			{return t_("Slope");}
 	virtual String GetEquation(int _numDigits = 3) {	
-		return Format("%s*x", FormatCoeff(0, _numDigits));
+		return F("%s*x", FormatCoeff(0, _numDigits));
 	}
 	void SetDegree(int )				{NEVER();}
 	virtual void GuessCoeff(DataSource &series)	{coeff[0] = series.Slope();}
@@ -129,7 +129,7 @@ public:
 	}
 	virtual String GetName() 			{return t_("Linear");}
 	virtual String GetEquation(int _numDigits = 3) {	
-		String ret = Format("%s + %s*x", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits));
+		String ret = F("%s + %s*x", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits));
 		ret.Replace("+ -", "- ");
 		return ret;
 	}
@@ -184,7 +184,7 @@ public:
 	double f(double x)				{return coeff[0] + coeff[1]*sin(coeff[2]*x + coeff[3]);}
 	virtual String GetName() 		{return t_("Sine");}
 	virtual String GetEquation(int _numDigits = 3) {
-		String ret = Format("%s + %s*sin(%s*x + %s)", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits)
+		String ret = F("%s + %s*sin(%s*x + %s)", FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits)
 													, FormatCoeff(2, _numDigits), FormatCoeff(3, _numDigits));
 		ret.Replace("+ -", "- ");
 		return ret;
@@ -218,7 +218,7 @@ public:
 	virtual String GetEquation(int _numDigits = 3) {
 		String stheta = IsNull(_numDigits) ? String("ζ") : FormatF(GetDampingRatio(), _numDigits);
 
-		String ret = Format("%s + %s*e^(-%s*(x + %s))*cos(%s*(x + %s)) (ζ: %s)", FormatCoeff(0, _numDigits), 
+		String ret = F("%s + %s*e^(-%s*(x + %s))*cos(%s*(x + %s)) (ζ: %s)", FormatCoeff(0, _numDigits), 
 			FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), FormatCoeff(4, _numDigits), FormatCoeff(3, _numDigits), 
 			FormatCoeff(4, _numDigits),
 			stheta);
@@ -266,7 +266,7 @@ public:
 	}
 	virtual String GetName() 		{return t_("Sin_DampedSinusoidal");}
 	virtual String GetEquation(int _numDigits = 3) {
-		String ret = Format("%s + %s*cos(%s*x + %s) + %s*e^(-%s*x)*cos(%s*x + %s)", 
+		String ret = F("%s + %s*cos(%s*x + %s) + %s*e^(-%s*x)*cos(%s*x + %s)", 
 			FormatCoeff(0, _numDigits), FormatCoeff(1, _numDigits), FormatCoeff(2, _numDigits), 
 			FormatCoeff(3, _numDigits), FormatCoeff(4, _numDigits), FormatCoeff(5, _numDigits),
 			FormatCoeff(6, _numDigits), FormatCoeff(7, _numDigits));
@@ -338,7 +338,7 @@ public:
 	double f(double x) 							{return coeff[0]*exp(-x) + coeff[1];}
 	virtual String GetName() 					{return t_("Exponential");}
 	virtual String GetEquation(int nDig = 3) {
-		String ret = Format("%s*e^-x + %s", FormatCoeff(0, nDig), FormatCoeff(1, nDig));
+		String ret = F("%s*e^-x + %s", FormatCoeff(0, nDig), FormatCoeff(1, nDig));
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -353,7 +353,7 @@ public:
 	double f(double x) 							{return coeff[0]*exp(-(x-coeff[3])*coeff[2]) + coeff[1];}
 	virtual String GetName() 					{return t_("Exponential2");}
 	virtual String GetEquation(int nDig = 3) {
-		String ret = Format("%s*e^-%s*(x-%s) + %s", FormatCoeff(0, nDig), FormatCoeff(3, nDig), FormatCoeff(2, nDig), FormatCoeff(1, nDig));
+		String ret = F("%s*e^-%s*(x-%s) + %s", FormatCoeff(0, nDig), FormatCoeff(3, nDig), FormatCoeff(2, nDig), FormatCoeff(1, nDig));
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -387,7 +387,7 @@ public:
 	}
 	virtual String GetName() 					{return t_("RealExponent");}
 	virtual String GetEquation(int nDig = 3) {
-		String ret = Format("%s*x^%s", FormatCoeff(0, nDig), FormatCoeff(1, nDig));
+		String ret = F("%s*x^%s", FormatCoeff(0, nDig), FormatCoeff(1, nDig));
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -418,7 +418,7 @@ public:
 		String k =  FormatCoeff(0, nDig);
 		String lambda = FormatCoeff(1, nDig);
 		String factor = FormatCoeff(2, nDig);
-		String ret = Format("%s*(1 - e^(-((x/%s)^%s)))", factor, lambda, k);
+		String ret = F("%s*(1 - e^(-((x/%s)^%s)))", factor, lambda, k);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -462,7 +462,7 @@ public:
 		String k =  FormatCoeff(0, nDig);
 		String lambda = FormatCoeff(1, nDig);
 		String sfactor = FormatCoeff(2, nDig);
-		String ret = Format("%s*(%s/%s)*(x/%s)^(%s-1)*e^(-((x/%s)^%s))", sfactor, k, lambda, lambda, k, lambda, k);
+		String ret = F("%s*(%s/%s)*(x/%s)^(%s-1)*e^(-((x/%s)^%s))", sfactor, k, lambda, lambda, k, lambda, k);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -505,7 +505,7 @@ public:
 		String lambda = FormatCoeff(1, nDig);
 		String factor = FormatCoeff(2, nDig);
 		String x0 = FormatCoeff(3, nDig);
-		String ret = Format("%s*(1 - e^(-(((x-%s)/%s)^%s)))", factor, x0, lambda, k);
+		String ret = F("%s*(1 - e^(-(((x-%s)/%s)^%s)))", factor, x0, lambda, k);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -553,7 +553,7 @@ public:
 		String lambda = FormatCoeff(1, nDig);
 		String sfactor = FormatCoeff(2, nDig);
 		String x0 = FormatCoeff(3, nDig);
-		String ret = Format("%s*(%s/%s)*(((x-%s)/%s)^(%s-1))*e^(-(((x-%s)/%s)^%s))", sfactor, k, lambda, x0, lambda, k, x0, lambda, k);
+		String ret = F("%s*(%s/%s)*(((x-%s)/%s)^(%s-1))*e^(-(((x-%s)/%s)^%s))", sfactor, k, lambda, x0, lambda, k, x0, lambda, k);
 		ret.Replace("+-", "-");
 		ret.Replace("--", "+");
 		return ret;
@@ -595,7 +595,7 @@ public:
 		String mu =  FormatCoeff(0, nDig);
 		String beta = FormatCoeff(1, nDig);
 		String factor = FormatCoeff(2, nDig);
-		String ret = Format("%s*e^-(e^-((x-%s)/%s))", factor, mu, beta);
+		String ret = F("%s*e^-(e^-((x-%s)/%s))", factor, mu, beta);
 		ret.Replace("+-", "-");
 		ret.Replace("--", "+");
 		return ret;
@@ -633,7 +633,7 @@ public:
 		String mu =  FormatCoeff(0, nDig);
 		String beta = FormatCoeff(1, nDig);
 		String sfactor = FormatCoeff(2, nDig);
-		String ret = Format("%s*(1/%s)*e^-((x-%s)/%s + e^-(x-%s)/%s)", sfactor, beta, mu, beta, mu, beta);
+		String ret = F("%s*(1/%s)*e^-((x-%s)/%s + e^-(x-%s)/%s)", sfactor, beta, mu, beta, mu, beta);
 		ret.Replace("+-", "-");
 		ret.Replace("--", "+");
 		return ret;
@@ -671,7 +671,7 @@ public:
 		String c = FormatCoeff(0, nDig);
 		String mean = FormatCoeff(1, nDig);
 		String std = FormatCoeff(2, nDig);
-		String ret = Format("(%s/(%s*sqrt(2*π)))*e^(-(1/2)*((x-%s)/%s)^2)", c, std, mean, std);
+		String ret = F("(%s/(%s*sqrt(2*π)))*e^(-(1/2)*((x-%s)/%s)^2)", c, std, mean, std);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}	
@@ -696,7 +696,7 @@ public:
 	}
 	virtual String GetName() 			{return t_("Rational_1");}
 	virtual String GetEquation(int nDig = 3) {
-		String ret = Format("%s/(x + %s) + %s", FormatCoeff(0, nDig), FormatCoeff(1, nDig), FormatCoeff(2, nDig));
+		String ret = F("%s/(x + %s) + %s", FormatCoeff(0, nDig), FormatCoeff(1, nDig), FormatCoeff(2, nDig));
 		ret.Replace("+ -", "- ");
 		return ret;
 	}			
@@ -715,7 +715,7 @@ public:
 	}
 	virtual String GetName() 	{return t_("Asymptotic Power");}
 	virtual String GetEquation(int numDigits = 3) {
-		return Format("%s + %s*^x^%s", FormatCoeff(0, numDigits), FormatCoeff(1, numDigits), FormatCoeff(2, numDigits));
+		return F("%s + %s*^x^%s", FormatCoeff(0, numDigits), FormatCoeff(1, numDigits), FormatCoeff(2, numDigits));
 	}
 	virtual void GuessCoeff(DataSource &series) {
 		GuessCoeff(series, 2);
@@ -756,9 +756,9 @@ public:
 	virtual String GetFullName(){return t_("Asymptotic") + String(" n = ") + FormatInt(numcoeff);}
 	virtual String GetEquation(int numDigits = 3) {
 		String ret = FormatCoeff(0, numDigits);
-		ret += Format(" + %s/x", FormatCoeff(1, numDigits));
+		ret += F(" + %s/x", FormatCoeff(1, numDigits));
 		for (int i = 2; i < numcoeff; ++i)
-			ret += Format(" + %s/x^%d", FormatCoeff(i, numDigits), i);
+			ret += F(" + %s/x^%d", FormatCoeff(i, numDigits), i);
 		ret.Replace("+ -", "- ");
 		return ret;
 	}
@@ -1045,7 +1045,7 @@ public:
 		if (id >= 0)
 			return variables[id];
 		if (errorIfUndefined)
-			EvalThrowError(p, Format(t_("Unknown identifier '%s'"), name));
+			EvalThrowError(p, F(t_("Unknown identifier '%s'"), name));
 		return variables.Add(name, Null);
 	}
 	doubleUnit &GetVariable(int id)							{return variables[id];}

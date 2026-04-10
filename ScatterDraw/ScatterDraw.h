@@ -1307,8 +1307,8 @@ protected:
 	void Scrolling(bool down, Point &pt, bool isOut = false);
 	
 	static void ExpFormat(String& s, int , double d)	{s = FormatE(d, 1);}
-	static void MonFormat(String& s, int , double d)	{s = Format("%Mon", int(d));}
-	static void DyFormat(String& s, int , double d)		{s = Format("%Dy", int(d));}
+	static void MonFormat(String& s, int , double d)	{s = F("%Mon", int(d));}
+	static void DyFormat(String& s, int , double d)		{s = F("%Dy", int(d));}
 
 	Vector<Pointf> DataAddPoints(DataSource& data, bool primaryY, bool sequential);
 	template<class T>

@@ -137,7 +137,7 @@ public:
 
 	void Init();
 	void MyFormat(String& s, int , double d) {
-		s = Format("%Mon", fround(d)); 
+		s = F("%Mon", fround(d)); 
 		if (!s.IsEmpty())
 			s << "\n2011";
 	}
@@ -305,10 +305,10 @@ public:
 				  << Pointf(posx - sizex/2., posy + sizex/2.)
 				  << Pointf(posx - sizex/2., posy - sizex/2.); 
 				DrawPolylineOpa(w, s, 1, 1, 2, Green(), "", Null);
-				DrawText(w, posx + sizex/2., posy, 0, Format("Pos %.2f, %.2f fixed font", p.x, p.y), Arial(15), Black());
+				DrawText(w, posx + sizex/2., posy, 0, F("Pos %.2f, %.2f fixed font", p.x, p.y), Arial(15), Black());
 				double sizeT = scatter.GetSizeY(0.05);
 				Font font = Arial((int)sizeT);
-				DrawText(w, posx + sizex/2., posy + 15, 0, Format("Pos %.2f, %.2f scaled font", p.x, p.y), font, Black());
+				DrawText(w, posx + sizex/2., posy + 15, 0, F("Pos %.2f, %.2f scaled font", p.x, p.y), font, Black());
 			}
 		}
 	}

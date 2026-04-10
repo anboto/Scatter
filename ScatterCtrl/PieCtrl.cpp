@@ -86,8 +86,8 @@ void PieCtrl::SaveToFile(String fileName)
 			name = t_("Pie plot");
 		fileToSave.PreSelect(ForceExt(name, ".jpg"));
 		fileToSave.ClearTypes();
-		fileToSave.Type(Format(t_("%s file"), "JPEG"), "*.jpg");
-		fileToSave.Type(Format(t_("%s file"), "PNG"), "*.png");
+		fileToSave.Type(F(t_("%s file"), "JPEG"), "*.jpg");
+		fileToSave.Type(F(t_("%s file"), "PNG"), "*.png");
 		fileToSave.type.WhenAction = [=] {OnFileToSave();};
 	    if(!fileToSave.ExecuteSaveAs(t_("Saving plot to PNG or JPEG file"))) {
 	        Exclamation(t_("Plot has not been saved"));
@@ -102,7 +102,7 @@ void PieCtrl::SaveToFile(String fileName)
 		JPGEncoder encoder(90);
 		encoder.SaveFile(fileName, GetImage(copyRatio));		
 	} else
-		Exclamation(Format(t_("File format \"%s\" not found"), GetFileExt(fileName)));
+		Exclamation(F(t_("File format \"%s\" not found"), GetFileExt(fileName)));
 }
 
 }

@@ -62,7 +62,7 @@ void Tab19_Surf::Init()
 	numbersWhere << Pointf(4.7, 8) << Pointf(1, 14);
 	numbersPos = Intersection(numbersWhere, isolines);
 	for (int i = 0; i < vals.GetCount(); ++i)
-		labels << Format("%.0f kg", vals[i]);
+		labels << F("%.0f kg", vals[i]);
 		
 	for (double x = -10; x <= 10; x += 1)
 		xAxisFun << x;

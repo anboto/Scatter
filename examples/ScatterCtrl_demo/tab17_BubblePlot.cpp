@@ -16,7 +16,7 @@ void TabBubblePlot::Init()
 		double y = (10 + 10*Random(30)*size);
 		double diameter = Random(80);
 		data << x << y << diameter;
-		labels << Format("%.0f cm", diameter); 		
+		labels << F("%.0f cm", diameter); 		
 	}
 	idsBubble << 2;
 	static Vector<int> idVoid;

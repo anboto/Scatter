@@ -166,9 +166,9 @@ String PolynomialEquation::GetEquation(int numDigits) {
 	String ret = FormatCoeff(0, numDigits);
 	if (coeff.GetCount() == 1)
 		return ret;
-	ret += Format(" + %s*x", FormatCoeff(1, numDigits));
+	ret += F(" + %s*x", FormatCoeff(1, numDigits));
 	for (int i = 2; i < coeff.GetCount(); ++i) 
-		ret += Format(" + %s*x^%s", FormatCoeff(i, numDigits), FormatInt(i));
+		ret += F(" + %s*x^%s", FormatCoeff(i, numDigits), FormatInt(i));
 	ret.Replace("+ -", "- ");
 	return ret;
 }
@@ -186,14 +186,14 @@ String PolynomialQuotient::GetEquation(int numDigits) {
 	if (coeff.IsEmpty())
 		return String();
 	String ret = FormatCoeff(0, numDigits);
-	ret += Format(" + %s*x", FormatCoeff(1, numDigits));
+	ret += F(" + %s*x", FormatCoeff(1, numDigits));
 	for (int i = 2; i < nnum; ++i) 
-		ret += Format(" + %s*x^%s", FormatCoeff(i, numDigits), FormatInt(i));
+		ret += F(" + %s*x^%s", FormatCoeff(i, numDigits), FormatInt(i));
 	ret << "/(";
 	ret << FormatCoeff(nnum, numDigits);
-	ret += Format(" + %s*x", FormatCoeff(nnum+1, numDigits));
+	ret += F(" + %s*x", FormatCoeff(nnum+1, numDigits));
 	for (int i = 2; i < nden; ++i) 
-		ret += Format(" + %s*x^%s", FormatCoeff(nnum+i, numDigits), FormatInt(i));
+		ret += F(" + %s*x^%s", FormatCoeff(nnum+i, numDigits), FormatInt(i));
 	ret << ")";
 	ret.Replace("+ -", "- ");
 	return ret;
@@ -216,9 +216,9 @@ String FourierEquation::GetEquation(int numDigits) {
 	
 	for (int i = 2; i < coeff.GetCount(); i += 2) {
 		int n = 1 + (i - 2)/2;
-		String nwx = Format("%d*%s*x", n, FormatCoeff(1, numDigits));
-		ret += Format(" + %s*cos(%s)", FormatCoeff(i, numDigits), nwx);
-		ret += Format(" + %s*sin(%s)", FormatCoeff(i + 1, numDigits), nwx);
+		String nwx = F("%d*%s*x", n, FormatCoeff(1, numDigits));
+		ret += F(" + %s*cos(%s)", FormatCoeff(i, numDigits), nwx);
+		ret += F(" + %s*sin(%s)", FormatCoeff(i + 1, numDigits), nwx);
 	}
 	ret.Replace("+ -", "- ");
 	return ret;
@@ -229,7 +229,7 @@ static inline double RadToDeg(double rad) {return rad*180./M_PI;}
 
 void EvalExpr::EvalThrowError(CParserPP &p, const char *s) {
 	CParserPP::Pos pos = p.GetPos();
-	CParserPP::Error err(Format("(%d): ", pos.GetColumn()) + String(s));
+	CParserPP::Error err(F("(%d): ", pos.GetColumn()) + String(s));
 	throw err;
 }
 
@@ -396,7 +396,7 @@ doubleUnit EvalExpr::Term(CParserPP& pp) {
 			pp.PassChar(')');
 			doubleUnit ret(function(x));
 			if (IsNull(ret))
-				EvalThrowError(pp, Format(t_("Error in %s(%f)"), strId, x.val));	
+				EvalThrowError(pp, F(t_("Error in %s(%f)"), strId, x.val));	
 			if (isneg)
 				ret.Neg();
 			return ret;
@@ -413,10 +413,10 @@ doubleUnit EvalExpr::Term(CParserPP& pp) {
 				ret = variables[id];
 			else {
 				if (errorIfUndefined) {
-					lastError = Format(t_("Unknown identifier '%s'"), strId);
+					lastError = F(t_("Unknown identifier '%s'"), strId);
 					return Null;
 				}
-					//EvalThrowError(pp, Format(t_("Unknown identifier '%s'"), strId));	
+					//EvalThrowError(pp, F(t_("Unknown identifier '%s'"), strId));	
 				lastVariableSetId = variables.FindAdd(strIdSearch, 0);
 				ret = variables[lastVariableSetId];
 			}
@@ -681,13 +681,13 @@ String EvalExpr::EvalStr(String line, int numDigits) {
 		} else
 			return ExpStr(pp, numDigits);
 	} catch(CParserPP::Error e) {
-		lastError = Format(t_("Error evaluating '%s': %s"), line, e);
+		lastError = F(t_("Error evaluating '%s': %s"), line, e);
 		return Null;
 	} catch(Exc e) {
-		lastError = Format(t_("Error: %s"), e);
+		lastError = F(t_("Error: %s"), e);
 		return Null;
 	} catch(String e) {
-		lastError = Format(t_("Error: %s"), e);
+		lastError = F(t_("Error: %s"), e);
 		return Null;
 	} catch(...) {
 		lastError = t_("Unknown error");
