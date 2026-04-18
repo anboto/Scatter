@@ -192,6 +192,7 @@ public:
 	Vector<double> SortDataY() 				{return SortData(&DataSource::y);}
 	Vector<double> PercentileY(double rate) {return Percentile(&DataSource::y, rate);}
 	double PercentileValY(double rate, double mn = Null, double mx = Null)  {return PercentileVal(&DataSource::y, rate, mn, mx);}
+	double PercentileValRangeY(double rateFrom, double rateTo, double mn = Null, double mx = Null)  {return PercentileValRange(&DataSource::y, rateFrom, rateTo, mn, mx);}
 	double PercentileValX(double rate, double mn = Null, double mx = Null)  {return PercentileVal(&DataSource::x, rate, mn, mx);}
 	double PercentileWeibullValY(double rate, double mn = Null, double mx = Null)  {return PercentileWeibullVal(true, rate, mn, mx);}
 	double PercentileWeibullValX(double rate, double mn = Null, double mx = Null)  {return PercentileWeibullVal(false, rate, mn, mx);}
@@ -238,6 +239,7 @@ public:
 	Vector<double> SortData(Getdatafun getdata);
 	Vector<double> Percentile(Getdatafun getdata, double rate);
 	double PercentileVal(Getdatafun getdata, double rate, double mn = Null, double mx = Null);
+	double PercentileValRange(Getdatafun getdata, double rateFrom, double rateTo, double mn = Null, double mx = Null);
 	double PercentileWeibullVal(bool isY, double rate, double mn = Null, double mx = Null);
 	Vector<Pointf> Derivative(Getdatafun getdataY, Getdatafun getdataX, int orderDer, int orderAcc);
 	Vector<Pointf> SavitzkyGolay(Getdatafun getdataY, Getdatafun getdataX, int deg, int size, int der);

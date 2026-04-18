@@ -678,7 +678,7 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 	
 	Vector<double> raw, data;
 	
-	if (IsNum(mn)) {
+	if (IsNum(mn) && IsNum(mx)) {
 		Copy(getdata, raw);
 		for (int i = 0; i < raw.size(); ++i)
 			if (Between(raw[i], mn, mx))
@@ -689,7 +689,30 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 	Sort(data);
 	
 	int num = int(data.size()*rate);
-	return LinearInterpolate<double>(data.size()*rate, num, num+1, data[num-1], data[num]);
+	return LinearInterpolate<double>(data.size()*rate, num, num+1, data[num], data[num+1]);
+}
+
+double DataSource::PercentileValRange(Getdatafun getdata, double rateFrom, double rateTo, double mn, double mx) {
+	ASSERT(rateFrom >= 0 && rateFrom <= 1);
+	ASSERT(rateTo >= 0 && rateTo <= 1);
+	
+	Vector<double> raw, data;
+	
+	if (IsNum(mn) && IsNum(mx)) {
+		Copy(getdata, raw);
+		for (int i = 0; i < raw.size(); ++i)
+			if (Between(raw[i], mn, mx))
+				data << raw[i];
+	} else
+		Copy(getdata, data);
+	
+	Sort(data);
+	
+	int numFrom = int(data.size()*rateFrom);
+	double valFrom = LinearInterpolate<double>(data.size()*rateFrom, numFrom, numFrom+1, data[numFrom], data[numFrom+1]);
+	int numTo = int(data.size()*rateTo);
+	double valTo = LinearInterpolate<double>(data.size()*rateTo, numTo, numTo+1, data[numTo], data[numTo+1]);
+	return valTo - valFrom;
 }
 
 double DataSource::PercentileWeibullVal(bool isY, double rate, double mn, double mx) {

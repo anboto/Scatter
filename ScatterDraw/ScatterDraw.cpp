@@ -328,11 +328,11 @@ ScatterDraw &ScatterDraw::SetXYMax(double x, double y, double y2) {
 	y2= FixLog10(y2,logY);
 	
 	if (IsNum(x)) 
-		xRange = x - xMin;
+		xRange = max(x - xMin, 0.);
 	if (IsNum(y)) 
-		yRange = y - yMin;
+		yRange = max(y - yMin, 0.);
 	if (IsNum(y2)) 
-		yRange2 = y2 - yMin2;
+		yRange2 = max(y2 - yMin2, 0.);
 
 	WhenSetXYMin();
 	return *this;
@@ -408,9 +408,9 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 						xRange = 2;
 						xMin = -1;
 					} else	
-						xRange = 2*maxx;
+						xRange = max(2*maxx, 0.);
 				} else	
-					xRange = maxx - minx;
+					xRange = max(maxx - minx, 0.);
 				double deltaX = xMin - minx;
 				xMin -= deltaX;
 				
@@ -423,7 +423,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				if (maxy == miny) 
 					yRange = maxy > 0 ? 2*maxy : 1;
 				else	
-					yRange = maxy - miny;
+					yRange = max(maxy - miny, 0.);
 				double deltaY = yMin - miny;
 				yMin -= deltaY;
 				
@@ -434,7 +434,7 @@ ScatterDraw &ScatterDraw::ZoomToFitNonLinked(bool horizontal, bool vertical, dou
 				if (maxy2 == miny2) 
 					yRange2 = maxy2 > 0 ? 2*maxy2 : 1;
 				else	
-					yRange2 = maxy2 - miny2;
+					yRange2 = max(maxy2 - miny2, 0.);
 				double deltaY2 = yMin2 - miny2;
 				yMin2 -= deltaY2;
 				
@@ -1370,6 +1370,7 @@ void ScatterDraw::Zoom(double scale, bool mouseX, bool mouseY) {
 }
 
 void ScatterDraw::ZoomNonLinked(double scale, bool mouseX, bool mouseY) {
+	ASSERT(scale >= 0);
 	if (scale == 1)
 		return;
 	lastRefresh_sign = (scale >= 0) ? 1 : -1;
