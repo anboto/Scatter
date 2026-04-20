@@ -689,7 +689,7 @@ double DataSource::PercentileVal(Getdatafun getdata, double rate, double mn, dou
 	Sort(data);
 	
 	int num = int(data.size()*rate);
-	return LinearInterpolate<double>(data.size()*rate, num, num+1, data[num], data[num+1]);
+	return LinearInterpolate<double>(data.size()*rate, num, num+1, data[num], data[min(num+1, data.size()-1)]);
 }
 
 double DataSource::PercentileValRange(Getdatafun getdata, double rateFrom, double rateTo, double mn, double mx) {
