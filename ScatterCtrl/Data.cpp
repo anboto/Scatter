@@ -68,7 +68,7 @@ void DataDlg::Init(ScatterCtrl& scatter) {
 	}
 }
 
-Value DataDlg::DataSourceX::F(const Value& q) const {
+Value DataDlg::DataSourceX::Format(const Value& q) const {
 	if (pscatter->IsDeletedDataSource(index))
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
@@ -79,7 +79,7 @@ Value DataDlg::DataSourceX::F(const Value& q) const {
 	return ret;
 }
 
-Value DataDlg::DataSourceY::F(const Value& q) const {
+Value DataDlg::DataSourceY::Format(const Value& q) const {
 	if (pscatter->IsDeletedDataSource(index))
 		return Null;
 	if (int(q) >= pscatter->GetDataSource(index).GetCount())
