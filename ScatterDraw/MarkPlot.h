@@ -46,7 +46,7 @@ public:
 
 	static int GetTypeCount(int iM)                  {return typeNumber()[iM];}
 	static String TypeString(int iM, int iT)		 {return typeString()[iM][iT];}
-	virtual int GetTypeCount()						 {return 0;}
+	static int GetTypeCount()						 {return 0;}
 	virtual const char **TypeString()				 {return NULL;}
 	
 	void SetTypeType(int _type) 					 {this->type = _type;}
@@ -295,7 +295,7 @@ public:
 		type = rangeType;
 		multiPlot = true;
 	}
-	virtual int GetTypeCount() const 			{return 3;}
+	static int GetTypeCount() {return 3;}
 	virtual const char **TypeString() override {
 		static const char *names[] = {"ALL", "MIN_MAX", "MIN_AVG_MAX"};
 		return names;

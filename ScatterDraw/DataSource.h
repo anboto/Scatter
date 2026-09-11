@@ -1668,13 +1668,13 @@ bool IsNum(const T* r, int sz) {
 template <class Range1, class Range2>
 void CleanNAN(const Range1 &x, Range2 &retx) {
 	int num = int(x.size());
-	Resize(retx, num);
+	Resize(retx, (size_t)num);
 	int n = 0;
 	for (int i = 0; i < num; ++i) {		
 		if (IsNum(x[i])) 
 			retx[n++] = x[i];
 	}
-	ResizeConservative(retx, n);
+	ResizeConservative(retx, (size_t)n);
 }
 
 template <class Range>	// Safely can rewrite the results
